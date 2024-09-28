@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn = "navigation_view">
+
+    <group android:checkableBehavior="single">
+
+    <item
+        android:id="@+id/navHome"
+        android:title="Home"
+        android:icon="@drawable/white_home_icon"
+        android:checked="true"/>
+
+    <item
+        android:id="@+id/navNews"
+        android:title="News"
+        android:icon="@drawable/white_newspaper_icon" />
+
+    <item
+        android:id="@+id/navDocumentRequest"
+        android:title="Document Request"
+        android:icon="@drawable/white_document_icon" />
+
+    <item
+        android:id="@+id/navHotlineNumbers"
+        android:title="Hotline Numbers"
+        android:icon="@drawable/white_call_icon" />
+
+    <item
+        android:id="@+id/navAboutBarangay"
+        android:title="About Barangay"
+        android:icon="@drawable/white_city_hall_icon" />
+
+    <item
+        android:id="@+id/navBarangayLeaders"
+        android:title="Barangay Leaders"
+        android:icon="@drawable/white_people_icon" />
+
+    </group>
+
+
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/navLogOut"
+            android:icon="@drawable/white_logout_icon"
+            android:title="Log out">
+        </item>
+
+    </group>
+
+</menu>

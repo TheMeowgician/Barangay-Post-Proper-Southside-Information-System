@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>]
+
+    <style name="roundedImageView">
+
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+
+    </style>
+
+    <style name="MenuItemsAttributes" >
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">18dp</item>
+    </style>
+
+    <style name="SelectableItemBackground">
+        <item name="android:colorControlHighlight">#7C33B0</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+
+
+</resources>

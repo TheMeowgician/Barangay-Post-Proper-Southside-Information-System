@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none">
+
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegistrationActivity"
+    android:padding="28dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/backImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@null"
+        android:onClick="back"
+        android:src="@drawable/baseline_arrow_back_24_black" />
+
+    <LinearLayout
+        android:id="@+id/headingAndSubHeadingLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/backImageButton"
+        android:layout_marginBottom="30dp">
+
+        <TextView
+            android:id="@+id/headingTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Join your barangay \ncommunity today!"
+            android:fontFamily="@font/poppins_bold"
+            android:textSize="22dp"
+            android:textColor="@color/black"
+            android:textAlignment="viewStart"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Be part of the community"
+            android:fontFamily="@font/poppins"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/firstLastNameTextInputEditTextsLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/headingAndSubHeadingLinearLayout"
+        android:layout_marginBottom="20dp">
+
+        <LinearLayout
+            android:id="@+id/firstNameEditTextLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_marginRight="30dp">
+
+            <TextView
+                android:id="@+id/firstNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="First Name"
+                android:textSize="18dp"
+                android:fontFamily="@font/poppins_light"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/firstNameTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="First Name"
+                app:boxCornerRadiusTopStart="13dp"
+                app:boxCornerRadiusTopEnd="13dp"
+                app:boxCornerRadiusBottomStart="13dp"
+                app:boxCornerRadiusBottomEnd="13dp"
+                app:endIconMode="clear_text"
+                app:boxStrokeColor="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/firstNameTextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textSize="14dp"
+                    android:fontFamily="@font/poppins"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lastNameEditTextLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/lastNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_light"
+                android:text="Last Name"
+                android:textSize="18dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/lastNameTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="last Name"
+                app:boxCornerRadiusTopStart="13dp"
+                app:boxCornerRadiusTopEnd="13dp"
+                app:boxCornerRadiusBottomStart="13dp"
+                app:boxCornerRadiusBottomEnd="13dp"
+                app:endIconMode="clear_text"
+                app:boxStrokeColor="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/lastNameTextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textSize="14dp"
+                    android:fontFamily="@font/poppins"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/usernameTextInputEditTextLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/firstLastNameTextInputEditTextsLinearLayout"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/usernameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Username"
+            android:textSize="18dp"
+            android:fontFamily="@font/poppins_light"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/usernameTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:boxCornerRadiusTopStart="13dp"
+            app:boxCornerRadiusTopEnd="13dp"
+            app:boxCornerRadiusBottomStart="13dp"
+            app:boxCornerRadiusBottomEnd="13dp"
+            app:endIconMode="clear_text"
+            app:boxStrokeColor="@color/black">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/usernameTextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter username"
+                android:inputType="text"
+                android:textSize="14dp"
+                android:fontFamily="@font/poppins"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/birthDateTextInputEditTextLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/usernameTextInputEditTextLinearLayout"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/dateOfBirthTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date of Birth"
+            android:textSize="18dp"
+            android:fontFamily="@font/poppins_light"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/birthDateTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:boxCornerRadiusBottomEnd="13dp"
+            app:boxCornerRadiusBottomStart="13dp"
+            app:boxCornerRadiusTopEnd="13dp"
+            app:boxCornerRadiusTopStart="13dp"
+            app:boxStrokeColor="@color/black"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/baseline_calendar_today_24"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/birthDateTextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:hint="DD/MM/YYYY"
+                android:inputType="date"
+                android:onClick="openDialog"
+                android:clickable="true"
+                android:textSize="14dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/passwordTextInputEditTextLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/birthDateTextInputEditTextLinearLayout"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/passwordTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Password"
+            android:textSize="18dp"
+            android:fontFamily="@font/poppins_light"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:boxCornerRadiusTopStart="13dp"
+            app:boxCornerRadiusTopEnd="13dp"
+            app:boxCornerRadiusBottomStart="13dp"
+            app:boxCornerRadiusBottomEnd="13dp"
+            app:endIconMode="password_toggle"
+            app:boxStrokeColor="@color/black">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordTextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter password"
+                android:inputType="textPassword"
+                android:textSize="14dp"
+                android:fontFamily="@font/poppins"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/confirmPasswordTextInputEditTextLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/passwordTextInputEditTextLinearLayout"
+        android:layout_marginBottom="50dp">
+
+        <TextView
+            android:id="@+id/confirmPasswordTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confirm Password"
+            android:textSize="18dp"
+            android:fontFamily="@font/poppins_light"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/confirmPasswordTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:boxCornerRadiusTopStart="13dp"
+            app:boxCornerRadiusTopEnd="13dp"
+            app:boxCornerRadiusBottomStart="13dp"
+            app:boxCornerRadiusBottomEnd="13dp"
+            app:endIconMode="password_toggle"
+            app:boxStrokeColor="@color/black">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/confirmPasswordTextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Confirm Password"
+                android:inputType="textPassword"
+                android:textSize="14dp"
+                android:fontFamily="@font/poppins"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/registerButtonLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/confirmPasswordTextInputEditTextLinearLayout"
+        android:layout_marginBottom="20dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:textAllCaps="false"
+            android:fontFamily="@font/poppins_medium"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:background="@drawable/custom_button_register"
+            android:layout_marginBottom="10dp"/>
+
+    </LinearLayout>
+
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>
+</ScrollView>
