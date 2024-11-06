@@ -8,11 +8,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -20,6 +22,7 @@ public class HomeActivity extends AppCompatActivity {
     ImageButton menuImageButton, closeMenuImageButton;
     DrawerLayout homeDrawerLayout;
     NavigationView navigationView;
+    ShapeableImageView profileMiniIconCircleImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +40,19 @@ public class HomeActivity extends AppCompatActivity {
         homeDrawerLayout.openDrawer(GravityCompat.START);
     }
 
+    public void openProfileActivity(View view) {
+        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
     private void initializeComponents() {
 
         menuImageButton = findViewById(R.id.menuImageButton);
         homeDrawerLayout = findViewById(R.id.homeDrawerLayout);
         navigationView = findViewById(R.id.navigationView);
         closeMenuImageButton = findViewById(R.id.closeMenuImageButton);
+
+        profileMiniIconCircleImageView = findViewById(R.id.profileMiniIconCircleImageView);
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override

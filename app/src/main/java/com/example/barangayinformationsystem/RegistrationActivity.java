@@ -23,6 +23,10 @@ public class RegistrationActivity extends AppCompatActivity {
     TextInputEditText usernameTextInputEditText;
     TextInputEditText passwordTextInputEditText;
     TextInputEditText confirmPasswordTextInputEditText;
+    TextInputEditText ageTextInputEditText;
+    TextInputEditText houseNumberTextInputEditText;
+    TextInputEditText zoneTextInputEditText;
+    TextInputEditText streetTextInputEditText;
 
     TextInputLayout birthdateTextInputLayout;
     TextInputLayout firstNameTextInputLayout;
@@ -30,6 +34,11 @@ public class RegistrationActivity extends AppCompatActivity {
     TextInputLayout usernameTextInputLayout;
     TextInputLayout passwordTextInputLayout;
     TextInputLayout confirmPasswordTextInputLayout;
+    TextInputLayout ageTextInputLayout;
+    TextInputLayout houseNumberTextInputLayout;
+    TextInputLayout zoneTextInputLayout;
+    TextInputLayout streetTextInputLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +72,10 @@ public class RegistrationActivity extends AppCompatActivity {
         usernameTextInputEditText = findViewById(R.id.usernameTextInputEditText);
         passwordTextInputEditText = findViewById(R.id.passwordTextInputEditText);
         confirmPasswordTextInputEditText = findViewById(R.id.confirmPasswordTextInputEditText);
+        ageTextInputEditText = findViewById(R.id.ageTextInputEditText);
+        houseNumberTextInputEditText = findViewById(R.id.houseNumberTextInputEditText);
+        zoneTextInputEditText = findViewById(R.id.zoneTextInputEditText);
+        streetTextInputEditText = findViewById(R.id.streetTextInputEditText);
 
         birthdateTextInputLayout = findViewById(R.id.birthDateTextInputLayout);
         firstNameTextInputLayout = findViewById(R.id.firstNameTextInputLayout);
@@ -70,6 +83,10 @@ public class RegistrationActivity extends AppCompatActivity {
         usernameTextInputLayout = findViewById(R.id.usernameTextInputLayout);
         passwordTextInputLayout = findViewById(R.id.passwordTextInputLayout);
         confirmPasswordTextInputLayout = findViewById(R.id.confirmPasswordTextInputLayout);
+        ageTextInputLayout = findViewById(R.id.ageTextInputLayout);
+        houseNumberTextInputLayout = findViewById(R.id.houseNumberTextInputLayout);
+        zoneTextInputLayout = findViewById(R.id.zoneTextInputLayout);
+        streetTextInputLayout = findViewById(R.id.streetTextInputLayout);
 
         removeTextInputLayoutAnimation();
 
@@ -94,6 +111,18 @@ public class RegistrationActivity extends AppCompatActivity {
 
         confirmPasswordTextInputLayout.setHintAnimationEnabled(false);
         confirmPasswordTextInputLayout.setHintEnabled(false);
+
+        ageTextInputLayout.setHintAnimationEnabled(false);
+        ageTextInputLayout.setHintEnabled(false);
+
+        houseNumberTextInputLayout.setHintAnimationEnabled(false);
+        houseNumberTextInputLayout.setHintEnabled(false);
+
+        zoneTextInputLayout.setHintAnimationEnabled(false);
+        zoneTextInputLayout.setHintEnabled(false);
+
+        streetTextInputLayout.setHintAnimationEnabled(false);
+        streetTextInputLayout.setHintEnabled(false);
 
     }
 

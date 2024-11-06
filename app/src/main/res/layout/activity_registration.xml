@@ -12,7 +12,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RegistrationActivity"
-    android:padding="28dp">
+    android:padding="28dp"
+    android:background="#F0F0FA">
 
 
     <LinearLayout
@@ -44,7 +45,7 @@
             android:text="Join your barangay \ncommunity today!"
             android:fontFamily="@font/poppins_bold"
             android:textSize="22dp"
-            android:textColor="@color/black"
+            android:textColor="#3F0070"
             android:textAlignment="viewStart"/>
 
         <TextView
@@ -184,12 +185,304 @@
 
     </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/ageTextInputEditTextLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/firstLastNameTextInputEditTextsLinearLayout"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/ageTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Age"
+                android:textSize="18dp"
+                android:fontFamily="@font/poppins_light"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ageTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:boxCornerRadiusTopStart="13dp"
+                app:boxCornerRadiusTopEnd="13dp"
+                app:boxCornerRadiusBottomStart="13dp"
+                app:boxCornerRadiusBottomEnd="13dp"
+                app:endIconMode="clear_text"
+                app:boxStrokeColor="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/ageTextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter age"
+                    android:inputType="text"
+                    android:textSize="14dp"
+                    android:fontFamily="@font/poppins"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/genderLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/firstLastNameTextInputEditTextsLinearLayout"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/genderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gender"
+                android:textSize="18dp"
+                android:fontFamily="@font/poppins_light"/>
+
+            <RadioGroup
+                android:id="@+id/genderRadioGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/maleRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Male"
+                    android:textSize="18sp"
+                    android:layout_marginRight="5dp"
+                    android:fontFamily="@font/poppins_extralight"/>
+
+                <RadioButton
+                    android:id="@+id/femaleRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Female"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/poppins_extralight"/>
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/addressLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/genderLinearLayout"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/addressTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Address"
+                android:textSize="18dp"
+                android:fontFamily="@font/poppins_light"/>
+
+            <LinearLayout
+                android:id="@+id/houseNoAndZoneLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/houseNumberLinearLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_marginRight="30dp">
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/houseNumberTextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="House No."
+                        app:boxCornerRadiusTopStart="13dp"
+                        app:boxCornerRadiusTopEnd="13dp"
+                        app:boxCornerRadiusBottomStart="13dp"
+                        app:boxCornerRadiusBottomEnd="13dp"
+                        app:endIconMode="clear_text"
+                        app:boxStrokeColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/houseNumberTextInputEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:textSize="14dp"
+                            android:fontFamily="@font/poppins"
+                            />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/zoneEditTextLinearLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    >
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/zoneTextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Zone"
+                        app:boxCornerRadiusTopStart="13dp"
+                        app:boxCornerRadiusTopEnd="13dp"
+                        app:boxCornerRadiusBottomStart="13dp"
+                        app:boxCornerRadiusBottomEnd="13dp"
+                        app:endIconMode="clear_text"
+                        app:boxStrokeColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/zoneTextInputEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:textSize="14dp"
+                            android:fontFamily="@font/poppins"
+                            />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/streetTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@+id/firstLastNameTextInputEditTextsLinearLayout"
+                >
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/streetTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:endIconMode="clear_text"
+                    app:boxStrokeColor="@color/black">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/streetTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Street"
+                        android:inputType="text"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/barangayTextInputEditTextLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/addressLinearLayout"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/barangayTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barangay"
+                android:textSize="18dp"
+                android:fontFamily="@font/poppins_light"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/barangayTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:boxCornerRadiusTopStart="13dp"
+                app:boxCornerRadiusTopEnd="13dp"
+                app:boxCornerRadiusBottomStart="13dp"
+                app:boxCornerRadiusBottomEnd="13dp"
+                app:endIconMode="clear_text"
+                app:boxStrokeColor="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/barangayTextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Post Proper Southside"
+                    android:inputType="text"
+                    android:textSize="14dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:fontFamily="@font/poppins"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/stateCityTextInputEditTextLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/barangayLinearLayout"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/stateCityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="State/City"
+                android:textSize="18dp"
+                android:fontFamily="@font/poppins_light"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/stateCityTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:boxCornerRadiusTopStart="13dp"
+                app:boxCornerRadiusTopEnd="13dp"
+                app:boxCornerRadiusBottomStart="13dp"
+                app:boxCornerRadiusBottomEnd="13dp"
+                app:endIconMode="clear_text"
+                app:boxStrokeColor="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/stateCityTextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Taguig City"
+                    android:inputType="text"
+                    android:textSize="14dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:fontFamily="@font/poppins"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
     <LinearLayout
         android:id="@+id/birthDateTextInputEditTextLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@+id/usernameTextInputEditTextLinearLayout"
+        android:layout_below="@+id/stateCityTextInputEditTextLinearLayoutLinearLayout"
         android:layout_marginBottom="20dp">
 
         <TextView

@@ -26,6 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="28dp"
+            android:background="#F0F0FA"
             android:orientation="vertical">
 
             <TextView
@@ -33,6 +34,7 @@
                 android:layout_height="wrap_content"
                 android:text="Connect to your local hub!"
                 android:textSize="22dp"
+                android:textColor="#3F0070"
                 android:fontFamily="@font/poppins_bold"
                 android:layout_gravity="center"
                 android:layout_marginBottom="50dp"

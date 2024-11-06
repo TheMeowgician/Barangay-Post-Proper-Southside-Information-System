@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ProfileActivity"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    android:background="#F0F0FA">
+    
+    <RelativeLayout
+        android:id="@+id/profileActivityMainRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        
+        <RelativeLayout
+            android:id="@+id/headerRelativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <RelativeLayout
+                android:id="@+id/topPartOfHeader"
+                android:layout_width="match_parent"
+                android:layout_height="168dp"
+                android:background="#61009F">
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/bottomPartOfHeader"
+                android:layout_width="match_parent"
+                android:layout_height="168dp"
+                android:background="#F0F0FA"
+                android:layout_below="@+id/topPartOfHeader">
+
+            </RelativeLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/profileCard"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                app:cardCornerRadius="90dp"
+                android:layout_centerInParent="true"
+                app:strokeColor="#61009F"
+                app:strokeWidth="3dp">
+
+
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/usernameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Lucas The Dog"
+
+                android:textSize="20sp"
+                android:layout_below="@id/profileCard"
+                android:layout_marginTop="85dp"/>
+            
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/profileInfoRelativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/headerRelativeLayout"
+            android:paddingLeft="28dp"
+            android:paddingRight="28dp">
+
+            <LinearLayout
+                android:id="@+id/nameTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:id="@+id/nameTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Name"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/nameTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    app:boxBackgroundColor="#A0A0A0">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/nameTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:text="Lucas The Dog"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:clickable="false"
+                        android:focusable="false"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileUsernameTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/nameTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileUsernameTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Username"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileUsernameTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    app:boxBackgroundColor="#A0A0A0">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileUsernameTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:text="Bakalako1234"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:clickable="false"
+                        android:focusable="false"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileAddressTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileUsernameTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileAddressTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Address"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileAddressTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    app:boxBackgroundColor="#A0A0A0">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileAddressTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:text="Post Proper Southside, Taguig City"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:clickable="false"
+                        android:focusable="false"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileAgeTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileAddressTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileAgeTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Age"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileAgeTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    app:boxBackgroundColor="#A0A0A0">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileAgeTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:text="30 years old"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:clickable="false"
+                        android:focusable="false"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileGenderTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileAgeTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileGenderTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Gender"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileGenderTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    app:boxBackgroundColor="#A0A0A0">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileGenderTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:text="Male"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:clickable="false"
+                        android:focusable="false"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileDateOfBirthTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileGenderTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileDateOfBirthTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Date of Birth"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileDateOfBirthTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    app:boxBackgroundColor="#A0A0A0">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileDateOfBirthTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:text="December 25, 2025"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:clickable="false"
+                        android:focusable="false"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profilePasswordTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileDateOfBirthTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profilePasswordTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Password"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profilePasswordTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profilePasswordTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:text="123456"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:clickable="false"
+                        android:focusable="false"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileConfirmPasswordTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profilePasswordTextInputEditTextLinearLayout"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/profileConfirmPasswordTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Confirm Password"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileConfirmPasswordTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    >
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileConfirmPasswordTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/profileButtonRelativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/profileInfoRelativeLayout"
+            android:paddingLeft="28dp"
+            android:paddingRight="28dp">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/editProfileButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Edit Profile"
+                android:textAllCaps="false"
+                android:fontFamily="@font/poppins_medium"
+                android:textSize="20dp"
+                android:textColor="@color/white"
+                android:background="@drawable/custom_button_register"
+                android:layout_marginBottom="10dp"/>
+
+        </RelativeLayout>
+        
+    </RelativeLayout>
+
+</ScrollView>

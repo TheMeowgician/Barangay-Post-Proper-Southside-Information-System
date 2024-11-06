@@ -31,6 +31,9 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     TextView notableProjectsTextView, seeInfoTextView1, seeInfoTextView2, seeInfoTextView3;
+    TextView newsAnnouncementsAndUpdatesTextView;
+    private TextView expandableTextView, seeMoreTextView, expandableTextView2, seeMoreTextView2;
+    private boolean isExpanded = false; // Flag to track expansion state
 
     public HomeFragment() {
         // Required empty public constructor
@@ -70,11 +73,19 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        expandableTextView = view.findViewById(R.id.expandableTextView);
+        seeMoreTextView = view.findViewById(R.id.seeMoreTextView);
+
+        expandableTextView2 = view.findViewById(R.id.expandableTextView2);
+        seeMoreTextView2 = view.findViewById(R.id.seeMoreTextView2);
+
         // Find the TextView after inflating the layout
         notableProjectsTextView = view.findViewById(R.id.notableProjectsOfOurBarangayTextView);
         seeInfoTextView1 = view.findViewById(R.id.seeInfoTextView1);
         seeInfoTextView2 = view.findViewById(R.id.seeInfoTextView2);
         seeInfoTextView3 = view.findViewById(R.id.seeInfoTextView3);
+
+        newsAnnouncementsAndUpdatesTextView = view.findViewById(R.id.newsAnnouncementsAndUpdatesTextView);
 
         seeInfoTextView1.setText("See Info"); // Replace with your actual text
 
@@ -93,6 +104,36 @@ public class HomeFragment extends Fragment {
         int end = start + "Projects".length();
         spannableStringBuilder2.setSpan(new ForegroundColorSpan(Color.parseColor("#61009F")), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         notableProjectsTextView.setText(spannableStringBuilder2);
+
+        // Change the color of "And"
+        String text2 = newsAnnouncementsAndUpdatesTextView.getText().toString();
+        SpannableStringBuilder spannableStringBuilder3 = new SpannableStringBuilder(text2);
+        int start2 = text2.indexOf("and");
+        int end2 = start2 + "and".length();
+        spannableStringBuilder3.setSpan(new ForegroundColorSpan(Color.parseColor("#000000")), start2, end2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        newsAnnouncementsAndUpdatesTextView.setText(spannableStringBuilder3);
+
+        seeMoreTextView.setOnClickListener(v -> {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                expandableTextView.setMaxLines(Integer.MAX_VALUE);
+                seeMoreTextView.setText("See Less");
+            } else {
+                expandableTextView.setMaxLines(4);
+                seeMoreTextView.setText("See More");
+            }
+        });
+
+        seeMoreTextView2.setOnClickListener(v -> {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                expandableTextView2.setMaxLines(Integer.MAX_VALUE);
+                seeMoreTextView2.setText("See Less");
+            } else {
+                expandableTextView2.setMaxLines(4);
+                seeMoreTextView2.setText("See More");
+            }
+        });
 
         return view;
     }

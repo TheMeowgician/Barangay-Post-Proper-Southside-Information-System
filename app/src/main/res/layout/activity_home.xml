@@ -54,15 +54,16 @@
                         android:layout_alignParentLeft="true"/>
 
                     <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/profileIconCircleImageView"
+                        android:id="@+id/profileMiniIconCircleImageView"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_alignParentRight="true"
+                        android:background="@drawable/circle_image_view_border"
+                        android:onClick="openProfileActivity"
+                        android:scaleType="fitXY"
                         app:civ_border_color="@color/black"
                         app:civ_border_width="2dp"
-                        android:scaleType="fitXY"
-                        android:background="@drawable/circle_image_view_border"
-                        app:shapeAppearanceOverlay="@style/roundedImageView"/>
+                        app:shapeAppearanceOverlay="@style/roundedImageView" />
 
 
 
