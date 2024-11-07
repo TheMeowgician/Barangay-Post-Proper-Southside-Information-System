@@ -46,8 +46,6 @@
                 app:strokeColor="#61009F"
                 app:strokeWidth="3dp">
 
-
-
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -57,7 +55,7 @@
 
                 android:layout_centerHorizontal="true"
                 android:fontFamily="@font/poppins_semibold"
-                android:text="Lucas The Dog"
+                android:text="Bernardo Batumbakal"
 
                 android:textSize="20sp"
                 android:layout_below="@id/profileCard"
@@ -97,19 +95,24 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusBottomEnd="13dp"
                     app:boxStrokeColor="@color/black"
-                    app:boxBackgroundColor="#A0A0A0">
+                    app:boxBackgroundColor="#A0A0A0"
+                    >
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/nameTextInputEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
-                        android:text="Lucas The Dog"
+                        android:text="Bernardo Batumbakal"
                         android:textSize="14dp"
                         android:fontFamily="@font/poppins"
                         android:clickable="false"
                         android:focusable="false"
+                        android:padding="16dp"
+                        android:drawableStart="@drawable/profile_name_icon"
+                        android:drawablePadding="16dp"
                         />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -151,6 +154,8 @@
                         android:fontFamily="@font/poppins"
                         android:clickable="false"
                         android:focusable="false"
+                        android:drawableStart="@drawable/profile_username_icon"
+                        android:drawablePadding="16dp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -193,6 +198,8 @@
                         android:fontFamily="@font/poppins"
                         android:clickable="false"
                         android:focusable="false"
+                        android:drawableStart="@drawable/profile_address_icon"
+                        android:drawablePadding="16dp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -235,6 +242,8 @@
                         android:fontFamily="@font/poppins"
                         android:clickable="false"
                         android:focusable="false"
+                        android:drawableStart="@drawable/profile_age_icon"
+                        android:drawablePadding="16dp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -277,6 +286,8 @@
                         android:fontFamily="@font/poppins"
                         android:clickable="false"
                         android:focusable="false"
+                        android:drawableStart="@drawable/profile_gender_icon"
+                        android:drawablePadding="16dp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -319,6 +330,8 @@
                         android:fontFamily="@font/poppins"
                         android:clickable="false"
                         android:focusable="false"
+                        android:drawableStart="@drawable/profile_date_of_birth_icon"
+                        android:drawablePadding="16dp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -348,7 +361,9 @@
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusBottomEnd="13dp"
-                    app:boxStrokeColor="@color/black">
+                    app:boxStrokeColor="@color/black"
+                    app:endIconMode="password_toggle"
+                    >
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/profilePasswordTextInputEditText"
@@ -360,6 +375,9 @@
                         android:fontFamily="@font/poppins"
                         android:clickable="false"
                         android:focusable="false"
+                        android:drawableStart="@drawable/profile_password_icon"
+                        android:drawablePadding="16dp"
+                        app:endIconCheckable="false"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -391,6 +409,7 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusBottomEnd="13dp"
                     app:boxStrokeColor="@color/black"
+                    app:endIconMode="password_toggle"
                     >
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -400,6 +419,8 @@
                         android:inputType="textPassword"
                         android:textSize="14dp"
                         android:fontFamily="@font/poppins"
+                        android:drawableStart="@drawable/profile_password_icon"
+                        android:drawablePadding="16dp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
 
