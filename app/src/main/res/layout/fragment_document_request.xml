@@ -1,16 +1,459 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DocumentRequestFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".DocumentRequestFragment"
+    android:background="#F0F0FA"
+    android:scrollbars="none">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Document Request Fragment"
-        android:textSize="20dp" />
+    <RelativeLayout
+        android:id="@+id/document_request_main_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/document_request_header_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="28dp"
+            android:background="#3F0070">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/document_request_select_document_type_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Document Type"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:fontFamily="@font/poppins_bold"
+                android:layout_alignParentLeft="true"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/document_request_general_instructions_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="General Instructions:"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins_medium"
+                android:layout_marginTop="15dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/document_request_select_document_type_textview"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/document_request_general_instructions_texts_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Please select the type of document you need and have a valid ID ready for verification. Follow the provided steps to complete your request, and we’ll notify you when your document is available for pickup."
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins"
+
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/document_request_general_instructions_textview"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/document_request_body_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/document_request_header_relative_layout"
+            android:padding="28dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/document_request_barangay_clearance_material_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#3F0070">
+                <!--Test-->
+                <RelativeLayout
+                    android:id="@+id/document_request_barangay_clearance_material_cardview_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="28dp"
+                    >
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_clearance_material_cardview_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Barangay Clearance"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_bold"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_clearance_material_cardview_required_documents_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Required Documents:"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="12sp"
+                        android:layout_below="@+id/document_request_barangay_clearance_material_cardview_material_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_clearance_material_cardview_required_documents_valid_id_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Valid ID"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_barangay_clearance_material_cardview_required_documents_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_clearance_material_cardview_price_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Price:"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="12sp"
+                        android:layout_below="@+id/document_request_barangay_clearance_material_cardview_required_documents_valid_id_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_clearance_material_cardview_price_php_50_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Php 50.00"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_barangay_clearance_material_cardview_price_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_clearance_material_cardview_price_senior_and_pwd_free_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Senior Citizen and PWD - Free"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_barangay_clearance_material_cardview_price_php_50_textview"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/document_request_barangay_clearance_material_cardview_select_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@+id/document_request_barangay_clearance_material_cardview_price_senior_and_pwd_free_textview"
+                        android:background="@drawable/custom_button_log_in"
+                        android:fontFamily="@font/poppins_medium"
+                        android:text="Select"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="20dp" />
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/document_request_cedula_material_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/document_request_barangay_clearance_material_cardview"
+                app:cardBackgroundColor="#3F0070">
+
+                <RelativeLayout
+                    android:id="@+id/document_request_cedula_material_cardview_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="28dp"
+                    >
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_cedula_material_cardview_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cedula"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_bold"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_cedula_material_cardview_required_documents_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Required Documents:"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="12sp"
+                        android:layout_below="@+id/document_request_cedula_material_cardview_material_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_cedula_material_cardview_required_documents_valid_id_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Valid ID"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_cedula_material_cardview_required_documents_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_cedula_material_cardview_price_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Price:"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="12sp"
+                        android:layout_below="@+id/document_request_cedula_material_cardview_required_documents_valid_id_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_cedula_material_cardview_price_php_50_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Depends on the income"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_cedula_material_cardview_price_textview"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/document_request_cedula_material_cardview_select_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@+id/document_request_cedula_material_cardview_price_php_50_textview"
+                        android:background="@drawable/custom_button_log_in"
+                        android:fontFamily="@font/poppins_medium"
+                        android:text="Select"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="20dp" />
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/document_request_barangay_certification_material_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                app:cardBackgroundColor="#3F0070"
+                android:layout_below="@+id/document_request_cedula_material_cardview">
+
+                <RelativeLayout
+                    android:id="@+id/document_request_barangay_certification_material_cardview_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="28dp"
+                    >
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_certification_material_cardview_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Barangay Clearance"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_bold"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_certification_material_cardview_required_documents_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Required Documents:"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="12sp"
+                        android:layout_below="@+id/document_request_barangay_certification_material_cardview_material_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_certification_material_cardview_required_documents_valid_id_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Valid ID"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_barangay_certification_material_cardview_required_documents_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_certification_material_cardview_price_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Price:"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="12sp"
+                        android:layout_below="@+id/document_request_barangay_certification_material_cardview_required_documents_valid_id_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_certification_material_cardview_price_php_50_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Php 50.00"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_barangay_certification_material_cardview_price_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_barangay_certification_material_cardview_price_senior_and_pwd_free_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Senior Citizen and PWD - Free"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_barangay_certification_material_cardview_price_php_50_textview"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/document_request_barangay_certification_material_cardview_select_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@+id/document_request_barangay_certification_material_cardview_price_senior_and_pwd_free_textview"
+                        android:background="@drawable/custom_button_log_in"
+                        android:fontFamily="@font/poppins_medium"
+                        android:text="Select"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="20dp" />
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/document_request_certificate_of_indigency_material_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                app:cardBackgroundColor="#3F0070"
+                android:layout_below="@+id/document_request_barangay_certification_material_cardview">
+
+                <RelativeLayout
+                    android:id="@+id/document_request_certificate_of_indigency_material_cardview_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="28dp"
+                    >
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_certificate_of_indigency_material_cardview_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Certificate of Indigency"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_bold"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_certificate_of_indigency_material_cardview_required_documents_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Required Documents:"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="12sp"
+                        android:layout_below="@+id/document_request_certificate_of_indigency_material_cardview_material_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_certificate_of_indigency_material_cardview_required_documents_valid_id_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Valid ID"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_certificate_of_indigency_material_cardview_required_documents_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_certificate_of_indigency_material_cardview_price_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Price:"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="12sp"
+                        android:layout_below="@+id/document_request_certificate_of_indigency_material_cardview_required_documents_valid_id_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_certificate_of_indigency_material_cardview_price_php_50_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Php 50.00"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_certificate_of_indigency_material_cardview_price_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/document_request_certificate_of_indigency_material_cardview_price_senior_and_pwd_free_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Senior Citizen and PWD - Free"
+                        android:textSize="12sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_light"
+                        android:drawableStart="@drawable/bullet"
+                        android:drawablePadding="5dp"
+                        android:textAlignment="center"
+                        android:layout_below="@+id/document_request_certificate_of_indigency_material_cardview_price_php_50_textview"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/document_request_certificate_of_indigency_material_cardview_select_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@+id/document_request_certificate_of_indigency_material_cardview_price_senior_and_pwd_free_textview"
+                        android:background="@drawable/custom_button_log_in"
+                        android:fontFamily="@font/poppins_medium"
+                        android:text="Select"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="20dp" />
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>
