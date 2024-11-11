@@ -32,6 +32,11 @@ public class HomeActivity extends AppCompatActivity {
         replaceFragment(new HomeFragment());
     }
 
+    public void openNotificationActivity(View view) {
+        Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
+        startActivity(intent);
+    }
+
     public void closeNavigationDrawer(View view) {
         homeDrawerLayout.closeDrawer(GravityCompat.START);
     }

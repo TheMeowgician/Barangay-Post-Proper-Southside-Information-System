@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NotificationActivity"
+    android:background="#F0F0FA">
+
+    <RelativeLayout
+        android:id="@+id/notification_activity_header_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="#61009F"
+        android:paddingLeft="28dp"
+        android:paddingRight="28dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/notification_activity_header_back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:onClick="back"
+            android:src="@drawable/white_round_arrow_back_icon" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/notification_activity_header_notification_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Notification"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:fontFamily="@font/poppins_medium" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/notification_activity_body_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/notification_activity_header_relative_layout">
+
+        <RelativeLayout
+            android:id="@+id/notification_activity_recent_notification_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:paddingLeft="28dp"
+            android:paddingRight="28dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/notification_activity_recent_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Recent"
+                android:textSize="14sp"
+                app:fontFamily="@font/poppins"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/notification_activity_mark_all_as_read_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:text="Mark all as read"
+                android:textSize="14sp"
+                app:fontFamily="@font/poppins"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
