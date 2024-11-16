@@ -11,4 +11,5 @@ public class LoginResponse {
     public int getId() {
         return id;
     }
+
 }
