@@ -10,8 +10,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.textfield.TextInputLayout;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,7 +77,7 @@ public class LogInActivity extends AppCompatActivity {
                         editor.putInt("user_id", loginResponse.getId()); // Save user ID
                         editor.apply(); // Commit changes
 
-                        // Navigate to HomeActivity
+                        // Navigate to HomeActivity (or ProfileActivity)
                         Intent intent = new Intent(LogInActivity.this, HomeActivity.class);
                         startActivity(intent);
                     } else {
@@ -119,4 +122,3 @@ public class LogInActivity extends AppCompatActivity {
         passwordTextInputLayout.setHintEnabled(false);
     }
 }
-
