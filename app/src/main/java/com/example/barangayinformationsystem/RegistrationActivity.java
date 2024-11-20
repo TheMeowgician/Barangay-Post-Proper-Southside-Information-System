@@ -271,20 +271,23 @@ public class RegistrationActivity extends AppCompatActivity {
             );
 
             call.enqueue(new Callback<RegistrationResponse>() {
+
                 @Override
                 public void onResponse(Call<RegistrationResponse> call, Response<RegistrationResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         if (response.body().isSuccess()) {
-                            Toast.makeText(RegistrationActivity.this,
-                                    "Registration successful!", Toast.LENGTH_SHORT).show();
+                            // Show success dialog instead of Toast
+                            Intent loginIntent = new Intent(RegistrationActivity.this, LogInActivity.class);
+                            loginIntent.putExtra("username", username);
+                            loginIntent.putExtra("firstName", firstName);
+                            loginIntent.putExtra("lastName", lastName);
+                            loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                            Intent intent = new Intent(RegistrationActivity.this, LogInActivity.class);
-                            intent.putExtra("username", username);
-                            intent.putExtra("firstName", firstName);
-                            intent.putExtra("lastName", lastName);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
+                            SuccessDialog.showSuccess(
+                                    RegistrationActivity.this,
+                                    "Congratulations! Your registration is successful.",
+                                    loginIntent
+                            );
                         } else {
                             Toast.makeText(RegistrationActivity.this,
                                     response.body().getMessage(), Toast.LENGTH_SHORT).show();
