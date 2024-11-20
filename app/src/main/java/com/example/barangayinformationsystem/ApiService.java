@@ -14,7 +14,7 @@ public interface ApiService {
             @Field("username") String username,
             @Field("password") String password
     );
-    @FormUrlEncoded
+
     @GET("fetch_user_details.php")
     Call<UserDetailsResponse> getUserDetails(@Query("id") int userId);
 

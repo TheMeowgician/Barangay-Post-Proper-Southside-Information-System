@@ -13,50 +13,22 @@ public class UserDetailsResponse {
     }
 
     public static class User {
-        private String username;
-        private String firstName;
-        private String lastName;
-        private String address;
-        private int age;
-        private String gender;
-        private String dateOfBirth;
-        private String password;
-        private String userProfilePicture;  // Make sure this is defined
+        private String username; // VARCHAR
+        private String firstName; // VARCHAR
+        private String lastName; // VARCHAR
+        private String address; // VARCHAR
+        private int age; // int in DB
+        private String gender; // VARCHAR
+        private String dateOfBirth; // VARCHAR or DATE
+        private String password; // VARCHAR
 
-        public String getUsername() {
-            return username;
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public String getAddress() {
-            return address;
-        }
-
-        public int getAge() {
-            return age;
-        }
-
-        public String getGender() {
-            return gender;
-        }
-
-        public String getDateOfBirth() {
-            return dateOfBirth;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public String getUserProfilePicture() {
-            return userProfilePicture;  // Make sure this matches your response field
-        }
+        public String getUsername() { return username; }
+        public String getFirstName() { return firstName; }
+        public String getLastName() { return lastName; }
+        public String getAddress() { return address; }
+        public int getAge() { return age; }
+        public String getGender() { return gender; }
+        public String getDateOfBirth() { return dateOfBirth; }
+        public String getPassword() { return password; }
     }
 }
