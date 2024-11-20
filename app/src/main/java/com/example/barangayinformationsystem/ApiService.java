@@ -18,4 +18,19 @@ public interface ApiService {
     @GET("fetch_user_details.php")
     Call<UserDetailsResponse> getUserDetails(@Query("id") int userId);
 
+    @FormUrlEncoded
+    @POST("register_user.php")
+    Call<RegistrationResponse> registerUser(
+            @Field("firstName") String firstName,
+            @Field("lastName") String lastName,
+            @Field("username") String username,
+            @Field("password") String password,
+            @Field("age") int age,
+            @Field("birthday") String birthday,
+            @Field("adrHouseNo") String houseNumber,
+            @Field("adrZone") String zone,
+            @Field("adrStreet") String street
+    );
+
+
 }
