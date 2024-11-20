@@ -2,14 +2,19 @@ package com.example.barangayinformationsystem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.content.ContextCompat;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -22,6 +27,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RegistrationActivity extends AppCompatActivity {
+
+    private TextView lengthRequirement;
+    private TextView uppercaseRequirement;
+    private TextView lowercaseRequirement;
+    private TextView specialCharRequirement;
 
     private ImageButton backImageButton;
     private AppCompatButton btnRegister;
@@ -68,6 +78,12 @@ public class RegistrationActivity extends AppCompatActivity {
     private boolean initializeComponents() {
         try {
             // Initialize all components
+
+            lengthRequirement = findViewById(R.id.lengthRequirement);
+            uppercaseRequirement = findViewById(R.id.uppercaseRequirement);
+            lowercaseRequirement = findViewById(R.id.lowercaseRequirement);
+            specialCharRequirement = findViewById(R.id.specialCharRequirement);
+
             backImageButton = findViewById(R.id.backImageButton);
             btnRegister = findViewById(R.id.btnRegister);
             genderRadioGroup = findViewById(R.id.genderRadioGroup);
@@ -152,6 +168,73 @@ public class RegistrationActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+    private void setupPasswordValidation() {
+        passwordTextInputEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String password = s.toString();
+                validatePasswordRequirements(password);
+            }
+        });
+    }
+
+    private boolean validatePassword(String password) {
+        boolean isValid = true;
+
+        if (password.length() < 8) {
+            isValid = false;
+        }
+        if (password.equals(password.toLowerCase())) {
+            isValid = false;
+        }
+        if (password.equals(password.toUpperCase())) {
+            isValid = false;
+        }
+        if (!password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            passwordTextInputLayout.setError("Password does not meet requirements");
+        }
+
+        return isValid;
+    }
+
+    private void validatePasswordRequirements(String password) {
+        // Check length requirement
+        boolean hasLength = password.length() >= 8;
+        updateRequirement(lengthRequirement, hasLength);
+
+        // Check uppercase requirement
+        boolean hasUppercase = !password.equals(password.toLowerCase());
+        updateRequirement(uppercaseRequirement, hasUppercase);
+
+        // Check lowercase requirement
+        boolean hasLowercase = !password.equals(password.toUpperCase());
+        updateRequirement(lowercaseRequirement, hasLowercase);
+
+        // Check special character requirement
+        boolean hasSpecial = password.matches(".*[!@#$%^&*(),.?\":{}|<>].*");
+        updateRequirement(specialCharRequirement, hasSpecial);
+    }
+
+    private void updateRequirement(TextView requirement, boolean isMet) {
+        Drawable icon = ContextCompat.getDrawable(this,
+                isMet ? R.drawable.ic_check : R.drawable.ic_error);
+
+        requirement.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
+        requirement.setTextColor(ContextCompat.getColor(this,
+                isMet ? android.R.color.darker_gray : android.R.color.holo_red_light));
+    }
+
+
     private boolean validateInputs() {
         boolean isValid = true;
 
@@ -181,9 +264,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         // Validate password match
         String password = passwordTextInputEditText.getText().toString();
-        String confirmPassword = confirmPasswordTextInputEditText.getText().toString();
-        if (!password.equals(confirmPassword)) {
-            confirmPasswordTextInputLayout.setError("Passwords don't match");
+        if (!validatePassword(password)) {
             isValid = false;
         }
 
