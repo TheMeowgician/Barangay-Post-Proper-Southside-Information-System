@@ -6,4 +6,5 @@
     <color name="for_ripple">#7C33B0</color>
     <color name="selected_item_color">#7C33B0</color>
     <color name="pressed_item_color">#7C33B0</color>
+    <color name="green">#4CAF50</color>
 </resources>

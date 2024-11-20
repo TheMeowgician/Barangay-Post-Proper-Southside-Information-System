@@ -62,24 +62,33 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     private void loginUser(String username, String password) {
+        // Show loading state
+        logInButton.setEnabled(false);
+        logInButton.setText("Logging in...");
+
         ApiService apiService = RetrofitClient.getApiService();
         Call<LoginResponse> call = apiService.loginUser(username, password);
 
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                // Reset button state
+                logInButton.setEnabled(true);
+                logInButton.setText("Log In");
+
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
                     if ("success".equals(loginResponse.getStatus())) {
-                        // Save user ID in SharedPreferences for session management
+                        // Save user ID in SharedPreferences
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LogInActivity.this);
                         SharedPreferences.Editor editor = prefs.edit();
-                        editor.putInt("user_id", loginResponse.getId()); // Save user ID
-                        editor.apply(); // Commit changes
+                        editor.putInt("user_id", loginResponse.getId());
+                        editor.apply();
 
-                        // Navigate to HomeActivity (or ProfileActivity)
-                        Intent intent = new Intent(LogInActivity.this, HomeActivity.class);
-                        startActivity(intent);
+                        // Show success dialog and navigate to home
+                        Intent homeIntent = new Intent(LogInActivity.this, HomeActivity.class);
+                        homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        SuccessDialog.showSuccess(LogInActivity.this, "You have successfully logged in", homeIntent);
                     } else {
                         Toast.makeText(LogInActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
                     }
@@ -90,6 +99,10 @@ public class LogInActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
+                // Reset button state
+                logInButton.setEnabled(true);
+                logInButton.setText("Log In");
+
                 Toast.makeText(LogInActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
