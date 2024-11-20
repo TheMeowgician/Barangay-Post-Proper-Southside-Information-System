@@ -1,5 +1,7 @@
 package com.example.barangayinformationsystem;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -31,6 +33,10 @@ public interface ApiService {
             @Field("adrZone") String zone,
             @Field("adrStreet") String street
     );
+
+    // Add this to your existing ApiService interface
+    @GET("get_announcements.php")
+    Call<List<AnnouncementResponse>> getAnnouncements();
 
 
 }

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="28dp"
+    android:layout_marginEnd="28dp"
+    android:layout_marginBottom="20dp"
+    app:cardCornerRadius="15dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header with logo and date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/post_proper_southside_barangay_logo"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Post Proper Southside"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/dateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/expandableTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/poppins"
+            android:textSize="12sp"
+            android:maxLines="4"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/seeMoreTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="See More..."
+            android:fontFamily="@font/poppins_light"
+            android:textColor="@android:color/black"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Images Container -->
+        <LinearLayout
+            android:id="@+id/imagesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <!-- Left side images (2) -->
+            <LinearLayout
+                android:id="@+id/leftImagesLayout"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="1dp"/>
+
+            <!-- Right side images (3) -->
+            <LinearLayout
+                android:id="@+id/rightImagesLayout"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:layout_weight="1.2"
+                android:orientation="vertical"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
