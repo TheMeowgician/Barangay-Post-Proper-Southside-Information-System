@@ -69,7 +69,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 if(id == R.id.navHome) {
                     replaceFragment(new HomeFragment());
-                } else if(id == R.id.navNews) {
+                } else if(id == R.id.navUpdates) {
                     replaceFragment(new NewsFragment());
                 } else if(id == R.id.navDocumentRequest) {
                     replaceFragment(new DocumentRequestFragment());
@@ -79,6 +79,8 @@ public class HomeActivity extends AppCompatActivity {
                     replaceFragment(new AboutBarangayFragment());
                 } else if(id == R.id.navBarangayLeaders) {
                     replaceFragment(new BarangayLeadersFragment());
+                } else if(id == R.id.navIncidentReport) {
+                    replaceFragment(new IncidentReportFragment());
                 } else if(id == R.id.navLogOut) {
                     finish();
                 }

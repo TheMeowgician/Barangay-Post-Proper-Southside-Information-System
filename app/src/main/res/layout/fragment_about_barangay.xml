@@ -1,16 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="none"
+    android:background="#F0F0FA"
     tools:context=".AboutBarangayFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="About Barangay Fragment"
-        android:textSize="20dp" />
+    <RelativeLayout
+        android:id="@+id/about_barangay_main_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/about_barangay_header_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#3F0070"
+            android:padding="28dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/about_barangay_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Learn More About Our Barangay"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:gravity="center"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/about_barangay_body_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="28dp"
+            android:layout_below="@+id/about_barangay_header_relative_layout">
+
+            <RelativeLayout
+                android:id="@+id/about_barangay_our_mission_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_our_mission_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Our Mission"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="22sp"
+                    android:layout_centerHorizontal="true"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_our_mission_description_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Barangay Post Proper Southside accomplish good governance, local and global competitiveness being accountable to the welfare of its constituents having eco-friendly, economic, equal, equitable and self- nurturing barangay."
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:layout_below="@+id/about_barangay_our_mission_textview"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/about_barangay_our_vision_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/about_barangay_our_mission_relative_layout">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_our_vision_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Our Vision"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="22sp"
+                    android:layout_centerHorizontal="true"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_our_vision_description_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Barangay Post Proper Southside accomplish good governance, local and global competitiveness being accountable to the welfare of its constituents having eco-friendly, economic, equal, equitable and self- nurturing barangay."
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:layout_below="@+id/about_barangay_our_vision_textview"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/about_barangay_our_goal_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/about_barangay_our_vision_relative_layout">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_our_goal_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Our Goal"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="22sp"
+                    android:layout_centerHorizontal="true"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_our_goal_description_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1. Consistency in the deliveries of Quality Service. \n
+2. To encourage stakeholders for greater participation in all programs, projects and activities of Governance. \n
+3. To promote public awareness and responsive citizens.\n
+4. To acquire modern technological facilities towards efficient and effective governance.\n
+5. To enhance capability in mitigating various disaster as response to climate change."
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:layout_below="@+id/about_barangay_our_goal_textview"/>
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

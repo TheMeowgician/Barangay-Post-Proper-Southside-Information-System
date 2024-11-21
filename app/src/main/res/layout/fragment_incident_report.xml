@@ -151,11 +151,11 @@
 
                 <ImageView
                     android:id="@+id/incident_report_upload_image_here_imageview_"
-                    android:layout_width="600dp"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/incident_upload_image_here"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:scaleType="fitXY"
-                    android:layout_centerInParent="true"/>
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/incident_upload_image_here" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"

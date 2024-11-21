@@ -6,18 +6,19 @@
     
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="55dp">
+        android:layout_height="150dp"
+        android:background="#61009F">
 
         <ImageButton
             android:id="@+id/closeMenuImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="28dp"
+            android:layout_marginTop="28dp"
             android:background="?android:selectableItemBackground"
             android:onClick="closeNavigationDrawer"
-            android:src="@drawable/black_close_icon" />
+            android:src="@drawable/white_close_button" />
 
         <LinearLayout
             android:id="@+id/bottomBorderOfRelativeLayout"
@@ -26,11 +27,34 @@
             android:orientation="horizontal"
             android:layout_alignParentBottom="true">
         </LinearLayout>
-        <!--android:background="#8C8C8C"-->
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/navheaderMiniIconCircleImageView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_below="@+id/closeMenuImageButton"
+            android:layout_marginLeft="28dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/circle_image_view_border"
+            android:onClick="openProfileActivity"
+            android:scaleType="fitXY"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/navHeaderFullNameTextView"
+            android:layout_below="@+id/navheaderMiniIconCircleImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="28dp"
+            android:layout_marginTop="10dp"
+            android:text="Bernardo Batumbakal"
+            android:fontFamily="@font/poppins_medium"
+            android:textSize="14sp"
+            android:textColor="@color/white"/>
+
     </RelativeLayout>
     
     <View
         android:layout_width="match_parent"
-        android:layout_height="55dp"/>
+        android:layout_height="150dp" />
 
 </RelativeLayout>

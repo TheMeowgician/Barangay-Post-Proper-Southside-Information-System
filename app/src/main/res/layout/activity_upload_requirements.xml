@@ -21,18 +21,10 @@
             android:background="#3F0070"
             android:padding="28dp">
 
-            <ImageButton
-                android:id="@+id/upload_requirements_form_back_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:src="@drawable/white_round_arrow_back_icon" />
-
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/upload_requirements_form_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/upload_requirements_form_back_button"
                 android:layout_alignParentLeft="true"
                 android:layout_marginTop="20dp"
                 android:fontFamily="@font/poppins_bold"
