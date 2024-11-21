@@ -44,18 +44,16 @@ public class ProfileActivity extends AppCompatActivity {
         // Initialize API service
         apiService = RetrofitClient.getApiService();
 
+
         // Get user ID from SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        userId = prefs.getInt("user_id", -1);  // Retrieve the user ID stored in SharedPreferences
-
-        // Log user ID to ensure it's passed correctly
-        Log.d("ProfileActivity", "User ID retrieved: " + userId);
-
+        userId = prefs.getInt("user_id", -1);
         if (userId != -1) {
-            fetchUserDetails(userId); // Fetch user details using the userId
+            fetchUserDetails(userId); // Fetch details if userId is valid
         } else {
             Toast.makeText(this, "Invalid user ID", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     private void fetchUserDetails(int userId) {
@@ -68,14 +66,18 @@ public class ProfileActivity extends AppCompatActivity {
                     if ("success".equals(userDetails.getStatus())) {
                         UserDetailsResponse.User user = userDetails.getUser();
 
-                        // Set the user details to the TextInputEditTexts
-                        nameTextInputEditText.setText(user.getFirstName() + " " + user.getLastName());
-                        profileUsernameTextInputEditText.setText(user.getUsername());
-                        profileAddressTextInputEditText.setText(user.getAddress());
-                        profileAgeTextInputEditText.setText(String.valueOf(user.getAge()));
-                        profileGenderTextInputEditText.setText(user.getGender());
-                        profileDateOfBirthTextInputEditText.setText(user.getDateOfBirth());
-                        profilePasswordTextInputEditText.setText(user.getPassword());
+                        runOnUiThread(() -> {
+                            // Set the user details to the TextInputEditTexts
+                            usernameTextView.setText(user.getFirstName() + " " + user.getLastName());
+                            nameTextInputEditText.setText(user.getFirstName() + " " + user.getLastName());
+                            profileUsernameTextInputEditText.setText(user.getUsername());
+                            profileAddressTextInputEditText.setText(user.getAddress());
+                            profileAgeTextInputEditText.setText(String.valueOf(user.getAge()));
+                            profileGenderTextInputEditText.setText(user.getGender());
+                            profileDateOfBirthTextInputEditText.setText(user.getDateOfBirth());
+                            profilePasswordTextInputEditText.setText(user.getPassword());
+                        });
+
                     } else {
                         Toast.makeText(ProfileActivity.this, "User not found", Toast.LENGTH_SHORT).show();
                     }
