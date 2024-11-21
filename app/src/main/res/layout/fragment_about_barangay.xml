@@ -100,7 +100,7 @@
                     android:layout_below="@+id/about_barangay_our_vision_textview"/>
 
             </RelativeLayout>
-
+<!-- test -->
             <RelativeLayout
                 android:id="@+id/about_barangay_our_goal_relative_layout"
                 android:layout_width="match_parent"
