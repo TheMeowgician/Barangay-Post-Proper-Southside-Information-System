@@ -15,9 +15,15 @@ import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textview.MaterialTextView;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -25,13 +31,57 @@ public class HomeActivity extends AppCompatActivity {
     DrawerLayout homeDrawerLayout;
     NavigationView navigationView;
     ShapeableImageView profileMiniIconCircleImageView;
+    MaterialTextView navHeaderFullNameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         initializeComponents();
+        loadUserDetails();
         replaceFragment(new HomeFragment());
+    }
+
+    private void loadUserDetails() {
+        // Get user ID from SharedPreferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int userId = prefs.getInt("user_id", -1);
+
+        if (userId != -1) {
+            ApiService apiService = RetrofitClient.getApiService();
+            Call<UserDetailsResponse> call = apiService.getUserDetails(userId);
+
+            call.enqueue(new Callback<UserDetailsResponse>() {
+                @Override
+                public void onResponse(Call<UserDetailsResponse> call, Response<UserDetailsResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        UserDetailsResponse userDetailsResponse = response.body();
+                        if ("success".equals(userDetailsResponse.getStatus()) && userDetailsResponse.getUser() != null) {
+                            updateNavigationHeader(userDetailsResponse.getUser());
+                        } else {
+                            Toast.makeText(HomeActivity.this, "Failed to load user details", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserDetailsResponse> call, Throwable t) {
+                    Toast.makeText(HomeActivity.this, "Network error: Failed to load user details", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void updateNavigationHeader(UserDetailsResponse.User user) {
+        View headerView = navigationView.getHeaderView(0);
+        navHeaderFullNameTextView = headerView.findViewById(R.id.navHeaderFullNameTextView);
+
+        // Create full name from first name and last name
+        String fullName = user.getFirstName() + " " + user.getLastName();
+        navHeaderFullNameTextView.setText(fullName);
+
+        // Here you could also update other user details in the navigation header
+        // like profile image, address, etc. if needed
     }
 
     public void openNotificationActivity(View view) {
@@ -56,12 +106,11 @@ public class HomeActivity extends AppCompatActivity {
         // Clear user session from SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.remove("user_id"); // Remove the user_id that was saved during login
+        editor.remove("user_id");
         editor.apply();
 
         // Create intent to return to login screen
         Intent loginIntent = new Intent(HomeActivity.this, LogInActivity.class);
-        // Clear the activity stack so user can't go back
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         // Show success message using your existing SuccessDialog
