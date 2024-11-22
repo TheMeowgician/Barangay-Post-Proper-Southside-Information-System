@@ -176,11 +176,27 @@
                 android:id="@+id/incident_report_images_file_upload_percentage_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:text="Images: "
+                android:layout_marginTop="20dp"
+                android:text="Images: (Max 3)"
                 android:fontFamily="@font/poppins_medium"
                 android:layout_below="@+id/incident_report_upload_image_imageview_relative_layout"/>
 
+            <HorizontalScrollView
+                android:id="@+id/images_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/incident_report_images_file_upload_percentage_textview"
+                android:layout_marginTop="10dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/selected_images_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp"/>
+
+            </HorizontalScrollView>
             <RelativeLayout
                 android:id="@+id/incident_report_images_file_upload_percentage_relative_layout"
                 android:layout_width="match_parent"
@@ -197,14 +213,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:layout_below="@+id/incident_report_images_file_upload_percentage_relative_layout">
+                android:layout_below="@+id/images_scroll_view">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/incident_report_submit_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:layout_centerInParent="true"
                     android:background="@drawable/custom_button_submit"
                     android:fontFamily="@font/poppins_medium"
                     android:text="Submit"

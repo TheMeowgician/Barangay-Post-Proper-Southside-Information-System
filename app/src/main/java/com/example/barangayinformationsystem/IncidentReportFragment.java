@@ -15,7 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -33,6 +38,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class IncidentReportFragment extends Fragment {
+
+    private static final int MAX_IMAGES = 3;
+    private LinearLayout selectedImagesContainer;
+    private List<String> encodedImages;
 
     private TextInputLayout titleInputLayout;
     private TextInputLayout descriptionInputLayout;
@@ -61,8 +70,9 @@ public class IncidentReportFragment extends Fragment {
                     if (extras != null) {
                         Bitmap imageBitmap = (Bitmap) extras.get("data");
                         if (imageBitmap != null) {
-                            uploadImageView.setImageBitmap(imageBitmap);
-                            encodedImage = encodeImage(imageBitmap);
+                            String encodedImage = encodeImage(imageBitmap);
+                            encodedImages.add(encodedImage);
+                            addImageToContainer(imageBitmap);
                         }
                     }
                 }
@@ -79,6 +89,7 @@ public class IncidentReportFragment extends Fragment {
 
     private void initializeViews(View view) {
         prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        encodedImages = new ArrayList<>();
 
         titleInputLayout = view.findViewById(R.id.usernameTextInputLayout);
         descriptionInputLayout = view.findViewById(R.id.incident_report_description_textInputLayout);
@@ -86,12 +97,68 @@ public class IncidentReportFragment extends Fragment {
         descriptionEditText = view.findViewById(R.id.incident_report_description_textInputEditText);
         uploadImageView = view.findViewById(R.id.incident_report_upload_image_here_imageview_);
         submitButton = view.findViewById(R.id.incident_report_submit_button);
+        selectedImagesContainer = view.findViewById(R.id.selected_images_container);
 
-        uploadImageView.setOnClickListener(v -> showImagePickerDialog());
+        uploadImageView.setOnClickListener(v -> {
+            if (encodedImages.size() >= MAX_IMAGES) {
+                Toast.makeText(getContext(), "Maximum " + MAX_IMAGES + " images allowed", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            showImagePickerDialog();
+        });
         submitButton.setOnClickListener(v -> submitReport());
     }
 
+    private void addImageToContainer(Bitmap bitmap) {
+        ImageView imageView = new ImageView(requireContext());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                dpToPx(100), // 100dp width
+                dpToPx(100)  // 100dp height
+        );
+        params.setMargins(dpToPx(8), 0, dpToPx(8), 0);
+        imageView.setLayoutParams(params);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setImageBitmap(bitmap);
+
+        // Add delete button
+        ImageView deleteButton = new ImageView(requireContext());
+        int deleteSize = dpToPx(24);
+        RelativeLayout.LayoutParams deleteParams = new RelativeLayout.LayoutParams(deleteSize, deleteSize);
+        deleteParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        deleteParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+        deleteButton.setLayoutParams(deleteParams);
+        deleteButton.setImageResource(R.drawable.ic_delete);
+        deleteButton.setPadding(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
+
+        // Create container for image and delete button
+        RelativeLayout container = new RelativeLayout(requireContext());
+        container.setLayoutParams(params);
+        container.addView(imageView);
+        container.addView(deleteButton);
+
+        // Set delete click listener
+        deleteButton.setOnClickListener(v -> {
+            selectedImagesContainer.removeView(container);
+            encodedImages.remove(encodedImages.size() - 1);
+            if (encodedImages.isEmpty()) {
+                uploadImageView.setImageResource(R.drawable.incident_upload_image_here);
+            }
+        });
+
+        selectedImagesContainer.addView(container);
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+
     private void showImagePickerDialog() {
+        if (encodedImages.size() >= MAX_IMAGES) {
+            Toast.makeText(getContext(), "Maximum " + MAX_IMAGES + " images allowed", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -113,6 +180,10 @@ public class IncidentReportFragment extends Fragment {
     }
 
     private void openCamera() {
+        if (encodedImages.size() >= MAX_IMAGES) {
+            Toast.makeText(getContext(), "Maximum " + MAX_IMAGES + " images allowed", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
             cameraLauncher.launch(takePictureIntent);
@@ -122,8 +193,18 @@ public class IncidentReportFragment extends Fragment {
     }
 
     private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        galleryLauncher.launch(intent);
+        if (encodedImages.size() >= MAX_IMAGES) {
+            Toast.makeText(getContext(), "Maximum " + MAX_IMAGES + " images allowed", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            galleryLauncher.launch(intent);
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Failed to open gallery", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
     private void handleSelectedImage(Uri imageUri) {
@@ -163,9 +244,10 @@ public class IncidentReportFragment extends Fragment {
                     bitmap = Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true);
                 }
 
-                // Update UI and store encoded image
-                uploadImageView.setImageBitmap(bitmap);
-                encodedImage = encodeImage(bitmap);
+                // Add to container and store encoded image
+                String encodedImage = encodeImage(bitmap);
+                encodedImages.add(encodedImage);
+                addImageToContainer(bitmap);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -199,12 +281,15 @@ public class IncidentReportFragment extends Fragment {
 
         submitButton.setEnabled(false);
 
+        JSONArray imagesJsonArray = new JSONArray(encodedImages);
+        String encodedImagesStr = imagesJsonArray.toString();
+
         ApiService apiService = RetrofitClient.getApiService();
         Call<IncidentReportResponse> call = apiService.submitIncidentReport(
                 userId,
                 title,
                 description,
-                encodedImage
+                encodedImagesStr
         );
 
         call.enqueue(new Callback<IncidentReportResponse>() {
@@ -259,8 +344,9 @@ public class IncidentReportFragment extends Fragment {
     private void clearForm() {
         titleEditText.setText("");
         descriptionEditText.setText("");
+        selectedImagesContainer.removeAllViews();
+        encodedImages.clear();
         uploadImageView.setImageResource(R.drawable.incident_upload_image_here);
-        encodedImage = "";
     }
 
     private String encodeImage(Bitmap bitmap) {
