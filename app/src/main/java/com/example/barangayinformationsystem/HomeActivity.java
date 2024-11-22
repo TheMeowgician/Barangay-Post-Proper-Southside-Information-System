@@ -9,13 +9,21 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textview.MaterialTextView;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -23,13 +31,84 @@ public class HomeActivity extends AppCompatActivity {
     DrawerLayout homeDrawerLayout;
     NavigationView navigationView;
     ShapeableImageView profileMiniIconCircleImageView;
+    MaterialTextView navHeaderFullNameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         initializeComponents();
+        loadUserDetails();
+        updateUserActivity();
         replaceFragment(new HomeFragment());
+    }
+
+    private void updateUserActivity() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int userId = prefs.getInt("user_id", -1);
+
+        if (userId != -1) {
+            ApiService apiService = RetrofitClient.getApiService();
+            Call<ActivityResponse> call = apiService.updateUserActivity(userId);
+
+            call.enqueue(new Callback<ActivityResponse>() {
+                @Override
+                public void onResponse(Call<ActivityResponse> call, Response<ActivityResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        // Activity updated successfully
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ActivityResponse> call, Throwable t) {
+                    // Silent failure - we don't want to bother the user with activity tracking errors
+                }
+            });
+        }
+    }
+
+    private void loadUserDetails() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int userId = prefs.getInt("user_id", -1);
+
+        if (userId != -1) {
+            ApiService apiService = RetrofitClient.getApiService();
+            Call<UserDetailsResponse> call = apiService.getUserDetails(userId);
+
+            call.enqueue(new Callback<UserDetailsResponse>() {
+                @Override
+                public void onResponse(Call<UserDetailsResponse> call, Response<UserDetailsResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        UserDetailsResponse userDetailsResponse = response.body();
+                        if ("success".equals(userDetailsResponse.getStatus()) && userDetailsResponse.getUser() != null) {
+                            updateNavigationHeader(userDetailsResponse.getUser());
+                            updateUserActivity();
+                        } else {
+                            Toast.makeText(HomeActivity.this, "Failed to load user details", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserDetailsResponse> call, Throwable t) {
+                    Toast.makeText(HomeActivity.this, "Network error: Failed to load user details", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void updateNavigationHeader(UserDetailsResponse.User user) {
+        View headerView = navigationView.getHeaderView(0);
+        navHeaderFullNameTextView = headerView.findViewById(R.id.navHeaderFullNameTextView);
+
+        String fullName = user.getFirstName() + " " + user.getLastName();
+        navHeaderFullNameTextView.setText(fullName);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUserActivity();
     }
 
     public void openNotificationActivity(View view) {
@@ -50,22 +129,35 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void initializeComponents() {
+    private void performLogout() {
+        updateUserActivity();
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("user_id");
+        editor.apply();
+
+        Intent loginIntent = new Intent(HomeActivity.this, LogInActivity.class);
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        SuccessDialog.showSuccess(HomeActivity.this, "You have successfully logged out", loginIntent);
+    }
+
+    private void initializeComponents() {
         menuImageButton = findViewById(R.id.menuImageButton);
         homeDrawerLayout = findViewById(R.id.homeDrawerLayout);
         navigationView = findViewById(R.id.navigationView);
         closeMenuImageButton = findViewById(R.id.closeMenuImageButton);
-
         profileMiniIconCircleImageView = findViewById(R.id.profileMiniIconCircleImageView);
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull @org.jetbrains.annotations.NotNull MenuItem item) {
-
                 int id = item.getItemId();
                 item.setChecked(true);
                 homeDrawerLayout.closeDrawer(GravityCompat.START);
+
+                updateUserActivity();
 
                 if(id == R.id.navHome) {
                     replaceFragment(new HomeFragment());
@@ -82,22 +174,18 @@ public class HomeActivity extends AppCompatActivity {
                 } else if(id == R.id.navIncidentReport) {
                     replaceFragment(new IncidentReportFragment());
                 } else if(id == R.id.navLogOut) {
-                    finish();
+                    performLogout();
                 }
 
                 return true;
             }
         });
-
     }
 
     public void replaceFragment(Fragment fragment) {
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
-
     }
-
 }
