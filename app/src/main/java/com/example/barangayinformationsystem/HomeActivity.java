@@ -39,11 +39,35 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         initializeComponents();
         loadUserDetails();
+        updateUserActivity();
         replaceFragment(new HomeFragment());
     }
 
+    private void updateUserActivity() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int userId = prefs.getInt("user_id", -1);
+
+        if (userId != -1) {
+            ApiService apiService = RetrofitClient.getApiService();
+            Call<ActivityResponse> call = apiService.updateUserActivity(userId);
+
+            call.enqueue(new Callback<ActivityResponse>() {
+                @Override
+                public void onResponse(Call<ActivityResponse> call, Response<ActivityResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        // Activity updated successfully
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ActivityResponse> call, Throwable t) {
+                    // Silent failure - we don't want to bother the user with activity tracking errors
+                }
+            });
+        }
+    }
+
     private void loadUserDetails() {
-        // Get user ID from SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         int userId = prefs.getInt("user_id", -1);
 
@@ -58,6 +82,7 @@ public class HomeActivity extends AppCompatActivity {
                         UserDetailsResponse userDetailsResponse = response.body();
                         if ("success".equals(userDetailsResponse.getStatus()) && userDetailsResponse.getUser() != null) {
                             updateNavigationHeader(userDetailsResponse.getUser());
+                            updateUserActivity();
                         } else {
                             Toast.makeText(HomeActivity.this, "Failed to load user details", Toast.LENGTH_SHORT).show();
                         }
@@ -76,12 +101,14 @@ public class HomeActivity extends AppCompatActivity {
         View headerView = navigationView.getHeaderView(0);
         navHeaderFullNameTextView = headerView.findViewById(R.id.navHeaderFullNameTextView);
 
-        // Create full name from first name and last name
         String fullName = user.getFirstName() + " " + user.getLastName();
         navHeaderFullNameTextView.setText(fullName);
+    }
 
-        // Here you could also update other user details in the navigation header
-        // like profile image, address, etc. if needed
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUserActivity();
     }
 
     public void openNotificationActivity(View view) {
@@ -103,17 +130,16 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void performLogout() {
-        // Clear user session from SharedPreferences
+        updateUserActivity();
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove("user_id");
         editor.apply();
 
-        // Create intent to return to login screen
         Intent loginIntent = new Intent(HomeActivity.this, LogInActivity.class);
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-        // Show success message using your existing SuccessDialog
         SuccessDialog.showSuccess(HomeActivity.this, "You have successfully logged out", loginIntent);
     }
 
@@ -130,6 +156,8 @@ public class HomeActivity extends AppCompatActivity {
                 int id = item.getItemId();
                 item.setChecked(true);
                 homeDrawerLayout.closeDrawer(GravityCompat.START);
+
+                updateUserActivity();
 
                 if(id == R.id.navHome) {
                     replaceFragment(new HomeFragment());

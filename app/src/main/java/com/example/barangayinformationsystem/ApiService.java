@@ -47,5 +47,10 @@ public interface ApiService {
             @Field("incident_picture") String encodedImage
     );
 
+    @FormUrlEncoded
+    @POST("update_user_activity.php")
+    Call<ActivityResponse> updateUserActivity(
+            @Field("user_id") int userId
+    );
 
 }
