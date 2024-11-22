@@ -38,5 +38,14 @@ public interface ApiService {
     @GET("get_announcements.php")
     Call<List<AnnouncementResponse>> getAnnouncements();
 
+    @FormUrlEncoded
+    @POST("submit_incident_report.php")
+    Call<IncidentReportResponse> submitIncidentReport(
+            @Field("user_id") int userId,
+            @Field("title") String title,
+            @Field("description") String description,
+            @Field("incident_picture") String encodedImage
+    );
+
 
 }

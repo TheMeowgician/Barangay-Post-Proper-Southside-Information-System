@@ -121,7 +121,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/incident_report_description_textInputLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/incident_report_description_textView"
                     app:boxCornerRadiusTopStart="13dp"
                     app:boxCornerRadiusTopEnd="13dp"
@@ -133,11 +133,16 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/incident_report_description_textInputEditText"
                         android:layout_width="match_parent"
-                        android:layout_height="192dp"
-                        android:inputType="text"
-                        android:textSize="14dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="192dp"
+                        android:gravity="top|start"
+                        android:inputType="textMultiLine"
+                        android:padding="12dp"
+                        android:textSize="14sp"
                         android:fontFamily="@font/poppins"
-                        />
+                        android:background="@null"
+                        android:verticalScrollbarPosition="right"
+                        android:scrollbars="vertical"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
             </RelativeLayout>
