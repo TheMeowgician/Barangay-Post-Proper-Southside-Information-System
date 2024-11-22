@@ -37,7 +37,7 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/about_barangay_body_relative_layout"
+            android:id="@+id/about_barangay_upper_body_relative_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="28dp"
@@ -75,7 +75,7 @@
                 android:id="@+id/about_barangay_our_vision_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="28dp"
                 android:layout_below="@+id/about_barangay_our_mission_relative_layout">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -105,7 +105,7 @@
                 android:id="@+id/about_barangay_our_goal_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="28dp"
                 android:layout_below="@+id/about_barangay_our_vision_relative_layout">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -135,6 +135,223 @@
 
             </RelativeLayout>
 
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/about_barangay_line_between_upper_and_lower"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#000000"
+            android:alpha="0.5"
+            android:layout_below="@+id/about_barangay_upper_body_relative_layout">
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/about_barangay_lower_body_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="28dp"
+            android:layout_below="@+id/about_barangay_upper_body_relative_layout">
+
+            <RelativeLayout
+                android:id="@+id/about_barangay_historical_background_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_historical_background_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Historical Background"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="22sp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_historical_background_description_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="The Military authorities first became aware of the importance of creating Barangay inside military reservation after issuance of P.D. 86 on December 31, 1972, creating the Citizens Assemblies aim “To broaden the base of the citizens participation in democratic process and afford ample opportunities for their citizenry to express their views on important issues”. Thus P.D. No. 557 dated November 6, 1974 was issued and as a result two (2) barangays inside Fort Bonifacio came into existence: Barangay Southside Post Proper and Barangay Northside Post Proper. During the time, every barangay was being consulted to ratify a new constitution. Thus, the existence of a community composed of military personnel and their dependents had to be recognized."
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/about_barangay_historical_background_textview"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/about_barangay_location_and_physical_features_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/about_barangay_historical_background_relative_layout">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_location_and_physical_features_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Location and Physical Features"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="22sp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_location_and_physical_features_boundaries_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Boundaries: "
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/about_barangay_location_and_physical_features_textview"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_location_and_physical_features_boundaries_3.1_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="28dp"
+                    android:paddingRight="28dp"
+                    android:text="3.1 Barangay Boundaries: (Originally)"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/about_barangay_location_and_physical_features_boundaries_textview"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_location_and_physical_features_boundaries_3.1_items_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="48dp"
+                    android:text="North - Post Proper North\nSouth - Taguig\nEast - Rizal\nWest - Forbes"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textSize="14sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/about_barangay_location_and_physical_features_boundaries_3.1_textview"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_location_and_physical_features_boundaries_3.2_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="28dp"
+                    android:paddingRight="28dp"
+                    android:text="3.2 Street Boundaries: Could not be defined due to boundary dispute between Makati and Taguig."
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_marginTop="10dp"
+
+                    android:layout_below="@+id/about_barangay_location_and_physical_features_boundaries_3.1_items_textview"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_location_and_physical_features_physical_attributes_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Physical Attributes"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/about_barangay_location_and_physical_features_boundaries_3.2_textview"/>
+
+                <RelativeLayout
+                    android:id="@+id/about_barangay_physical_attributes_items_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/about_barangay_location_and_physical_features_physical_attributes_textview">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/about_barangay_physical_attributes_items_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="28dp"
+                        android:paddingRight="28dp"
+                        android:text="2.1 Slope Characteristics: Moderately undulating and rolling land in many direction\n2.2. Physiograph: Undulating tuffaceous plain\n2.3 Flood Intensity: Low\n2.4 Earthquake Risk: None to Low\n2.5 Water Bodies: None"
+                        android:fontFamily="@font/poppins"
+                        android:textSize="14sp"
+                        android:layout_marginTop="10dp"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/about_barangay_physical_attributes_total_landArea_and_landmark_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@+id/about_barangay_physical_attributes_items_textview"
+                        android:fontFamily="@font/poppins"
+                        android:textSize="14sp"
+                        android:text="Total Land Area: 243 hectares\n
+Landmark: American Cemetery"/>
+
+                </RelativeLayout>
+
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/about_barangay_population_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/about_barangay_location_and_physical_features_relative_layout">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_population_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Population"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"
+                    />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_population_items_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1. Total Population: 63,308 as per NSO Survey 2020\n2. Number of Households: 15,976\n3. Average Household size: 5 members to 10 members\n4. Number of O.S.Y.: 82"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/about_barangay_population_textview"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/about_barangay_facilities_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/about_barangay_population_relative_layout">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_facilities_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Facilities"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"
+                    />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/about_barangay_facilities_items_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Barangay Hall: Barangay 31 Southside Post Proper Lawton Avenue, Taguig City\n
+Satellite Office: Fox St. Grp, 4 Palar Village Southside, Taguig City\n
+Open Court: Abram St. Grp. 3 Palar Village Southside, Taguig City\n"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/about_barangay_facilities_textview"/>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/barangay_ppss_map"
+                    android:layout_marginTop="28dp"
+                    android:layout_below="@+id/about_barangay_facilities_items_textview"/>
+                
+            </RelativeLayout>
 
         </RelativeLayout>
 
