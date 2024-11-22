@@ -9,7 +9,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -50,19 +52,32 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void initializeComponents() {
+    private void performLogout() {
+        // Clear user session from SharedPreferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("user_id"); // Remove the user_id that was saved during login
+        editor.apply();
 
+        // Create intent to return to login screen
+        Intent loginIntent = new Intent(HomeActivity.this, LogInActivity.class);
+        // Clear the activity stack so user can't go back
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        // Show success message using your existing SuccessDialog
+        SuccessDialog.showSuccess(HomeActivity.this, "You have successfully logged out", loginIntent);
+    }
+
+    private void initializeComponents() {
         menuImageButton = findViewById(R.id.menuImageButton);
         homeDrawerLayout = findViewById(R.id.homeDrawerLayout);
         navigationView = findViewById(R.id.navigationView);
         closeMenuImageButton = findViewById(R.id.closeMenuImageButton);
-
         profileMiniIconCircleImageView = findViewById(R.id.profileMiniIconCircleImageView);
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull @org.jetbrains.annotations.NotNull MenuItem item) {
-
                 int id = item.getItemId();
                 item.setChecked(true);
                 homeDrawerLayout.closeDrawer(GravityCompat.START);
@@ -82,22 +97,18 @@ public class HomeActivity extends AppCompatActivity {
                 } else if(id == R.id.navIncidentReport) {
                     replaceFragment(new IncidentReportFragment());
                 } else if(id == R.id.navLogOut) {
-                    finish();
+                    performLogout();
                 }
 
                 return true;
             }
         });
-
     }
 
     public void replaceFragment(Fragment fragment) {
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
-
     }
-
 }
