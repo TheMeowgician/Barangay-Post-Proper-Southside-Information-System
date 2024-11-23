@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView 
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -45,6 +45,23 @@
                 android:layout_centerInParent="true"
                 app:strokeColor="#61009F"
                 app:strokeWidth="3dp">
+
+                <ImageView
+                    android:id="@+id/profileImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/default_profile_picture"/>  <!-- Add a default profile picture drawable -->
+
+                <ImageView
+                    android:id="@+id/editProfilePictureButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/circular_background"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_camera"/>
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -142,7 +159,7 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusBottomEnd="13dp"
                     app:boxStrokeColor="@color/black"
-                    app:boxBackgroundColor="#A0A0A0">
+                    >
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/profileUsernameTextInputEditText"
@@ -152,8 +169,6 @@
                         android:text="Bakalako1234"
                         android:textSize="14dp"
                         android:fontFamily="@font/poppins"
-                        android:clickable="false"
-                        android:focusable="false"
                         android:drawableStart="@drawable/profile_username_icon"
                         android:drawablePadding="16dp"
                         />
@@ -162,12 +177,127 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/profileAddressTextInputEditTextLinearLayout"
+                android:id="@+id/profileHouseNoTextInputEditTextLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="20dp"
                 android:layout_below="@+id/profileUsernameTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileHouseNoTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="House No."
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileHouseNoTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileHouseNoTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:drawableStart="@drawable/profile_address_icon"
+                        android:drawablePadding="16dp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileStreetTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileHouseNoTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileStreetTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Street"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileStreetTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileStreetTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:drawableStart="@drawable/profile_address_icon"
+                        android:drawablePadding="16dp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileZoneTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileStreetTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileZoneTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Zone"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileZoneTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    >
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileZoneTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:drawableStart="@drawable/profile_address_icon"
+                        android:drawablePadding="16dp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profileAddressTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileZoneTextInputEditTextLinearLayout">
 
                 <TextView
                     android:id="@+id/profileAddressTextView"
@@ -370,11 +500,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
-                        android:text="123456"
                         android:textSize="14dp"
                         android:fontFamily="@font/poppins"
-                        android:clickable="false"
-                        android:focusable="false"
                         android:drawableStart="@drawable/profile_password_icon"
                         android:drawablePadding="16dp"
                         app:endIconCheckable="false"
@@ -390,7 +517,7 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="20dp"
                 android:layout_below="@+id/profilePasswordTextInputEditTextLinearLayout"
-                android:visibility="gone">
+                >
 
                 <TextView
                     android:id="@+id/profileConfirmPasswordTextView"
@@ -441,13 +568,13 @@
                 android:id="@+id/editProfileButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Edit Profile"
-                android:textAllCaps="false"
-                android:fontFamily="@font/poppins_medium"
-                android:textSize="20dp"
-                android:textColor="@color/white"
+                android:layout_marginBottom="5dp"
                 android:background="@drawable/custom_button_register"
-                android:layout_marginBottom="5dp"/>
+                android:fontFamily="@font/poppins_medium"
+                android:text="Save Changes"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="20dp" />
 
         </RelativeLayout>
         
