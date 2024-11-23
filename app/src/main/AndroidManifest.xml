@@ -17,6 +17,9 @@
         android:theme="@style/Theme.BarangayInformationSystem"
         tools:targetApi="31">
         <activity
+            android:name=".CedulaFormActivity"
+            android:exported="false" />
+        <activity
             android:name=".UploadRequirementsActivity"
             android:exported="false" />
         <activity

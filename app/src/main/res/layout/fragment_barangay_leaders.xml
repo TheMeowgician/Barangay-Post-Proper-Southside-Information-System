@@ -1,17 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="none"
+    android:background="#F0F0FA"
     tools:context=".BarangayLeadersFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/homeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Barangay Leaders Fragment"
-        android:textSize="20dp" />
+    <RelativeLayout
+        android:id="@+id/barangay_leaders_main_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/barangay_leaders_header_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#3F0070"
+            android:padding="28dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/barangay_leaders_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Our Barangay Officials"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:gravity="center"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/barangay_leaders_body_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="28dp"
+            android:layout_below="@+id/barangay_leaders_header_relative_layout">
+
+            <RelativeLayout
+                android:id="@+id/barangay_leaders_punong_barangay_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/punong_barangay_card_view"
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    app:cardCornerRadius="0dp"
+                    android:layout_centerHorizontal="true"
+                    app:strokeColor="#61009F"
+                    app:strokeWidth="3dp">
+
+                    <ImageView
+                        android:id="@+id/punong_barangay_image_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/punong_barangay"
+                        android:background="@drawable/gradient_background"/>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/barangay_leaders_punong_barangay_material_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:text="Quirino V. Sarono"
+                    android:fontFamily="@font/poppins_light"
+                    android:textSize="16sp"
+                    android:layout_below="@+id/punong_barangay_card_view"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/barangay_leaders_punong_barangay_role_material_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+
+                    android:text="Punong Barangay"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="12sp"
+                    android:textColor="#61009F"
+                    android:layout_below="@+id/barangay_leaders_punong_barangay_material_textview"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/barangay_leaders_officials_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="28dp"
+                android:paddingBottom="28dp"
+                android:layout_below="@+id/barangay_leaders_punong_barangay_relative_layout">
+
+                <RelativeLayout
+                    android:id="@+id/barangay_secretary_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/barangay_secretary_card_view"
+                    android:layout_width="115dp"
+                    android:layout_height="115dp"
+                    app:cardCornerRadius="90dp"
+                    android:layout_centerHorizontal="true"
+                    app:strokeColor="#61009F"
+                    app:strokeWidth="3dp">
+
+                    <ImageView
+                        android:id="@+id/barangay_secretary_image_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/barangay_secretary"
+                        android:background="@drawable/gradient_background"/>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/barangay_secretary_name_material_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="Rannie Jeffrey A.\nCamba"
+                    android:fontFamily="@font/poppins_light"
+                    android:textSize="14sp"
+                    android:layout_below="@+id/barangay_secretary_card_view"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/barangay_secretary_role_material_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="Barangay Secretary"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="10sp"
+                    android:textColor="#61009F"
+                    android:layout_below="@+id/barangay_secretary_name_material_textview"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/barangay_treasurer_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/barangay_treasurer_card_view"
+                        android:layout_width="115dp"
+                        android:layout_height="115dp"
+                        app:cardCornerRadius="90dp"
+                        android:layout_centerHorizontal="true"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/barangay_treasurer_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/barangay_treasurer"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/barangay_treasurer_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:text="Lily G.\nNacionales"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:layout_below="@+id/barangay_treasurer_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/barangay_treasurer_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:text="Barangay Secretary"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/barangay_treasurer_name_material_textview"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>
