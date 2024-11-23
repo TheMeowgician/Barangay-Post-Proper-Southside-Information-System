@@ -181,7 +181,7 @@ public class UploadRequirementsActivity extends AppCompatActivity {
 
                         SuccessDialog.showSuccess(
                                 UploadRequirementsActivity.this,
-                                "Document request submitted successfully",
+                                "Your request has been submitted. You will be notified when the document is ready for pickup.",
                                 homeIntent,
                                 2000
                         );

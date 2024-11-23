@@ -303,7 +303,7 @@ public class IncidentReportFragment extends Fragment {
                     if ("success".equals(reportResponse.getStatus())) {
                         clearForm();
                         SuccessDialog.showSuccess(requireContext(),
-                                "Your incident report has been submitted successfully",
+                                "Your incident report has been successfully submitted and will be reviewed shortly.",
                                 null);
                     } else {
                         showError("Submission Failed",

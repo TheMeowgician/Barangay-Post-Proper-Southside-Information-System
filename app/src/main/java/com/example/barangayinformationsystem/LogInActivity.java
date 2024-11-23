@@ -21,7 +21,6 @@ import retrofit2.Response;
 
 public class LogInActivity extends AppCompatActivity {
 
-    TextView forgotPasswordTextView;
     TextView signUpTextView;
     Button logInButton;
     ImageButton backImageButton;
@@ -36,7 +35,6 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
-        forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView);
         signUpTextView = findViewById(R.id.signUpTextView);
         logInButton = findViewById(R.id.logInButton);
         backImageButton = findViewById(R.id.backImageButton);
@@ -123,7 +121,6 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     private void addUnderlineToTextView() {
-        forgotPasswordTextView.setPaintFlags(forgotPasswordTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         signUpTextView.setPaintFlags(signUpTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     }
 
