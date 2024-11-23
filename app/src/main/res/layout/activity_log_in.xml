@@ -115,13 +115,6 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
 
-            <TextView
-                android:id="@+id/forgotPasswordTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Forgot Password?"
-                android:layout_gravity="right"
-                android:fontFamily="@font/poppins"/>
         </LinearLayout>
 
             <LinearLayout

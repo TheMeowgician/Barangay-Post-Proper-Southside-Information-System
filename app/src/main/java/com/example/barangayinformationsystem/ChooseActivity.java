@@ -26,7 +26,7 @@ public class ChooseActivity extends AppCompatActivity {
     }
 
     public void moveToRegistrationActivity(View view) {//This code will take the user to Registration Activity
-        Intent intent = new Intent(ChooseActivity.this, RegistrationActivity.class);
+        Intent intent = new Intent(ChooseActivity.this, TermsAndConditionsActivity.class);
         startActivity(intent);
     }
 
