@@ -67,6 +67,7 @@ public interface ApiService {
             @Field("ctc") String ctc,
             @Field("alias") String alias,
             @Field("age") int age,
+            @Field("birthday") String birthday,
             @Field("lengthOfStay") int lengthOfStay,
             @Field("citizenship") String citizenship,
             @Field("gender") String gender,

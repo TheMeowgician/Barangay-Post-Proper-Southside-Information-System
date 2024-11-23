@@ -1,8 +1,11 @@
 package com.example.barangayinformationsystem;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -14,12 +17,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BarangayClearanceFormActivity extends AppCompatActivity {
 
+    private TextInputEditText birthdayInput;
+    private Calendar calendar;
     private static final String TAG = "BarangayClearanceForm";
     private ImageButton backButton;
     private TextInputEditText nameInput, aliasInput, ageInput, addressInput;
@@ -33,12 +41,15 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barangay_clearance_form);
 
+        calendar = Calendar.getInstance();
         apiService = RetrofitClient.getApiService();
         initializeComponents();
         setupListeners();
+        setupDateInputHandling();
     }
 
     private void initializeComponents() {
+        birthdayInput = findViewById(R.id.barangay_clearance_form_date_of_birth_textInputEditText);
         backButton = findViewById(R.id.barangay_clearance_form_back_button);
         nameInput = findViewById(R.id.barangay_clearance_form_name_textInputEditText);
         aliasInput = findViewById(R.id.barangay_clearance_form_alias_textInputEditText);
@@ -55,6 +66,83 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Submitting request...");
         progressDialog.setCancelable(false);
+    }
+
+    private void setupDateInputHandling() {
+        // Set up date format watcher
+        birthdayInput.addTextChangedListener(new TextWatcher() {
+            private String current = "";
+            private String mmddyy = "MMDDYY";
+            private Calendar cal = Calendar.getInstance();
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!s.toString().equals(current)) {
+                    String clean = s.toString().replaceAll("[^\\d.]|\\.","");
+                    String cleanC = current.replaceAll("[^\\d.]|\\.","");
+
+                    int cl = clean.length();
+                    int sel = cl;
+                    for (int i = 2; i <= cl && i < 6; i += 2) {
+                        sel++;
+                    }
+                    //Fix for pressing delete next to a forward slash
+                    if (clean.equals(cleanC)) sel--;
+
+                    if (clean.length() < 6){
+                        clean = clean + mmddyy.substring(clean.length());
+                    }else{
+                        //This part makes sure that when we finish entering numbers
+                        //the date is correct, fixing it if necessary
+                        int mon  = Integer.parseInt(clean.substring(0,2));
+                        int day  = Integer.parseInt(clean.substring(2,4));
+                        int year = Integer.parseInt(clean.substring(4,6));
+
+                        mon = mon < 1 ? 1 : mon > 12 ? 12 : mon;
+                        cal.set(Calendar.MONTH, mon-1);
+                        year = year + 2000;
+                        cal.set(Calendar.YEAR, year);
+
+                        // Adjust day based on month and year
+                        int maxDays = cal.getActualMaximum(Calendar.DATE);
+                        day = day < 1 ? 1 : day > maxDays ? maxDays : day;
+
+                        clean = String.format(Locale.US, "%02d%02d%02d", mon, day, year % 100);
+                    }
+
+                    clean = String.format("%s-%s-%s", clean.substring(0,2),
+                            clean.substring(2,4), clean.substring(4,6));
+
+                    sel = sel < 0 ? 0 : sel;
+                    current = clean;
+                    birthdayInput.setText(current);
+                    birthdayInput.setSelection(sel < current.length() ? sel : current.length());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        // Set up date picker dialog
+        birthdayInput.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    this,
+                    (view, year, month, dayOfMonth) -> {
+                        calendar.set(year, month, dayOfMonth);
+                        String dateFormat = String.format(Locale.US, "%02d-%02d-%02d",
+                                month + 1, dayOfMonth, year % 100);
+                        birthdayInput.setText(dateFormat);
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+            datePickerDialog.show();
+        });
     }
 
     private void setupListeners() {
@@ -77,6 +165,11 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
             progressDialog.show();
 
             // Get all form values with proper error handling
+            String birthday = birthdayInput.getText().toString().trim();
+            if (!isValidDate(birthday)) {
+                birthdayInput.setError("Please enter a valid date (MM-DD-YY)");
+                return;
+            }
             String name = getEditTextValue(nameInput);
             String alias = getEditTextValue(aliasInput);
             String address = getEditTextValue(addressInput);
@@ -103,6 +196,7 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
                     ctc,
                     alias,
                     age,
+                    birthday,
                     lengthOfStay,
                     citizenship,
                     gender,
@@ -110,6 +204,7 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
                     purpose,
                     1  // Default quantity
             );
+
 
             call.enqueue(new Callback<DocumentRequestResponse>() {
                 @Override
@@ -153,6 +248,30 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
             Log.e(TAG, "Error in form submission", e);
             progressDialog.dismiss();
             showError("Error preparing form submission: " + e.getMessage());
+        }
+    }
+
+    private boolean isValidDate(String date) {
+        if (date == null || !date.matches("\\d{2}-\\d{2}-\\d{2}")) {
+            return false;
+        }
+        try {
+            String[] parts = date.split("-");
+            int month = Integer.parseInt(parts[0]);
+            int day = Integer.parseInt(parts[1]);
+            int year = Integer.parseInt(parts[2]);
+
+            if (month < 1 || month > 12) return false;
+            if (day < 1 || day > 31) return false;
+            if (year < 0 || year > 99) return false;
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.YEAR, 2000 + year);
+            cal.set(Calendar.MONTH, month - 1);
+
+            return day <= cal.getActualMaximum(Calendar.DATE);
+        } catch (Exception e) {
+            return false;
         }
     }
 

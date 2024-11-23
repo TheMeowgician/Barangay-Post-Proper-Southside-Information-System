@@ -373,6 +373,9 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
                         android:inputType="date"
+                        android:hint="MM-DD-YY"
+                        android:maxLength="8"
+                        android:digits="0123456789-"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
