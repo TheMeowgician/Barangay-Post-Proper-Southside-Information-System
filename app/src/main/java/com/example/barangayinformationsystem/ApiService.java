@@ -2,11 +2,15 @@ package com.example.barangayinformationsystem;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface ApiService {
@@ -53,4 +57,30 @@ public interface ApiService {
             @Field("user_id") int userId
     );
 
+    @FormUrlEncoded
+    @POST("submit_document_request.php")
+    Call<DocumentRequestResponse> submitDocumentRequest(
+            @Field("documentType") String documentType,
+            @Field("name") String name,
+            @Field("address") String address,
+            @Field("tin") String tin,
+            @Field("ctc") String ctc,
+            @Field("alias") String alias,
+            @Field("age") int age,
+            @Field("lengthOfStay") int lengthOfStay,
+            @Field("citizenship") String citizenship,
+            @Field("gender") String gender,
+            @Field("civilStatus") String civilStatus,
+            @Field("purpose") String purpose,
+            @Field("quantity") int quantity
+    );
+
+    @Multipart
+    @POST("upload_requirements.php")
+    Call<UploadRequirementsResponse> uploadRequirements(
+            @Part("requestId") RequestBody requestId,
+            @Part("quantity") RequestBody quantity,
+            @Part MultipartBody.Part validId
+    );
 }
+

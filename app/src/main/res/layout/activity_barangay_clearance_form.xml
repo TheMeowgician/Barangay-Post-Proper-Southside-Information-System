@@ -93,7 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Name"
+                    android:text="Name (WARNING!: make sure to input the same name in your account or you will be rejected)"
                     android:textSize="14dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -201,6 +201,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins"
+                                android:hint="Example: 20,36,45"
                                 android:inputType="text"
                                 android:textSize="14dp" />
                         </com.google.android.material.textfield.TextInputLayout>
@@ -350,7 +351,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Date of Birth"
+                    android:text="Date of Birth (MM-DD-YY)"
                     android:textSize="14dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -485,6 +486,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
+                        android:hint="Example: 888-A Kalaw Street Zone 4"
                         android:inputType="text"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -503,7 +505,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Length of Stay"
+                    android:text="Length of Stay (Years)"
                     android:textSize="14dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -524,6 +526,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
                         android:inputType="text"
+                        android:hint="Example: 8"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -599,6 +602,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
+                        android:hint="Example: 000123456001"
                         android:inputType="text"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -638,6 +642,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
                         android:inputType="text"
+                        android:hint = "Example: 000123456001"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -695,7 +700,7 @@
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/custom_button_submit"
                     android:fontFamily="@font/poppins_semibold"
-                    android:text="Submit"
+                    android:text="Proceed to Next Step"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="18dp" />
