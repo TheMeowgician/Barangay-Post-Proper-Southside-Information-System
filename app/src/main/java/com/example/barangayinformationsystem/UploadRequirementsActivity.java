@@ -1,6 +1,7 @@
 package com.example.barangayinformationsystem;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -130,28 +131,38 @@ public class UploadRequirementsActivity extends AppCompatActivity {
         }
 
         try {
-            File file = createFileFromUri(validIdUri);
-            if (file == null) {
-                Toast.makeText(this, "Error preparing file", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            // Show progress dialog
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Processing and uploading images...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
 
-            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
-            MultipartBody.Part validIdPart = MultipartBody.Part.createFormData(
-                    "validId",
-                    file.getName(),
-                    requestFile
-            );
+            // Process and compress the valid ID image
+            File compressedValidId = ImageUploadUtil.prepareImageForUpload(this, validIdUri, "valid_id");
 
+            // Create request parts
             RequestBody requestIdPart = RequestBody.create(
                     MediaType.parse("text/plain"),
                     String.valueOf(requestId)
             );
+
             RequestBody quantityPart = RequestBody.create(
                     MediaType.parse("text/plain"),
                     copies
             );
 
+            RequestBody validIdRequestFile = RequestBody.create(
+                    MediaType.parse("image/jpeg"),
+                    compressedValidId
+            );
+
+            MultipartBody.Part validIdPart = MultipartBody.Part.createFormData(
+                    "validId",
+                    compressedValidId.getName(),
+                    validIdRequestFile
+            );
+
+            // Make the API call
             Call<UploadRequirementsResponse> call = apiService.uploadRequirements(
                     requestIdPart,
                     quantityPart,
@@ -160,20 +171,19 @@ public class UploadRequirementsActivity extends AppCompatActivity {
 
             call.enqueue(new Callback<UploadRequirementsResponse>() {
                 @Override
-                public void onResponse(Call<UploadRequirementsResponse> call,
-                                       Response<UploadRequirementsResponse> response) {
+                public void onResponse(Call<UploadRequirementsResponse> call, Response<UploadRequirementsResponse> response) {
+                    progressDialog.dismiss();
+
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                         // Show success dialog and navigate to home
-                        Intent homeIntent = new Intent(UploadRequirementsActivity.this,
-                                HomeActivity.class);
-                        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                                Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Intent homeIntent = new Intent(UploadRequirementsActivity.this, HomeActivity.class);
+                        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
                         SuccessDialog.showSuccess(
                                 UploadRequirementsActivity.this,
                                 "Document request submitted successfully",
                                 homeIntent,
-                                2000 // 2 seconds delay
+                                2000
                         );
                     } else {
                         Toast.makeText(UploadRequirementsActivity.this,
@@ -183,6 +193,7 @@ public class UploadRequirementsActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<UploadRequirementsResponse> call, Throwable t) {
+                    progressDialog.dismiss();
                     Toast.makeText(UploadRequirementsActivity.this,
                             "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
