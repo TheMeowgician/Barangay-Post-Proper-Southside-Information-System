@@ -17,7 +17,9 @@ import android.widget.Button;
 public class DocumentRequestFragment extends Fragment {
 
     public AppCompatButton document_request_barangay_clearance_material_cardview_select_button,
-            document_request_cedula_material_cardview_select_button;
+            document_request_cedula_material_cardview_select_button,
+            document_request_barangay_certification_material_cardview_select_button,
+            document_request_certificate_of_indigency_material_cardview_select_button;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,8 @@ public class DocumentRequestFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_document_request, container, false);
         document_request_barangay_clearance_material_cardview_select_button = view.findViewById(R.id.document_request_barangay_clearance_material_cardview_select_button);
         document_request_cedula_material_cardview_select_button = view.findViewById(R.id.document_request_cedula_material_cardview_select_button);
+        document_request_barangay_certification_material_cardview_select_button = view.findViewById(R.id.document_request_barangay_certification_material_cardview_select_button);
+        document_request_certificate_of_indigency_material_cardview_select_button = view.findViewById(R.id.document_request_certificate_of_indigency_material_cardview_select_button);
 
         document_request_barangay_clearance_material_cardview_select_button.setOnClickListener(new OnClickListener() {
             @Override
@@ -43,6 +47,22 @@ public class DocumentRequestFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), CedulaFormActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        document_request_barangay_certification_material_cardview_select_button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), BarangayCertificationFormActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        document_request_certificate_of_indigency_material_cardview_select_button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), CertificateOfIndigencyFormActivity.class);
                 startActivity(intent);
             }
         });
