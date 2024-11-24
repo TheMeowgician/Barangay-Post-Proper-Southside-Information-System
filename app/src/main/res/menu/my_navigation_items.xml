@@ -5,46 +5,51 @@
 
     <group android:checkableBehavior="single">
 
-    <item
-        android:id="@+id/navHome"
-        android:title="Home"
-        android:icon="@drawable/nav_drawer_home"
-        android:checked="true"/>
+        <item
+            android:id="@+id/navHome"
+            android:title="Home"
+            android:icon="@drawable/nav_drawer_home"
+            android:checked="true"/>
 
-    <item
-        android:id="@+id/navUpdates"
-        android:title="Updates"
-        android:icon="@drawable/nav_drawer_commercial" />
+        <item
+            android:id="@+id/navUpdates"
+            android:title="Updates"
+            android:icon="@drawable/nav_drawer_commercial" />
 
-    <item
-        android:id="@+id/navDocumentRequest"
-        android:title="Document Request"
-        android:icon="@drawable/nav_drawer_document" />
+        <item
+            android:id="@+id/navDocumentRequest"
+            android:title="Document Request"
+            android:icon="@drawable/nav_drawer_document" />
 
-    <item
-        android:id="@+id/navDeskChat"
-        android:title="Desk Chat"
-        android:icon="@drawable/nav_drawer_chat_bubble" />
+        <item
+            android:id="@+id/navDocumentStatus"
+            android:title="Document Status"
+            android:icon="@drawable/nav_drawer_document_status" />
 
-    <item
-        android:id="@+id/navIncidentReport"
-        android:title="Incident Report"
-        android:icon="@drawable/nav_drawer_alert" />
+        <item
+            android:id="@+id/navDeskChat"
+            android:title="Desk Chat"
+            android:icon="@drawable/nav_drawer_chat_bubble" />
 
-    <item
-        android:id="@+id/navHotlineNumbers"
-        android:title="Hotline Numbers"
-        android:icon="@drawable/nav_drawer_hotline" />
+        <item
+            android:id="@+id/navIncidentReport"
+            android:title="Incident Report"
+            android:icon="@drawable/nav_drawer_alert" />
 
-    <item
-        android:id="@+id/navBarangayLeaders"
-        android:title="Barangay Leaders"
-        android:icon="@drawable/nav_drawer_management" />
+        <item
+            android:id="@+id/navHotlineNumbers"
+            android:title="Hotline Numbers"
+            android:icon="@drawable/nav_drawer_hotline" />
 
-    <item
-        android:id="@+id/navAboutBarangay"
-        android:title="About Barangay"
-        android:icon="@drawable/nav_drawer_info" />
+        <item
+            android:id="@+id/navBarangayLeaders"
+            android:title="Barangay Leaders"
+            android:icon="@drawable/nav_drawer_management" />
+
+        <item
+            android:id="@+id/navAboutBarangay"
+            android:title="About Barangay"
+            android:icon="@drawable/nav_drawer_info" />
 
     </group>
 

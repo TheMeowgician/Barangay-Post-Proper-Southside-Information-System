@@ -99,5 +99,14 @@ public interface ApiService {
             @Part("quantity") RequestBody quantity,
             @Part MultipartBody.Part validId
     );
+
+    @GET("get_user_requests.php")
+    Call<DocumentRequestListResponse> getUserRequests(@Query("userId") int userId);
+
+    @FormUrlEncoded
+    @POST("cancel_request.php")
+    Call<DocumentRequestResponse> cancelRequest(
+            @Field("requestId") int requestId
+    );
 }
 

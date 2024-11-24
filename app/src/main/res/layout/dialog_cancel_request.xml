@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please select a reason for cancelling your request."
+        android:textSize="16sp"
+        android:fontFamily="@font/poppins"
+        android:layout_marginBottom="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/cancel_reason_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/reason_mistake"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submitted by mistake"
+            android:fontFamily="@font/poppins"
+            android:padding="8dp"/>
+
+        <RadioButton
+            android:id="@+id/reason_not_needed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No longer needed"
+            android:fontFamily="@font/poppins"
+            android:padding="8dp"/>
+
+        <RadioButton
+            android:id="@+id/reason_incorrect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Incorrect information"
+            android:fontFamily="@font/poppins"
+            android:padding="8dp"/>
+    </RadioGroup>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/other_reason_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/other_reason_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Other (please specify):"
+            android:fontFamily="@font/poppins"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

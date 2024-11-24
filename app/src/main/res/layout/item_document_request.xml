@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="12dp"
+    android:elevation="4dp"
+    app:cardBackgroundColor="#3F0070">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/cancel_request_button">
+
+            <TextView
+                android:id="@+id/transaction_number_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Transaction No:"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/poppins_medium"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/transaction_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TXN-20230927"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/poppins"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/document_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Certificate of Indigency"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/poppins"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical">
+
+                <View
+                    android:id="@+id/status_indicator"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/pending_status_dot"/>
+
+                <TextView
+                    android:id="@+id/status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pending"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
+            <!-- For approved documents -->
+            <TextView
+                android:id="@+id/pickup_instructions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Claim at Brgy. Hall (7AM-5PM)"
+                android:textColor="#FFEB3B"
+                android:fontFamily="@font/poppins"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"/>
+
+            <!-- For rejected documents -->
+            <TextView
+                android:id="@+id/rejection_reason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF6B6B"
+                android:fontFamily="@font/poppins"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/cancel_request_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="Cancel Request"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#6A359C"
+            android:fontFamily="@font/poppins"/>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,24 +1,69 @@
 package com.example.barangayinformationsystem;
 
+import com.google.gson.annotations.SerializedName;
+
 public class DocumentRequest {
+    @SerializedName("Id")
     private int id;
+
+    @SerializedName("userId")
+    private int userId;
+
+    @SerializedName("DocumentType")
     private String documentType;
+
+    @SerializedName("Name")
     private String name;
+
+    @SerializedName("Address")
     private String address;
+
+    @SerializedName("TIN_No")
     private String tinNo;
+
+    @SerializedName("CTC_No")
     private String ctcNo;
+
+    @SerializedName("Alias")
     private String alias;
+
+    @SerializedName("Age")
     private int age;
+
+    @SerializedName("birthday")
+    private String birthday;
+
+    @SerializedName("LengthOfStay")
     private int lengthOfStay;
+
+    @SerializedName("Citizenship")
     private String citizenship;
+
+    @SerializedName("Gender")
     private String gender;
+
+    @SerializedName("CivilStatus")
     private String civilStatus;
+
+    @SerializedName("Purpose")
     private String purpose;
+
+    @SerializedName("Status")
     private String status;
+
+    @SerializedName("Quantity")
     private int quantity;
+
+    @SerializedName("DateRequested")
     private String dateRequested;
+
+    @SerializedName("valid_id")
     private String validId;
+
+    @SerializedName("request_picture")
     private String requestPicture;
+
+    @SerializedName("rejection_reason")
     private String rejectionReason;
 
     // Constructor
@@ -27,6 +72,9 @@ public class DocumentRequest {
     // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
 
     public String getDocumentType() { return documentType; }
     public void setDocumentType(String documentType) { this.documentType = documentType; }
@@ -48,6 +96,9 @@ public class DocumentRequest {
 
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }
+
+    public String getBirthday() { return birthday; }
+    public void setBirthday(String birthday) { this.birthday = birthday; }
 
     public int getLengthOfStay() { return lengthOfStay; }
     public void setLengthOfStay(int lengthOfStay) { this.lengthOfStay = lengthOfStay; }

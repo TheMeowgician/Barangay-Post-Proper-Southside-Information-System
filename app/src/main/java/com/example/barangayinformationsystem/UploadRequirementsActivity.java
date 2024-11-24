@@ -176,7 +176,7 @@ public class UploadRequirementsActivity extends AppCompatActivity {
 
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                         // Show success dialog and navigate to home
-                        Intent homeIntent = new Intent(UploadRequirementsActivity.this, HomeActivity.class);
+                        Intent homeIntent = new Intent(UploadRequirementsActivity.this, DocumentStatusFragment.class);
                         homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
                         SuccessDialog.showSuccess(

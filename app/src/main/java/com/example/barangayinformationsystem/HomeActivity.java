@@ -165,6 +165,8 @@ public class HomeActivity extends AppCompatActivity {
                     replaceFragment(new NewsFragment());
                 } else if(id == R.id.navDocumentRequest) {
                     replaceFragment(new DocumentRequestFragment());
+                } else if(id == R.id.navDocumentStatus) {
+                    replaceFragment(new DocumentStatusFragment());
                 } else if(id == R.id.navHotlineNumbers) {
                     replaceFragment(new HotlineNumbersFragment());
                 } else if(id == R.id.navAboutBarangay) {

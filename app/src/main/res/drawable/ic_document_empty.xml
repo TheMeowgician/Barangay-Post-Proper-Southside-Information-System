@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/ic_document_empty.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Document outline -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.5"
+        android:pathData="M14,2H6C4.89,2 4,2.89 4,4V20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20V8L14,2Z"/>
+
+    <!-- Folded corner -->
+    <path
+        android:fillColor="#F5F5F5"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.5"
+        android:pathData="M14,2V8H20L14,2Z"/>
+
+    <!-- Document lines -->
+    <path
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="1"
+        android:pathData="M8,12L16,12"/>
+
+    <path
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="1"
+        android:pathData="M8,15L16,15"/>
+
+    <path
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="1"
+        android:pathData="M8,18L12,18"/>
+
+    <!-- Sad face expression -->
+    <path
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.5"
+        android:fillColor="#00000000"
+        android:pathData="M12,11 A5,5 0 1,1 12,21 A5,5 0 1,1 12,11"/>
+
+    <path
+        android:fillColor="#BDBDBD"
+        android:pathData="M10,14 m-0.5,0 a0.5,0.5 0 1,0 1,0 a0.5,0.5 0 1,0 -1,0"/>
+
+    <path
+        android:fillColor="#BDBDBD"
+        android:pathData="M14,14 m-0.5,0 a0.5,0.5 0 1,0 1,0 a0.5,0.5 0 1,0 -1,0"/>
+
+    <path
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.5"
+        android:pathData="M10,17.5C10.8333,16.6667 13.2,16.6667 14,17.5"/>
+</vector>
