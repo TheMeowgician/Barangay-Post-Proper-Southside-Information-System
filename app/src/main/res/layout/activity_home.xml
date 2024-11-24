@@ -61,10 +61,9 @@
                         android:layout_alignParentRight="true"
                         android:background="@drawable/circle_image_view_border"
                         android:onClick="openProfileActivity"
-                        android:scaleType="fitXY"
-                        app:civ_border_color="@color/black"
-                        app:civ_border_width="2dp"
-                        app:shapeAppearanceOverlay="@style/roundedImageView" />
+                        android:scaleType="centerCrop"
+                        app:shapeAppearanceOverlay="@style/CircleImageView"
+                        android:padding="1dp"/>
 
 
 

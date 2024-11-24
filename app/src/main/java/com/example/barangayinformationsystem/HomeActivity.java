@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
@@ -98,11 +99,37 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updateNavigationHeader(UserDetailsResponse.User user) {
+        // Update Navigation Header
         View headerView = navigationView.getHeaderView(0);
         navHeaderFullNameTextView = headerView.findViewById(R.id.navHeaderFullNameTextView);
+        ShapeableImageView navHeaderImageView = headerView.findViewById(R.id.navheaderMiniIconCircleImageView);
 
         String fullName = user.getFirstName() + " " + user.getLastName();
         navHeaderFullNameTextView.setText(fullName);
+
+        // Update both profile pictures (nav header and top bar)
+        if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
+            String imageUrl = RetrofitClient.BASE_URL + user.getProfilePicture();
+
+            // Load image for navigation header
+            Glide.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.default_profile_picture)
+                    .error(R.drawable.default_profile_picture)
+                    .centerCrop()
+                    .into(navHeaderImageView);
+
+            // Load image for top bar mini icon
+            Glide.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.default_profile_picture)
+                    .error(R.drawable.default_profile_picture)
+                    .centerCrop()
+                    .into(profileMiniIconCircleImageView);
+        } else {
+            navHeaderImageView.setImageResource(R.drawable.default_profile_picture);
+            profileMiniIconCircleImageView.setImageResource(R.drawable.default_profile_picture);
+        }
     }
 
     @Override
