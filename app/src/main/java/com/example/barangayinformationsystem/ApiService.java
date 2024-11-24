@@ -75,6 +75,7 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("submit_document_request.php")
     Call<DocumentRequestResponse> submitDocumentRequest(
+            @Field("userId") int userId,  // Added userId
             @Field("documentType") String documentType,
             @Field("name") String name,
             @Field("address") String address,

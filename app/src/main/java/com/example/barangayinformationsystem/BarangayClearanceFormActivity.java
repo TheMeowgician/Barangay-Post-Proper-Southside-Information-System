@@ -3,7 +3,9 @@ package com.example.barangayinformationsystem;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -46,6 +48,7 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
         initializeComponents();
         setupListeners();
         setupDateInputHandling();
+
     }
 
     private void initializeComponents() {
@@ -161,6 +164,9 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
                 return;
             }
 
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            int userId = prefs.getInt("user_id", -1);
+
             Log.d(TAG, "Starting form submission");
             progressDialog.show();
 
@@ -189,6 +195,7 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
 
             // Create API call
             Call<DocumentRequestResponse> call = apiService.submitDocumentRequest(
+                    userId,  // Add userId here
                     "Barangay Clearance",
                     name,
                     address,
@@ -202,7 +209,7 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
                     gender,
                     civilStatus,
                     purpose,
-                    1  // Default quantity
+                    1
             );
 
 

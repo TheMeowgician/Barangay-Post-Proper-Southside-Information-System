@@ -1,7 +1,9 @@
 package com.example.barangayinformationsystem;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -63,6 +65,8 @@ public class CedulaFormActivity extends AppCompatActivity {
         if (!validateInputs()) {
             return;
         }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int userId = prefs.getInt("user_id", -1);
 
         // Get all form values
         String name = nameInput.getText().toString();
@@ -82,6 +86,7 @@ public class CedulaFormActivity extends AppCompatActivity {
 
         // Make the API call with DOCUMENT_TYPE constant
         Call<DocumentRequestResponse> call = apiService.submitDocumentRequest(
+                userId,
                 DOCUMENT_TYPE,  // Using constant instead of hardcoded string
                 name,
                 address,
