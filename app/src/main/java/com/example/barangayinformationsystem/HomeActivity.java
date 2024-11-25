@@ -195,7 +195,7 @@ public class HomeActivity extends AppCompatActivity {
                 } else if(id == R.id.navDocumentStatus) {
                     replaceFragment(new DocumentStatusFragment());
                 } else if(id == R.id.navHotlineNumbers) {
-                    replaceFragment(new HotlineNumbersFragment());
+                    replaceFragment(new EmergencyHotlineFragment());
                 } else if(id == R.id.navAboutBarangay) {
                     replaceFragment(new AboutBarangayFragment());
                 } else if(id == R.id.navBarangayLeaders) {

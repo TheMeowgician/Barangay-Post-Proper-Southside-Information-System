@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    android:background="#F0F0FA"
+    tools:context=".EmergencyHotlineFragment">
+
+    <RelativeLayout
+        android:id="@+id/emergency_hotline_main_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/emergency_hotline_header_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#3F0070"
+            android:padding="28dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/emergency_hotline_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Emergency Hotlines"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:gravity="center"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/emergency_hotlines_body_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="28dp"
+            android:layout_below="@+id/emergency_hotline_header_relative_layout">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/emergency_hotlines_barangay_pps_material_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                app:cardBackgroundColor="#3F0070">
+
+                <RelativeLayout
+                    android:id="@+id/emergency_hotlines_barangay_pps_material_cardview_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:alpha="0.5"
+                        android:src="@drawable/barangay_post_proper_southside_logo"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_barangay_pps_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Barangay Post Proper Southside"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_semibold"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_barangay_pps_telephone_number_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_below="@+id/emergency_hotlines_barangay_pps_material_textview"
+                        android:text="Telephone No: (02) 8986-2484\n                            (02) 8986-1681"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_light"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_barangay_pps_mobile_number_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_below="@+id/emergency_hotlines_barangay_pps_telephone_number_textview"
+                        android:text="Mobile No: 0998-975-0368"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_light"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_bantaybayan_and_barangay_enforcer_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="Bantay Bayan and Barangay Enforcer"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:layout_below="@+id/emergency_hotlines_barangay_pps_mobile_number_textview"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_bantaybayan_and_barangay_enforcer_mobile_number_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_below="@+id/emergency_hotlines_bantaybayan_and_barangay_enforcer_material_textview"
+                        android:text="Mobile No: 0906-445-1489"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_light"/>
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/emergency_hotlines_taguig_pnp_material_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                app:cardBackgroundColor="#3F0070"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/emergency_hotlines_barangay_pps_material_cardview">
+
+                <RelativeLayout
+                    android:id="@+id/emergency_hotlines_taguig_pnp_material_cardview_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:alpha="0.5"
+                        android:src="@drawable/emergency_hotlines_taguig_pnp"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_taguig_pnp_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Taguig PNP (Philippine National Police)"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_semibold"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_taguig_pnp_mobile_number_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_below="@+id/emergency_hotlines_taguig_pnp_material_textview"
+                        android:text="Mobile No: 0998-598-7932"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_light"/>
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/emergency_hotlines_taguig_command_center_material_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                app:cardBackgroundColor="#3F0070"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/emergency_hotlines_taguig_pnp_material_cardview">
+
+                <RelativeLayout
+                    android:id="@+id/emergency_hotlines_taguig_command_center_material_cardview_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:alpha="0.5"
+                        android:src="@drawable/emergency_hotlines_city_of_taguig"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_taguig_command_center_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Taguig Command Center"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_semibold"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/emergency_hotlines_taguig_command_center_telephone_number_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_below="@+id/emergency_hotlines_taguig_command_center_material_textview"
+                        android:text="Telephone No: (02) 8640-0340"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_light"/>
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>
