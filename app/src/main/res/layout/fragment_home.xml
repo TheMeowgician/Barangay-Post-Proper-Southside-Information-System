@@ -282,7 +282,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Manila Water IEC"
+                            android:text="MANILA WATER IEC"
                             android:textSize="16sp"
                             android:textColor="#F0F0FA"
                             android:fontFamily="@font/poppins_medium"
