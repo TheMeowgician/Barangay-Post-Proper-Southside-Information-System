@@ -92,11 +92,10 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/barangay_leaders_officials_relative_layout"
+                android:id="@+id/barangay_leaders_2nd_officials_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="28dp"
-                android:paddingBottom="28dp"
+                android:layout_marginTop="28dp"
                 android:layout_below="@+id/barangay_leaders_punong_barangay_relative_layout">
 
                 <RelativeLayout
@@ -104,45 +103,46 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/barangay_secretary_card_view"
-                    android:layout_width="115dp"
-                    android:layout_height="115dp"
-                    app:cardCornerRadius="90dp"
-                    android:layout_centerHorizontal="true"
-                    app:strokeColor="#61009F"
-                    app:strokeWidth="3dp">
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/barangay_secretary_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
 
-                    <ImageView
-                        android:id="@+id/barangay_secretary_image_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/barangay_secretary"
-                        android:background="@drawable/gradient_background"/>
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
 
-                </com.google.android.material.card.MaterialCardView>
+                        <ImageView
+                            android:id="@+id/barangay_secretary_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/barangay_secretary"
+                            android:background="@drawable/gradient_background"/>
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/barangay_secretary_name_material_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:text="Rannie Jeffrey A.\nCamba"
-                    android:fontFamily="@font/poppins_light"
-                    android:textSize="14sp"
-                    android:layout_below="@+id/barangay_secretary_card_view"/>
+                    </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/barangay_secretary_role_material_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Barangay Secretary"
-                    android:fontFamily="@font/poppins_bold"
-                    android:textSize="10sp"
-                    android:textColor="#61009F"
-                    android:layout_below="@+id/barangay_secretary_name_material_textview"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/barangay_secretary_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Rannie Jeffrey A.\nCamba"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/barangay_secretary_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/barangay_secretary_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:text="Barangay Secretary"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/barangay_secretary_name_material_textview"/>
 
                 </RelativeLayout>
 
@@ -154,10 +154,9 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/barangay_treasurer_card_view"
-                        android:layout_width="115dp"
-                        android:layout_height="115dp"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
                         app:cardCornerRadius="90dp"
-                        android:layout_centerHorizontal="true"
                         app:strokeColor="#61009F"
                         app:strokeWidth="3dp">
 
@@ -174,24 +173,448 @@
                         android:id="@+id/barangay_treasurer_name_material_textview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_below="@+id/barangay_treasurer_card_view"
                         android:layout_marginTop="10dp"
                         android:layout_centerHorizontal="true"
-                        android:text="Lily G.\nNacionales"
                         android:fontFamily="@font/poppins_light"
-                        android:textSize="14sp"
                         android:gravity="center"
-                        android:layout_below="@+id/barangay_treasurer_card_view"/>
+                        android:text="Lily G.\nNacionales"
+                        android:textSize="14sp" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/barangay_treasurer_role_material_textview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
-                        android:text="Barangay Secretary"
+                        android:text="Barangay Treasurer"
                         android:fontFamily="@font/poppins_bold"
                         android:textSize="10sp"
                         android:textColor="#61009F"
                         android:layout_below="@+id/barangay_treasurer_name_material_textview"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/barangay_leaders_3rd_officials_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/barangay_leaders_2nd_officials_relative_layout">
+
+                <RelativeLayout
+                    android:id="@+id/cic_on_social_service_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cic_on_social_service_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/cic_on_social_service_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/committee_in_charge_on_social_service"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_social_service_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Jennifer L. Abaniel"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/cic_on_social_service_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_social_service_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Committee in-charge on\nSocial Service"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/cic_on_social_service_name_material_textview"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/cic_on_clean_and_green_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cic_on_clean_and_green_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/cic_on_clean_and_green_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/committee_in_charge_on_clean_and_green"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_clean_and_green_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:text="Elmer T. Baldonado"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:layout_below="@+id/cic_on_clean_and_green_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_clean_and_green_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Committee in charge on\nClean and Green"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/cic_on_clean_and_green_name_material_textview"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/barangay_leaders_4th_officials_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/barangay_leaders_3rd_officials_relative_layout">
+
+                <RelativeLayout
+                    android:id="@+id/cic_on_livelihood_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cic_on_livelihood_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/cic_on_livelihood_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/committee_in_charge_on_livelihood"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_livelihood_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Wilma V. Dava"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/cic_on_livelihood_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_livelihood_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Committee in-charge on\nLivelihood"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/cic_on_livelihood_name_material_textview"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/cic_on_ways_and_means_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cic_on_ways_and_means_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/cic_on_ways_and_means_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/committee_in_charge_on_ways_and_means"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_ways_and_means_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:text="Carolina G. Gener"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:layout_below="@+id/cic_on_ways_and_means_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_ways_and_means_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Committee in charge on\nWays and Means"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/cic_on_ways_and_means_name_material_textview"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/barangay_leaders_5th_officials_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/barangay_leaders_4th_officials_relative_layout">
+
+                <RelativeLayout
+                    android:id="@+id/cic_on_health_and_sanitation_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cic_on_health_and_sanitation_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/cic_on_health_and_sanitation_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/committee_in_charge_on_health_and_sanitation"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_health_and_sanitation_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Jobert L.\nQuiambao"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/cic_on_health_and_sanitation_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_health_and_sanitation_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Committee in-charge\non Health and\nSanitation"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/cic_on_health_and_sanitation_name_material_textview"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/cic_on_education_culture_tourism_and_arts_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cic_on_education_culture_tourism_and_arts_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/cic_on_education_culture_tourism_and_arts_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/committee_in_charge_on_education_culture_tourism_and_arts"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_education_culture_tourism_and_arts_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:text="Rhodora P.\nPatingo"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:layout_below="@+id/cic_on_education_culture_tourism_and_arts_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_education_culture_tourism_and_arts_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Committee in charge\non Education, Culture,\nTourism and Arts"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/cic_on_education_culture_tourism_and_arts_name_material_textview"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/barangay_leaders_6th_officials_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_below="@+id/barangay_leaders_5th_officials_relative_layout">
+
+                <RelativeLayout
+                    android:id="@+id/cic_on_infrastructure_finance_bids_and_awards_committee_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cic_on_infrastructure_finance_bids_and_awards_committee_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/cic_on_infrastructure_finance_bids_and_awards_committee_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/committee_in_charge_on_infrastructure_finance_bids_and_awards_committee"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_infrastructure_finance_bids_and_awards_committee_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Elmer L.\nBaldonado"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/cic_on_infrastructure_finance_bids_and_awards_committee_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/cic_on_infrastructure_finance_bids_and_awards_committee_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="Committee in-charge\non Infrastructure,\nFinance and Bids and\nAwards Committee"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/cic_on_infrastructure_finance_bids_and_awards_committee_name_material_textview"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/sk_chairman_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/sk_chairman_card_view"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="90dp"
+                        app:strokeColor="#61009F"
+                        app:strokeWidth="3dp">
+
+                        <ImageView
+                            android:id="@+id/sk_chairman_image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/sk_chairman"
+                            android:background="@drawable/gradient_background"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/sk_chairman_name_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:text="Francis John R.\nSan Vicente"
+                        android:fontFamily="@font/poppins_light"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:layout_below="@+id/sk_chairman_card_view"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/sk_chairman_role_material_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="SK Chairman"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textSize="10sp"
+                        android:textColor="#61009F"
+                        android:layout_below="@+id/sk_chairman_name_material_textview"/>
 
                 </RelativeLayout>
 
