@@ -109,7 +109,7 @@
             android:layout_height="450dp">
 
             <RelativeLayout
-                android:id="@+id/searchAndRescueRelativeLayout"
+                android:id="@+id/taguigLoveCaravanRelativeLayout"
                 android:layout_width="300dp"
                 android:layout_height="390dp"
                 android:layout_marginLeft="28dp"
@@ -136,12 +136,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="180dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/search_and_rescue"/>
+                            android:src="@drawable/taguig_love_caravan_image"/>
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Search and rescue during flood"
+                            android:text="TAGUIG LOVE CARAVAN"
                             android:textSize="16sp"
                             android:textColor="#F0F0FA"
                             android:fontFamily="@font/poppins_medium"
@@ -152,7 +152,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pulvinar vel purus id elementum. Etiam faucibus tempus sapien non sodales."
+                            android:text="Medical and Dental Mission\nProject of Taguig City Mayor Lani Cayetano in coordination with Punong Barangay Quirino Sarono a successful activity for the people of Post Proper Southside."
                             android:textSize="12sp"
                             android:textColor="#F0F0FA"
                             android:fontFamily="@font/poppins_light"
@@ -180,13 +180,13 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/roadCleaningRelativeLayout"
+                android:id="@+id/livelihoodAssistanceRelativeLayout"
                 android:layout_width="300dp"
                 android:layout_height="390dp"
                 android:layout_marginRight="28dp"
                 android:layout_marginTop="30dp"
                 android:elevation="50dp"
-                android:layout_toRightOf="@id/searchAndRescueRelativeLayout">
+                android:layout_toRightOf="@id/taguigLoveCaravanRelativeLayout">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/roadCleaningCardView"
@@ -207,12 +207,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="180dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/road_cleaning"/>
+                            android:src="@drawable/livelihood_assistance_image"/>
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Road Cleaning"
+                            android:text="LIVELIHOOD ASSISTANCE"
                             android:textSize="16sp"
                             android:textColor="#F0F0FA"
                             android:fontFamily="@font/poppins_medium"
@@ -223,7 +223,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pulvinar vel purus id elementum. Etiam faucibus tempus sapien non sodales."
+                            android:text='The City of Taguig, under Mayor Lani Cayetano, launched the "Priority Families" project to promote proper nutrition for all, especially during the 50th Nutrition Month.'
                             android:textSize="12sp"
                             android:textColor="#F0F0FA"
                             android:fontFamily="@font/poppins_light"
@@ -250,13 +250,13 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/bestInBarangayRelativeLayout"
+                android:id="@+id/ManilaWaterIECRelativeLayout"
                 android:layout_width="300dp"
                 android:layout_height="390dp"
                 android:layout_marginRight="28dp"
                 android:layout_marginTop="30dp"
                 android:elevation="50dp"
-                android:layout_toRightOf="@id/roadCleaningRelativeLayout">
+                android:layout_toRightOf="@id/livelihoodAssistanceRelativeLayout">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/bestInBarangayCardView"
@@ -277,12 +277,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="180dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/awards"/>
+                            android:src="@drawable/manila_water_iec_image"/>
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Best in Barangay 2024 Award"
+                            android:text="Manila Water IEC"
                             android:textSize="16sp"
                             android:textColor="#F0F0FA"
                             android:fontFamily="@font/poppins_medium"
@@ -293,7 +293,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pulvinar vel purus id elementum. Etiam faucibus tempus sapien non sodales."
+                            android:text="Manila Water and Taguig City Government launched the Individualization Palar Project at the New Taguig City Hall Convention Center"
                             android:textSize="12sp"
                             android:textColor="#F0F0FA"
                             android:fontFamily="@font/poppins_light"
