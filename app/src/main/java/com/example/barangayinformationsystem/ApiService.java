@@ -6,6 +6,7 @@ import java.util.Map;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -107,6 +108,22 @@ public interface ApiService {
     @POST("cancel_request.php")
     Call<DocumentRequestResponse> cancelRequest(
             @Field("requestId") int requestId
+    );
+
+    @POST("send_message.php")
+    Call<MessageResponse> sendMessage(
+            @Body ChatMessageRequest message  // Changed to use @Body
+    );
+
+    @GET("get_messages.php")
+    Call<List<ChatMessage>> getMessages(
+            @Query("user_id") int userId
+    );
+
+    @GET("check_new_messages.php")
+    Call<MessageCheckResponse> checkNewMessages(
+            @Query("user_id") int userId,
+            @Query("last_message_timestamp") long lastMessageTimestamp
     );
 }
 
