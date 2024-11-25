@@ -194,6 +194,8 @@ public class HomeActivity extends AppCompatActivity {
                     replaceFragment(new DocumentRequestFragment());
                 } else if(id == R.id.navDocumentStatus) {
                     replaceFragment(new DocumentStatusFragment());
+                } else if(id == R.id.navDeskChat) {
+                    replaceFragment(new DeskChatFragment());
                 } else if(id == R.id.navHotlineNumbers) {
                     replaceFragment(new EmergencyHotlineFragment());
                 } else if(id == R.id.navAboutBarangay) {
