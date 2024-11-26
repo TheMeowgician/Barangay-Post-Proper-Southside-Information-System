@@ -11,7 +11,7 @@ public class RetrofitClient {
     // Use the appropriate base URL
     public static final String BASE_URL = "http://10.0.2.2/PostProperAdmin/"; // For Android Emulator
     // If testing on a physical device, replace with your computer's local IP:
-    //private static final String BASE_URL = "http://192.168.100.45/PostProperAdmin/";
+    //public static final String BASE_URL = "http://192.168.100.190/PostProperAdmin/";
 
     private static Retrofit retrofit = null;
     private static OkHttpClient okHttpClient = null;
