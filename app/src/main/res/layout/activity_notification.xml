@@ -38,37 +38,50 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/notification_activity_recent_notification_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:paddingLeft="28dp"
+        android:paddingRight="28dp"
+        android:layout_below="@+id/notification_activity_header_relative_layout">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/notification_activity_recent_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="Recent"
+            android:textSize="14sp"
+            app:fontFamily="@font/poppins"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/notification_activity_mark_all_as_read_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:text="Mark all as read"
+            android:textSize="14sp"
+            app:fontFamily="@font/poppins"/>
+
+    </RelativeLayout>
+
     <ScrollView
         android:id="@+id/notification_activity_body_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/notification_activity_header_relative_layout">
+        android:layout_below="@+id/notification_activity_recent_notification_relative_layout">
 
         <RelativeLayout
-            android:id="@+id/notification_activity_recent_notification_relative_layout"
+            android:id="@+id/notification_activity_body_relative_layout"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:paddingLeft="28dp"
-            android:paddingRight="28dp">
+            android:layout_height="match_parent">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/notification_activity_recent_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="Recent"
-                android:textSize="14sp"
-                app:fontFamily="@font/poppins"/>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/notification_activity_mark_all_as_read_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:text="Mark all as read"
-                android:textSize="14sp"
-                app:fontFamily="@font/poppins"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/notification_activity_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
         </RelativeLayout>
 

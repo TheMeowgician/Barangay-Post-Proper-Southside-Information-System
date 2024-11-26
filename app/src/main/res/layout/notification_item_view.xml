@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#E9D8F8">
+
+    <RelativeLayout
+        android:id="@+id/notification_recycler_view_item_image_view_relative_layout"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginRight="10dp">
+
+        <ImageView
+            android:id="@+id/notification_recycler_view_item_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/notification_name_of_user_and_caption_relative_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="28dp"
+        android:layout_toEndOf="@+id/notification_recycler_view_item_image_view_relative_layout">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/notification_recycler_view_item_name_of_user_material_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="20dp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/poppins_semibold"
+            android:textSize="14sp"
+            />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/notification_recycler_view_item_caption_of_user_material_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="20dp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/poppins"
+            android:textSize="10sp"
+            android:layout_below="@+id/notification_recycler_view_item_name_of_user_material_text_view"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#A0A0A0"
+        android:layout_below="@+id/notification_recycler_view_item_image_view_relative_layout">
+
+    </LinearLayout>
+
+</RelativeLayout>
