@@ -603,7 +603,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
                         android:hint="Example: 000123456001"
-                        android:inputType="text"
+                        android:inputType="number"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -642,7 +642,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
                         android:hint="Example: 000123456001"
-                        android:inputType="text"
+                        android:inputType="number"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
