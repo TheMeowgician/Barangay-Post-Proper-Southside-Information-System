@@ -45,14 +45,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/custom_button_register"
             android:fontFamily="@font/poppins_bold"
             android:onClick="moveToRegistrationActivity"
-            android:text="Register"
+            android:text="Sign Up"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="20dp"
-            android:layout_marginBottom="20dp"/>
+            android:textSize="20dp" />
 
     </LinearLayout>
 
