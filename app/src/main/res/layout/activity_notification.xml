@@ -51,9 +51,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:onClick="addRecentNotification"
             android:text="Recent"
             android:textSize="14sp"
-            app:fontFamily="@font/poppins"/>
+            app:fontFamily="@font/poppins" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/notification_activity_mark_all_as_read_textview"

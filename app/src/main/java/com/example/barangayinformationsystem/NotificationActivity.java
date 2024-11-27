@@ -1,59 +1,177 @@
 package com.example.barangayinformationsystem;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class NotificationActivity extends AppCompatActivity {
 
-    AppCompatImageButton notification_activity_header_back_button;
-    RecyclerView notification_activity_recycler_view;
-    List<NotificationRecyclerViewItem> notificationRecyclerViewItems;
+    private RecyclerView notificationRecyclerView;
+    private MaterialTextView notification_activity_recent_textview;
+    private NotificationAdapter notificationAdapter;
+    private List<NotificationRecyclerViewItem> notificationItems;
+    private ApiService apiService;
 
-    String nameOfUser = "Post Proper Southside";
+    private final Handler handler = new Handler();
+    private final int POLLING_INTERVAL = 5000; // Poll every 5 seconds
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_notification);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        notification_activity_recent_textview = findViewById(R.id.notification_activity_recent_textview);
+
+        notificationRecyclerView = findViewById(R.id.notification_activity_recycler_view);
+        notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Initialize the list and adapter
+        notificationItems = new ArrayList<>();
+        notificationAdapter = new NotificationAdapter(this, notificationItems);
+        notificationRecyclerView.setAdapter(notificationAdapter);
+
+        // Initialize the API service
+        apiService = RetrofitClient.getApiService();
+
+        startPolling();
+
+        // Fetch announcements
+        fetchAnnouncements();
+    }
+
+    private void startPolling() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fetchNewAnnouncements(); // Fetch new announcements
+                handler.postDelayed(this, POLLING_INTERVAL); // Re-run after interval
+            }
+        }, POLLING_INTERVAL);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null); // Stop all scheduled tasks
+    }
+
+    private void fetchNewAnnouncements() {
+        Call<List<AnnouncementResponse>> call = apiService.getAnnouncements();
+        call.enqueue(new Callback<List<AnnouncementResponse>>() {
+            @Override
+            public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<AnnouncementResponse> announcements = response.body();
+
+                    for (AnnouncementResponse announcement : announcements) {
+                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcement.getAnnouncementTitle();
+
+                        NotificationRecyclerViewItem newNotification = new NotificationRecyclerViewItem(
+                                "Post Proper Southside",
+                                updatedTitle,
+                                R.drawable.notification_pps_logo
+                        );
+
+                        // Avoid duplicates
+                        if (!notificationItems.contains(newNotification)) {
+                            notificationItems.add(0, newNotification); // Add new to top
+                            notificationAdapter.notifyItemInserted(0); // Notify adapter
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<AnnouncementResponse>> call, Throwable t) {
+                Log.e("NotificationActivity", "Error fetching announcements: " + t.getMessage());
+            }
         });
-        initializeComponents();
     }
 
-    private void initializeComponents() {
-        notification_activity_header_back_button = findViewById(R.id.notification_activity_header_back_button);
-        notification_activity_recycler_view = findViewById(R.id.notification_activity_recycler_view);
+    private void fetchAnnouncements() {
+        Call<List<AnnouncementResponse>> call = apiService.getAnnouncements();
+        call.enqueue(new Callback<List<AnnouncementResponse>>() {
+            @Override
+            public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<AnnouncementResponse> announcements = response.body();
+                    for (AnnouncementResponse announcement : announcements) {
+                        // Prepend the text to the announcement title
+                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcement.getAnnouncementTitle();
 
-        addItemsToRecyclerView();
+                        // Add each announcement to the list
+                        notificationItems.add(new NotificationRecyclerViewItem(
+                                "Post Proper Southside",
+                                updatedTitle,
+                                R.drawable.notification_pps_logo
+                        ));
+                    }
+                    notificationAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(NotificationActivity.this, "Failed to load announcements", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        notification_activity_recycler_view.setLayoutManager(new LinearLayoutManager(this));
-        notification_activity_recycler_view.setAdapter(new NotificationAdapter(getApplicationContext(), notificationRecyclerViewItems));
-
+            @Override
+            public void onFailure(Call<List<AnnouncementResponse>> call, Throwable t) {
+                Log.e("NotificationActivity", "Error: " + t.getMessage());
+                Toast.makeText(NotificationActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void addItemsToRecyclerView() {
+    public void addRecentNotification(View view) {
+        Call<List<AnnouncementResponse>> call = apiService.getAnnouncements();
+        call.enqueue(new Callback<List<AnnouncementResponse>>() {
+            @Override
+            public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<AnnouncementResponse> announcements = response.body();
 
-        notificationRecyclerViewItems = new ArrayList<NotificationRecyclerViewItem>();
-        notificationRecyclerViewItems.add(new NotificationRecyclerViewItem(nameOfUser, "Test Announcements", R.drawable.notification_pps_logo));
-    }
+                    for (AnnouncementResponse announcement : announcements) {
+                        // Prepend the text to the announcement title
+                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcement.getAnnouncementTitle();
 
-    public void back(View view) {
-        finish();
+                        NotificationRecyclerViewItem newNotification = new NotificationRecyclerViewItem(
+                                "Post Proper Southside",
+                                updatedTitle,
+                                R.drawable.notification_pps_logo
+                        );
+
+                        // Avoid duplicates: Check if the new announcement already exists
+                        if (!notificationItems.contains(newNotification)) {
+                            notificationItems.add(0, newNotification); // Add to the top
+                        }
+                    }
+
+                    notificationAdapter.notifyDataSetChanged(); // Notify the adapter
+                    Toast.makeText(NotificationActivity.this, "Recent notification added!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(NotificationActivity.this, "No new notifications found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<AnnouncementResponse>> call, Throwable t) {
+                Log.e("NotificationActivity", "Error: " + t.getMessage());
+                Toast.makeText(NotificationActivity.this, "An error occurred while fetching recent notifications", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

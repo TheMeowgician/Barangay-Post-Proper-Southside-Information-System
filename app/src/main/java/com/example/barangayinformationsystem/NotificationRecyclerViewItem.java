@@ -1,15 +1,9 @@
 package com.example.barangayinformationsystem;
 
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 public class NotificationRecyclerViewItem {
-
-    String nameOfUser;
-    String caption;
-    int image;
+    private String nameOfUser;
+    private String caption;
+    private int image;
 
     public NotificationRecyclerViewItem(String nameOfUser, String caption, int image) {
         this.nameOfUser = nameOfUser;
@@ -21,23 +15,24 @@ public class NotificationRecyclerViewItem {
         return nameOfUser;
     }
 
-    public void setNameOfUser(String nameOfUser) {
-        this.nameOfUser = nameOfUser;
-    }
-
     public String getCaption() {
         return caption;
-    }
-
-    public void setCaption(String caption) {
-        this.caption = caption;
     }
 
     public int getImage() {
         return image;
     }
 
-    public void setImage(int image) {
-        this.image = image;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        NotificationRecyclerViewItem that = (NotificationRecyclerViewItem) obj;
+        return caption.equals(that.caption); // Compare by title to prevent duplicates
+    }
+
+    @Override
+    public int hashCode() {
+        return caption.hashCode();
     }
 }
