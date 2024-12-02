@@ -8,12 +8,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -156,6 +160,24 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void showLogoutConfirmationDialog() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_logout_confirmation);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        Button noButton = dialog.findViewById(R.id.noButton);
+        Button yesButton = dialog.findViewById(R.id.yesButton);
+
+        noButton.setOnClickListener(v -> dialog.dismiss());
+
+        yesButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            performLogout();
+        });
+
+        dialog.show();
+    }
+
     private void performLogout() {
         updateUserActivity();
 
@@ -205,9 +227,8 @@ public class HomeActivity extends AppCompatActivity {
                 } else if(id == R.id.navIncidentReport) {
                     replaceFragment(new IncidentReportFragment());
                 } else if(id == R.id.navLogOut) {
-                    performLogout();
+                    showLogoutConfirmationDialog();  // Show confirmation instead of direct logout
                 }
-
                 return true;
             }
         });

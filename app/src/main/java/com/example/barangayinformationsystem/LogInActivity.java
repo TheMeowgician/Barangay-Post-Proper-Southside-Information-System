@@ -26,12 +26,35 @@ public class LogInActivity extends AppCompatActivity {
     ImageButton backImageButton;
     TextInputLayout usernameTextInputLayout;
     TextInputLayout passwordTextInputLayout;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize SharedPreferences
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Check if user is already logged in
+        if (isUserLoggedIn()) {
+            redirectToHome();
+            return;
+        }
+
         setContentView(R.layout.activity_log_in);
         initializeComponents();
+    }
+
+    private boolean isUserLoggedIn() {
+        // Check if user_id exists in SharedPreferences
+        return prefs.contains("user_id");
+    }
+
+    private void redirectToHome() {
+        Intent intent = new Intent(LogInActivity.this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void initializeComponents() {
@@ -53,14 +76,13 @@ public class LogInActivity extends AppCompatActivity {
                 if (username.isEmpty() || password.isEmpty()) {
                     Toast.makeText(LogInActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 } else {
-                    loginUser(username, password); // Call the method to send credentials
+                    loginUser(username, password);
                 }
             }
         });
     }
 
     private void loginUser(String username, String password) {
-        // Show loading state
         logInButton.setEnabled(false);
         logInButton.setText("Logging in...");
 
@@ -70,20 +92,18 @@ public class LogInActivity extends AppCompatActivity {
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                // Reset button state
                 logInButton.setEnabled(true);
                 logInButton.setText("Log In");
 
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
                     if ("success".equals(loginResponse.getStatus())) {
-                        // Save user ID in SharedPreferences
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LogInActivity.this);
+                        // Save login state and user ID
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putInt("user_id", loginResponse.getId());
+                        // You might want to save additional user data here
                         editor.apply();
 
-                        // Show success dialog and navigate to home
                         Intent homeIntent = new Intent(LogInActivity.this, HomeActivity.class);
                         homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         SuccessDialog.showSuccess(LogInActivity.this, "You have successfully logged in", homeIntent);
@@ -97,10 +117,8 @@ public class LogInActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                // Reset button state
                 logInButton.setEnabled(true);
                 logInButton.setText("Log In");
-
                 Toast.makeText(LogInActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
