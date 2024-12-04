@@ -9,11 +9,18 @@ public class RegistrationResponse {
     @SerializedName("message")
     private String message;
 
+    @SerializedName("id")
+    private int id;
+
     public boolean isSuccess() {
         return success;
     }
 
     public String getMessage() {
         return message;
+    }
+
+    public int getId() {
+        return id;
     }
 }

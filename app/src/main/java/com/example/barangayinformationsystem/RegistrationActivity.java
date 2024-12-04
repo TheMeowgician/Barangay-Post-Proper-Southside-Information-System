@@ -15,6 +15,7 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -22,6 +23,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -128,6 +130,7 @@ public class RegistrationActivity extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
                     validIdPreview.setImageURI(validIdUri);
+                    validIdPreview.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -229,44 +232,20 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void openCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photoFile = new File(getExternalCacheDir(), "valid_id_photo.jpg");
-        validIdUri = FileProvider.getUriForFile(this,
-                "com.example.barangayinformationsystem.fileprovider",
-                photoFile);
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, validIdUri);
-        cameraLauncher.launch(takePictureIntent);
+        try {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            File photoFile = new File(getExternalCacheDir(), "valid_id_photo.jpg");
+            validIdUri = FileProvider.getUriForFile(this,
+                    "com.example.barangayinformationsystem.fileprovider",
+                    photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, validIdUri);
+            cameraLauncher.launch(takePictureIntent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error opening camera: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
-
     private void openGallery() {
         galleryLauncher.launch("image/*");
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                if (data != null && data.getExtras() != null) {
-                    Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-                    if (imageBitmap != null) {
-                        validIdPreview.setImageBitmap(imageBitmap);
-                        validIdPreview.setVisibility(View.VISIBLE);
-                        validIdUri = getImageUri(this, imageBitmap);
-                    } else {
-                        Toast.makeText(this, "Error capturing image", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            } else if (requestCode == REQUEST_PICK_IMAGE) {
-                if (data != null && data.getData() != null) {
-                    validIdUri = data.getData();
-                    validIdPreview.setImageURI(validIdUri);
-                    validIdPreview.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(this, "Error selecting image", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
     }
 
     private Uri getImageUri(Context context, Bitmap bitmap) {
@@ -510,14 +489,21 @@ public class RegistrationActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                     if (response.isSuccessful() && response.body() != null) {
                         if (response.body().isSuccess()) {
-                            Intent loginIntent = new Intent(RegistrationActivity.this, LogInActivity.class);
-                            loginIntent.putExtra("username", usernameTextInputEditText.getText().toString().trim());
-                            loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            // Save login state and user ID if provided in response
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(RegistrationActivity.this);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putInt("user_id", response.body().getId());
+                            editor.apply();
+
+                            // Show success dialog first, then go to PendingStatusActivity
+                            Intent pendingIntent = new Intent(RegistrationActivity.this, PendingStatusActivity.class);
+                            pendingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                             SuccessDialog.showSuccess(
                                     RegistrationActivity.this,
                                     "Registration successful! Please wait for your account to be verified.",
-                                    loginIntent
+                                    pendingIntent,
+                                    3000  // Show dialog for 3 seconds before redirecting
                             );
                         } else {
                             Toast.makeText(RegistrationActivity.this,
