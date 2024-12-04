@@ -79,6 +79,10 @@ public class RegistrationActivity extends AppCompatActivity {
     private ImageView validIdPreview;
     private Uri validIdUri;
     private Uri photoUri;
+    private AppCompatButton takeBackPhotoButton;
+    private AppCompatButton chooseBackPhotoButton;
+    private ImageView backValidIdPreview;
+    private Uri backValidIdUri;
 
     private TextInputEditText birthDateTextInputEditText;
     private TextInputEditText firstNameTextInputEditText;
@@ -143,6 +147,23 @@ public class RegistrationActivity extends AppCompatActivity {
                 }
             });
 
+    private final ActivityResultLauncher<Intent> backCameraLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    backValidIdPreview.setImageURI(backValidIdUri);
+                    backValidIdPreview.setVisibility(View.VISIBLE);
+                }
+            });
+
+    private final ActivityResultLauncher<String> backGalleryLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    backValidIdUri = uri;
+                    backValidIdPreview.setImageURI(uri);
+                    backValidIdPreview.setVisibility(View.VISIBLE);
+                }
+            });
+
     private boolean initializeComponents() {
         try {
             // Initialize all existing components
@@ -151,6 +172,9 @@ public class RegistrationActivity extends AppCompatActivity {
             lowercaseRequirement = findViewById(R.id.lowercaseRequirement);
             specialCharRequirement = findViewById(R.id.specialCharRequirement);
 
+            takeBackPhotoButton = findViewById(R.id.takeBackPhotoButton);
+            chooseBackPhotoButton = findViewById(R.id.chooseBackPhotoButton);
+            backValidIdPreview = findViewById(R.id.backValidIdPreview);
             backImageButton = findViewById(R.id.backImageButton);
             btnRegister = findViewById(R.id.btnRegister);
             genderRadioGroup = findViewById(R.id.genderRadioGroup);
@@ -221,6 +245,9 @@ public class RegistrationActivity extends AppCompatActivity {
 
         takePhotoButton.setOnClickListener(v -> dispatchTakePictureIntent());
         choosePhotoButton.setOnClickListener(v -> openGallery());
+
+        takeBackPhotoButton.setOnClickListener(v -> dispatchTakeBackPictureIntent());
+        chooseBackPhotoButton.setOnClickListener(v -> openBackGallery());
     }
 
     private void dispatchTakePictureIntent() {
@@ -248,17 +275,30 @@ public class RegistrationActivity extends AppCompatActivity {
         galleryLauncher.launch("image/*");
     }
 
-    private Uri getImageUri(Context context, Bitmap bitmap) {
-        File outputFile = new File(context.getCacheDir(), "valid_id_" + System.currentTimeMillis() + ".jpg");
-        outputFile.deleteOnExit(); // Ensures file is removed when app exits
-        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            return FileProvider.getUriForFile(context, context.getPackageName() + ".provider", outputFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show();
-            return null;
+    private void dispatchTakeBackPictureIntent() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            openBackCamera();
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
+    }
+
+    private void openBackCamera() {
+        try {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            File photoFile = new File(getExternalCacheDir(), "valid_id_back_photo.jpg");
+            backValidIdUri = FileProvider.getUriForFile(this,
+                    "com.example.barangayinformationsystem.fileprovider",
+                    photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, backValidIdUri);
+            backCameraLauncher.launch(takePictureIntent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error opening camera: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openBackGallery() {
+        backGalleryLauncher.launch("image/*");
     }
 
     public void openDialog(View view) {
@@ -419,8 +459,9 @@ public class RegistrationActivity extends AppCompatActivity {
             streetTextInputLayout.setError("Street is required");
             isValid = false;
         }
-        if (validIdUri == null) {
-            Toast.makeText(this, "Please provide a valid ID with address", Toast.LENGTH_SHORT).show();
+
+        if (validIdUri == null || backValidIdUri == null) {
+            Toast.makeText(this, "Please provide both front and back images of your valid ID", Toast.LENGTH_SHORT).show();
             isValid = false;
         }
 
@@ -459,6 +500,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
             // Process and compress the valid ID image
             File compressedValidId = ImageUploadUtil.prepareImageForUpload(this, validIdUri, "valid_id");
+            File compressedBackValidId = ImageUploadUtil.prepareImageForUpload(this, backValidIdUri, "valid_id_back");
 
             // Create request parts
             RequestBody firstNamePart = RequestBody.create(MediaType.parse("text/plain"), firstNameTextInputEditText.getText().toString().trim());
@@ -474,13 +516,14 @@ public class RegistrationActivity extends AppCompatActivity {
 
             RequestBody validIdRequestFile = RequestBody.create(MediaType.parse("image/jpeg"), compressedValidId);
             MultipartBody.Part validIdPart = MultipartBody.Part.createFormData("valid_id", compressedValidId.getName(), validIdRequestFile);
+            MultipartBody.Part backValidIdPart = MultipartBody.Part.createFormData("valid_id_back", compressedBackValidId.getName(), RequestBody.create(MediaType.parse("image/jpeg"), compressedBackValidId));
 
             // Make API call
             ApiService apiService = RetrofitClient.getApiService();
             Call<RegistrationResponse> call = apiService.registerUser(
                     firstNamePart, lastNamePart, usernamePart, passwordPart,
                     agePart, birthDatePart, houseNumberPart, zonePart, streetPart,
-                    genderPart, validIdPart
+                    genderPart, validIdPart,backValidIdPart
             );
 
             call.enqueue(new Callback<RegistrationResponse>() {

@@ -44,7 +44,8 @@ public interface ApiService {
             @Part("adrZone") RequestBody zone,
             @Part("adrStreet") RequestBody street,
             @Part("gender") RequestBody gender,
-            @Part MultipartBody.Part validId
+            @Part MultipartBody.Part validId,
+            @Part MultipartBody.Part validIdBack
     );
 
     // Add this to your existing ApiService interface
