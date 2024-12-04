@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:background="@android:color/transparent"
-            android:onClick="back"
+            android:onClick="goBack"
             android:src="@drawable/white_round_arrow_back_icon" />
 
         <com.google.android.material.textview.MaterialTextView

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +24,7 @@ public class NotificationActivity extends AppCompatActivity {
 
     private RecyclerView notificationRecyclerView;
     private MaterialTextView notification_activity_recent_textview;
+    private AppCompatImageButton notification_activity_header_back_button;
     private NotificationAdapter notificationAdapter;
     private List<NotificationRecyclerViewItem> notificationItems;
     private ApiService apiService;
@@ -36,6 +38,7 @@ public class NotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification);
 
         notification_activity_recent_textview = findViewById(R.id.notification_activity_recent_textview);
+        notification_activity_header_back_button = findViewById(R.id.notification_activity_header_back_button);
 
         notificationRecyclerView = findViewById(R.id.notification_activity_recycler_view);
         notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -52,6 +55,10 @@ public class NotificationActivity extends AppCompatActivity {
 
         // Fetch announcements
         fetchAnnouncements();
+    }
+
+    public void goBack(View view) {
+        finish();
     }
 
     private void startPolling() {
