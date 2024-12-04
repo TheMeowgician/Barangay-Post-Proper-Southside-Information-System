@@ -649,6 +649,64 @@
 
     </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/validIdLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="30dp">
+
+            <TextView
+                android:id="@+id/validIdTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Valid ID with Address"
+                android:textSize="18dp"
+                android:fontFamily="@font/poppins_light"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Submit a valid ID that proves you are from Barangay Post Proper Southside"
+                android:textSize="12dp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/takePhotoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Take Photo"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/custom_button_register"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/poppins"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/choosePhotoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Choose Photo"
+                    android:background="@drawable/custom_button_register"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/poppins"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/validIdPreview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:scaleType="centerInside"/>
+        </LinearLayout>
+
     <LinearLayout
         android:id="@+id/registerButtonLinearLayout"
         android:layout_width="match_parent"

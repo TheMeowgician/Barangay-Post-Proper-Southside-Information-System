@@ -9,4 +9,10 @@
     <external-path
         name="external"
         path="." />
+    <external-files-path
+        name="my_images"
+        path="Pictures" />
+    <external-path
+        name="my_images"
+        path="Android/data/com.example.barangayinformationsystem/files/Pictures/" />
 </paths>

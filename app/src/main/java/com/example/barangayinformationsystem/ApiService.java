@@ -31,18 +31,20 @@ public interface ApiService {
     @GET("fetch_user_details.php")
     Call<UserDetailsResponse> getUserDetails(@Query("id") int userId);
 
-    @FormUrlEncoded
+    @Multipart
     @POST("register_user.php")
     Call<RegistrationResponse> registerUser(
-            @Field("firstName") String firstName,
-            @Field("lastName") String lastName,
-            @Field("username") String username,
-            @Field("password") String password,
-            @Field("age") int age,
-            @Field("birthday") String birthday,
-            @Field("adrHouseNo") String houseNumber,
-            @Field("adrZone") String zone,
-            @Field("adrStreet") String street
+            @Part("firstName") RequestBody firstName,
+            @Part("lastName") RequestBody lastName,
+            @Part("username") RequestBody username,
+            @Part("password") RequestBody password,
+            @Part("age") RequestBody age,
+            @Part("birthday") RequestBody birthday,
+            @Part("adrHouseNo") RequestBody houseNumber,
+            @Part("adrZone") RequestBody zone,
+            @Part("adrStreet") RequestBody street,
+            @Part("gender") RequestBody gender,
+            @Part MultipartBody.Part validId
     );
 
     // Add this to your existing ApiService interface

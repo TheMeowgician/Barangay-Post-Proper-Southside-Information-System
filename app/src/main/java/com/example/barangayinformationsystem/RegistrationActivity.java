@@ -1,16 +1,32 @@
 package com.example.barangayinformationsystem;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+
+import android.Manifest;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -20,13 +36,30 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.Date;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.widget.ImageView;
+
 public class RegistrationActivity extends AppCompatActivity {
+
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_PICK_IMAGE = 2;
 
     private TextView lengthRequirement;
     private TextView uppercaseRequirement;
@@ -38,6 +71,12 @@ public class RegistrationActivity extends AppCompatActivity {
     private RadioGroup genderRadioGroup;
     private RadioButton maleRadioButton;
     private RadioButton femaleRadioButton;
+
+    private AppCompatButton takePhotoButton;
+    private AppCompatButton choosePhotoButton;
+    private ImageView validIdPreview;
+    private Uri validIdUri;
+    private Uri photoUri;
 
     private TextInputEditText birthDateTextInputEditText;
     private TextInputEditText firstNameTextInputEditText;
@@ -73,12 +112,37 @@ public class RegistrationActivity extends AppCompatActivity {
         }
 
         setupClickListeners();
+        setupPasswordValidation();
     }
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    openCamera();
+                } else {
+                    Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private final ActivityResultLauncher<Intent> cameraLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    validIdPreview.setImageURI(validIdUri);
+                }
+            });
+
+    private final ActivityResultLauncher<String> galleryLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    validIdUri = uri;
+                    validIdPreview.setImageURI(uri);
+                    validIdPreview.setVisibility(View.VISIBLE);
+                }
+            });
 
     private boolean initializeComponents() {
         try {
-            // Initialize all components
-
+            // Initialize all existing components
             lengthRequirement = findViewById(R.id.lengthRequirement);
             uppercaseRequirement = findViewById(R.id.uppercaseRequirement);
             lowercaseRequirement = findViewById(R.id.lowercaseRequirement);
@@ -89,6 +153,11 @@ public class RegistrationActivity extends AppCompatActivity {
             genderRadioGroup = findViewById(R.id.genderRadioGroup);
             maleRadioButton = findViewById(R.id.maleRadioButton);
             femaleRadioButton = findViewById(R.id.femaleRadioButton);
+
+            // Initialize Valid ID components
+            takePhotoButton = findViewById(R.id.takePhotoButton);
+            choosePhotoButton = findViewById(R.id.choosePhotoButton);
+            validIdPreview = findViewById(R.id.validIdPreview);
 
             // Initialize TextInputEditText components
             birthDateTextInputEditText = findViewById(R.id.birthDateTextInputEditText);
@@ -113,11 +182,6 @@ public class RegistrationActivity extends AppCompatActivity {
             houseNumberTextInputLayout = findViewById(R.id.houseNumberTextInputLayout);
             zoneTextInputLayout = findViewById(R.id.zoneTextInputLayout);
             streetTextInputLayout = findViewById(R.id.streetTextInputLayout);
-
-            // Verify that all required views were found
-            if (anyViewsNull()) {
-                return false;
-            }
 
             removeTextInputLayoutAnimation();
             return true;
@@ -151,6 +215,71 @@ public class RegistrationActivity extends AppCompatActivity {
 
         birthDateTextInputEditText.setOnClickListener(this::openDialog);
         backImageButton.setOnClickListener(v -> finish());
+
+        takePhotoButton.setOnClickListener(v -> dispatchTakePictureIntent());
+        choosePhotoButton.setOnClickListener(v -> openGallery());
+    }
+
+    private void dispatchTakePictureIntent() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            openCamera();
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    private void openCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photoFile = new File(getExternalCacheDir(), "valid_id_photo.jpg");
+        validIdUri = FileProvider.getUriForFile(this,
+                "com.example.barangayinformationsystem.fileprovider",
+                photoFile);
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, validIdUri);
+        cameraLauncher.launch(takePictureIntent);
+    }
+
+    private void openGallery() {
+        galleryLauncher.launch("image/*");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                if (data != null && data.getExtras() != null) {
+                    Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+                    if (imageBitmap != null) {
+                        validIdPreview.setImageBitmap(imageBitmap);
+                        validIdPreview.setVisibility(View.VISIBLE);
+                        validIdUri = getImageUri(this, imageBitmap);
+                    } else {
+                        Toast.makeText(this, "Error capturing image", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } else if (requestCode == REQUEST_PICK_IMAGE) {
+                if (data != null && data.getData() != null) {
+                    validIdUri = data.getData();
+                    validIdPreview.setImageURI(validIdUri);
+                    validIdPreview.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(this, "Error selecting image", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    private Uri getImageUri(Context context, Bitmap bitmap) {
+        File outputFile = new File(context.getCacheDir(), "valid_id_" + System.currentTimeMillis() + ".jpg");
+        outputFile.deleteOnExit(); // Ensures file is removed when app exits
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            return FileProvider.getUriForFile(context, context.getPackageName() + ".provider", outputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show();
+            return null;
+        }
     }
 
     public void openDialog(View view) {
@@ -311,6 +440,10 @@ public class RegistrationActivity extends AppCompatActivity {
             streetTextInputLayout.setError("Street is required");
             isValid = false;
         }
+        if (validIdUri == null) {
+            Toast.makeText(this, "Please provide a valid ID with address", Toast.LENGTH_SHORT).show();
+            isValid = false;
+        }
 
         return isValid;
     }
@@ -334,39 +467,56 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void registerUser() {
         try {
-            String firstName = firstNameTextInputEditText.getText().toString().trim();
-            String lastName = lastNameTextInputEditText.getText().toString().trim();
-            String username = usernameTextInputEditText.getText().toString().trim();
-            String password = passwordTextInputEditText.getText().toString().trim();
-            String birthDate = birthDateTextInputEditText.getText().toString().trim();
-            int age = Integer.parseInt(ageTextInputEditText.getText().toString().trim());
-            String houseNumber = houseNumberTextInputEditText.getText().toString().trim();
-            String zone = zoneTextInputEditText.getText().toString().trim();
-            String street = streetTextInputEditText.getText().toString().trim();
-            String gender = maleRadioButton.isChecked() ? "Male" : "Female";
+            if (validIdUri == null) {
+                Toast.makeText(this, "Please provide a valid ID image", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            // Show progress dialog
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Processing registration...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
+            // Process and compress the valid ID image
+            File compressedValidId = ImageUploadUtil.prepareImageForUpload(this, validIdUri, "valid_id");
+
+            // Create request parts
+            RequestBody firstNamePart = RequestBody.create(MediaType.parse("text/plain"), firstNameTextInputEditText.getText().toString().trim());
+            RequestBody lastNamePart = RequestBody.create(MediaType.parse("text/plain"), lastNameTextInputEditText.getText().toString().trim());
+            RequestBody usernamePart = RequestBody.create(MediaType.parse("text/plain"), usernameTextInputEditText.getText().toString().trim());
+            RequestBody passwordPart = RequestBody.create(MediaType.parse("text/plain"), passwordTextInputEditText.getText().toString().trim());
+            RequestBody agePart = RequestBody.create(MediaType.parse("text/plain"), ageTextInputEditText.getText().toString().trim());
+            RequestBody birthDatePart = RequestBody.create(MediaType.parse("text/plain"), birthDateTextInputEditText.getText().toString().trim());
+            RequestBody houseNumberPart = RequestBody.create(MediaType.parse("text/plain"), houseNumberTextInputEditText.getText().toString().trim());
+            RequestBody zonePart = RequestBody.create(MediaType.parse("text/plain"), zoneTextInputEditText.getText().toString().trim());
+            RequestBody streetPart = RequestBody.create(MediaType.parse("text/plain"), streetTextInputEditText.getText().toString().trim());
+            RequestBody genderPart = RequestBody.create(MediaType.parse("text/plain"), maleRadioButton.isChecked() ? "male" : "female");
+
+            RequestBody validIdRequestFile = RequestBody.create(MediaType.parse("image/jpeg"), compressedValidId);
+            MultipartBody.Part validIdPart = MultipartBody.Part.createFormData("valid_id", compressedValidId.getName(), validIdRequestFile);
+
+            // Make API call
             ApiService apiService = RetrofitClient.getApiService();
             Call<RegistrationResponse> call = apiService.registerUser(
-                    firstName, lastName, username, password,
-                    age, birthDate, houseNumber, zone, street
+                    firstNamePart, lastNamePart, usernamePart, passwordPart,
+                    agePart, birthDatePart, houseNumberPart, zonePart, streetPart,
+                    genderPart, validIdPart
             );
 
             call.enqueue(new Callback<RegistrationResponse>() {
-
                 @Override
                 public void onResponse(Call<RegistrationResponse> call, Response<RegistrationResponse> response) {
+                    progressDialog.dismiss();
                     if (response.isSuccessful() && response.body() != null) {
                         if (response.body().isSuccess()) {
-                            // Show success dialog instead of Toast
                             Intent loginIntent = new Intent(RegistrationActivity.this, LogInActivity.class);
-                            loginIntent.putExtra("username", username);
-                            loginIntent.putExtra("firstName", firstName);
-                            loginIntent.putExtra("lastName", lastName);
+                            loginIntent.putExtra("username", usernameTextInputEditText.getText().toString().trim());
                             loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                             SuccessDialog.showSuccess(
                                     RegistrationActivity.this,
-                                    "Congratulations! Your registration is successful.",
+                                    "Registration successful! Please wait for your account to be verified.",
                                     loginIntent
                             );
                         } else {
@@ -381,10 +531,12 @@ public class RegistrationActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<RegistrationResponse> call, Throwable t) {
+                    progressDialog.dismiss();
                     Toast.makeText(RegistrationActivity.this,
                             "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
+
         } catch (Exception e) {
             Toast.makeText(this, "Error processing registration: " + e.getMessage(),
                     Toast.LENGTH_SHORT).show();
