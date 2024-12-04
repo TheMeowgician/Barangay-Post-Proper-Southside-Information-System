@@ -218,7 +218,15 @@ public class DeskChatFragment extends Fragment {
         public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
             ChatMessage message = messages.get(position);
             holder.messageText.setText(message.getMessage());
-            holder.senderNameText.setText(message.getSenderName());
+
+            // Only show sender name for admin messages
+            if (message.isAdmin()) {
+                holder.senderNameText.setVisibility(View.VISIBLE);
+                holder.senderNameText.setText(message.getSenderName());
+            } else {
+                // Hide sender name for user's own messages
+                holder.senderNameText.setVisibility(View.GONE);
+            }
 
             // Format and set timestamp
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
