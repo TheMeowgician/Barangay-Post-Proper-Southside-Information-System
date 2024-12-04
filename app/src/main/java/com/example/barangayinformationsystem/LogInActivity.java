@@ -1,5 +1,6 @@
 package com.example.barangayinformationsystem;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
@@ -97,18 +98,39 @@ public class LogInActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
-                    if ("success".equals(loginResponse.getStatus())) {
-                        // Save login state and user ID
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putInt("user_id", loginResponse.getId());
-                        // You might want to save additional user data here
-                        editor.apply();
 
-                        Intent homeIntent = new Intent(LogInActivity.this, HomeActivity.class);
-                        homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        SuccessDialog.showSuccess(LogInActivity.this, "You have successfully logged in", homeIntent);
+                    if ("success".equals(loginResponse.getStatus())) {
+                        // Handle verified users
+                        if ("verified".equals(loginResponse.getAccountStatus())) {
+                            // Save login state and user ID
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putInt("user_id", loginResponse.getId());
+                            editor.apply();
+
+                            Intent homeIntent = new Intent(LogInActivity.this, HomeActivity.class);
+                            homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            SuccessDialog.showSuccess(LogInActivity.this, "You have successfully logged in", homeIntent);
+                        }
+                        // Handle pending users
+                        else if ("pending".equals(loginResponse.getAccountStatus())) {
+                            // Save user ID but redirect to pending status
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putInt("user_id", loginResponse.getId());
+                            editor.apply();
+
+                            Intent pendingIntent = new Intent(LogInActivity.this, PendingStatusActivity.class);
+                            pendingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(pendingIntent);
+                            finish();
+                        }
+                        // Handle rejected users
+                        else if ("rejected".equals(loginResponse.getAccountStatus())) {
+                            Toast.makeText(LogInActivity.this, "Your account has been rejected. Please contact support.", Toast.LENGTH_LONG).show();
+                        }
                     } else {
-                        Toast.makeText(LogInActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LogInActivity.this, loginResponse.getMessage() != null ?
+                                        loginResponse.getMessage() : "Invalid username or password",
+                                Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(LogInActivity.this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();

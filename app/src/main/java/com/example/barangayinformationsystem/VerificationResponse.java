@@ -1,21 +1,12 @@
 package com.example.barangayinformationsystem;
 
-public class LoginResponse {
+public class VerificationResponse {
     private String status;
-    private int id;
-    private String accountStatus;
     private String message;
 
+    // Getters
     public String getStatus() {
         return status;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getAccountStatus() {
-        return accountStatus;
     }
 
     public String getMessage() {

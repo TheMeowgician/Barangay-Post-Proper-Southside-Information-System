@@ -25,6 +25,9 @@ public interface ApiService {
             @Field("password") String password
     );
 
+    @GET("check_verification_status.php")
+    Call<VerificationResponse> checkVerificationStatus(@Query("user_id") int userId);
+
     @GET("fetch_user_details.php")
     Call<UserDetailsResponse> getUserDetails(@Query("id") int userId);
 
