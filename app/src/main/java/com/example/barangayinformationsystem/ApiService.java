@@ -116,10 +116,21 @@ public interface ApiService {
             @Field("requestId") int requestId
     );
 
+    @FormUrlEncoded
     @POST("send_message.php")
     Call<MessageResponse> sendMessage(
-            @Body ChatMessageRequest message  // Changed to use @Body
+            @Field("message") String message,
+            @Field("sender_id") int senderId,
+            @Field("is_admin") int isAdmin
     );
+
+    @FormUrlEncoded
+    @POST("send_user_message.php")
+    Call<MessageResponse> sendMessage(
+            @Field("message") String message,
+            @Field("sender_id") int senderId
+    );
+
 
     @GET("get_messages.php")
     Call<List<ChatMessage>> getMessages(

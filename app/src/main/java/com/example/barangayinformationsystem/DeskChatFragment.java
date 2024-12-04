@@ -115,8 +115,10 @@ public class DeskChatFragment extends Fragment {
 
     private void sendMessage(String messageText) {
         ApiService apiService = RetrofitClient.getApiService();
-        ChatMessageRequest request = new ChatMessageRequest(userId, messageText);
-        Call<MessageResponse> call = apiService.sendMessage(request);
+        Call<MessageResponse> call = apiService.sendMessage(
+                messageText,  // message
+                userId        // sender_id
+        );
 
         call.enqueue(new Callback<MessageResponse>() {
             @Override
@@ -216,6 +218,7 @@ public class DeskChatFragment extends Fragment {
         public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
             ChatMessage message = messages.get(position);
             holder.messageText.setText(message.getMessage());
+            holder.senderNameText.setText(message.getSenderName());
 
             // Format and set timestamp
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
@@ -239,11 +242,13 @@ public class DeskChatFragment extends Fragment {
         static class ChatViewHolder extends RecyclerView.ViewHolder {
             TextView messageText;
             TextView timestampText;
+            TextView senderNameText;
 
             ChatViewHolder(@NonNull View itemView) {
                 super(itemView);
                 messageText = itemView.findViewById(R.id.messageText);
                 timestampText = itemView.findViewById(R.id.timestampText);
+                senderNameText = itemView.findViewById(R.id.senderNameText);
             }
         }
     }
