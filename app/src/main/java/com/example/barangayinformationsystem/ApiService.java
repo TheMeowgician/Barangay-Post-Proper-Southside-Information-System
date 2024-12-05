@@ -22,7 +22,7 @@ public interface ApiService {
     @POST("Android_login.php")  // This is correct
     Call<LoginResponse> loginUser(
             @Field("username") String username,
-            @Field("password") String password
+            @Field("password") String hashedPassword
     );
 
     @GET("check_verification_status.php")

@@ -337,7 +337,7 @@
                         android:id="@+id/zoneTextInputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="Zone(eg:Palar Village, ISU Village)"
+                        android:hint="Zone(eg:Palar Village)"
                         app:boxCornerRadiusTopStart="13dp"
                         app:boxCornerRadiusTopEnd="13dp"
                         app:boxCornerRadiusBottomStart="13dp"

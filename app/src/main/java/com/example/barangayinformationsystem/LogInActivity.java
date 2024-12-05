@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.barangayinformationsystem.PasswordHasher;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -89,8 +90,17 @@ public class LogInActivity extends AppCompatActivity {
         logInButton.setEnabled(false);
         logInButton.setText("Logging in...");
 
+        // Hash the password before sending
+        String hashedPassword = PasswordHasher.hashPassword(password);
+        if (hashedPassword == null) {
+            logInButton.setEnabled(true);
+            logInButton.setText("Log In");
+            Toast.makeText(LogInActivity.this, "Error processing password. Please try again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ApiService apiService = RetrofitClient.getApiService();
-        Call<LoginResponse> call = apiService.loginUser(username, password);
+        Call<LoginResponse> call = apiService.loginUser(username, hashedPassword);
 
         call.enqueue(new Callback<LoginResponse>() {
             @Override
@@ -127,7 +137,7 @@ public class LogInActivity extends AppCompatActivity {
                         }
                         // Handle rejected users
                         else if ("rejected".equals(loginResponse.getAccountStatus())) {
-                            Toast.makeText(LogInActivity.this, "Your account has been rejected. Please contact support.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(LogInActivity.this, "Your account has been rejected.", Toast.LENGTH_LONG).show();
                         }
                     } else {
                         Toast.makeText(LogInActivity.this, loginResponse.getMessage() != null ?

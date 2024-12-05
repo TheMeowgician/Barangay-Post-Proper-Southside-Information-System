@@ -523,7 +523,12 @@ public class RegistrationActivity extends AppCompatActivity {
             RequestBody firstNamePart = RequestBody.create(MediaType.parse("text/plain"), firstNameTextInputEditText.getText().toString().trim());
             RequestBody lastNamePart = RequestBody.create(MediaType.parse("text/plain"), lastNameTextInputEditText.getText().toString().trim());
             RequestBody usernamePart = RequestBody.create(MediaType.parse("text/plain"), usernameTextInputEditText.getText().toString().trim());
-            RequestBody passwordPart = RequestBody.create(MediaType.parse("text/plain"), passwordTextInputEditText.getText().toString().trim());
+            String hashedPassword = PasswordHasher.hashPassword(passwordTextInputEditText.getText().toString().trim());
+            if (hashedPassword == null) {
+                Toast.makeText(this, "Error processing password. Please try again.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            RequestBody passwordPart = RequestBody.create(MediaType.parse("text/plain"), hashedPassword);
             RequestBody agePart = RequestBody.create(MediaType.parse("text/plain"), ageTextInputEditText.getText().toString().trim());
             RequestBody birthDatePart = RequestBody.create(MediaType.parse("text/plain"), birthDateTextInputEditText.getText().toString().trim());
             RequestBody houseNumberPart = RequestBody.create(MediaType.parse("text/plain"), houseNumberTextInputEditText.getText().toString().trim());
