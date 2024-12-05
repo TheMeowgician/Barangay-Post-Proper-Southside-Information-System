@@ -1,5 +1,6 @@
 package com.example.barangayinformationsystem;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +14,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,6 +63,33 @@ public class CertificateOfIndigencyFormActivity extends AppCompatActivity {
 
     private void setupListeners() {
         findViewById(R.id.certificate_of_indigency_form_submit_button).setOnClickListener(v -> submitForm());
+        TextInputLayout birthdayInputLayout = findViewById(R.id.certificate_of_indigency_form_date_of_birth_textInputLayout);
+        birthdayInputLayout.setEndIconOnClickListener(v -> showDatePickerDialog());
+    }
+
+    private void showDatePickerDialog() {
+        // Get current date
+        Calendar calendar = Calendar.getInstance();
+
+        // Show DatePickerDialog
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    // Format the selected date to MM-DD-YY
+                    calendar.set(year, month, dayOfMonth);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy", Locale.getDefault());
+                    String formattedDate = dateFormat.format(calendar.getTime());
+
+                    // Set the formatted date to the TextInputEditText
+                    birthdayInput.setText(formattedDate);
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        // Show the dialog
+        datePickerDialog.show();
     }
 
     private void submitForm() {
