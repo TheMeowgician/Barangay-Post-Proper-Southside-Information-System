@@ -2,4 +2,13 @@
     <string name="app_name">Barangay Information System</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="incident_types">
+        <item>Accident</item>
+        <item>Injury</item>
+        <item>Property Damage</item>
+        <item>Theft</item>
+        <item>Fire</item>
+        <item>Other</item>
+    </string-array>
 </resources>

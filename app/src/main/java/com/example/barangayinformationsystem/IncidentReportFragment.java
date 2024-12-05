@@ -1,5 +1,6 @@
 package com.example.barangayinformationsystem;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -13,9 +14,11 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.LinearLayout;
 import org.json.JSONArray;
@@ -47,6 +50,7 @@ public class IncidentReportFragment extends Fragment {
     private TextInputLayout descriptionInputLayout;
     private TextInputEditText titleEditText;
     private TextInputEditText descriptionEditText;
+    private Spinner titleSpinner;
     private ImageView uploadImageView;
     private Button submitButton;
     private String encodedImage = "";
@@ -84,8 +88,20 @@ public class IncidentReportFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_incident_report, container, false);
         initializeViews(view);
+
+        // Initialize the spinner
+        titleSpinner = view.findViewById(R.id.titleSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.incident_types, // This is the string array you defined in strings.xml
+                android.R.layout.simple_spinner_item // Standard Android layout for spinner items
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // Layout for the dropdown
+        titleSpinner.setAdapter(adapter);
+
         return view;
     }
+
 
     private void initializeViews(View view) {
         prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
@@ -256,7 +272,7 @@ public class IncidentReportFragment extends Fragment {
     }
 
     private void submitReport() {
-        String title = titleEditText.getText().toString().trim();
+        String title = titleSpinner.getSelectedItem().toString().trim();
         String description = descriptionEditText.getText().toString().trim();
 
         if (title.isEmpty() || description.isEmpty()) {
@@ -342,7 +358,7 @@ public class IncidentReportFragment extends Fragment {
     }
 
     private void clearForm() {
-        titleEditText.setText("");
+        titleSpinner.setSelection(0);
         descriptionEditText.setText("");
         selectedImagesContainer.removeAllViews();
         encodedImages.clear();

@@ -87,17 +87,19 @@
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusBottomEnd="13dp"
-                    app:endIconMode="clear_text"
                     app:boxStrokeColor="@color/black">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/usernameTextInputEditText"
+                    <Spinner
+                        android:id="@+id/titleSpinner"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:textSize="14dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="14sp"
+                        android:background="@drawable/spinner_outline"
                         android:fontFamily="@font/poppins"
-                        />
+                        android:spinnerMode="dropdown" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </RelativeLayout>
