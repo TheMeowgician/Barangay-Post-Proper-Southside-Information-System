@@ -210,13 +210,14 @@
                 app:boxCornerRadiusBottomStart="13dp"
                 app:boxCornerRadiusBottomEnd="13dp"
                 app:endIconMode="clear_text"
+                app:boxBackgroundColor="#A0A0A0"
                 app:boxStrokeColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ageTextInputEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter age"
+                    android:hint="Age (auto-calculated)"
                     android:inputType="text"
                     android:textSize="14dp"
                     android:fontFamily="@font/poppins"
@@ -336,7 +337,7 @@
                         android:id="@+id/zoneTextInputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="Zone"
+                        android:hint="Zone(eg:Palar Village, ISU Village)"
                         app:boxCornerRadiusTopStart="13dp"
                         app:boxCornerRadiusTopEnd="13dp"
                         app:boxCornerRadiusBottomStart="13dp"
@@ -418,6 +419,7 @@
                 app:boxCornerRadiusBottomStart="13dp"
                 app:boxCornerRadiusBottomEnd="13dp"
                 app:endIconMode="clear_text"
+                app:boxBackgroundColor="#A0A0A0"
                 app:boxStrokeColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -460,6 +462,7 @@
                 app:boxCornerRadiusBottomStart="13dp"
                 app:boxCornerRadiusBottomEnd="13dp"
                 app:endIconMode="clear_text"
+                app:boxBackgroundColor="#A0A0A0"
                 app:boxStrokeColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText

@@ -68,6 +68,8 @@ public class LogInActivity extends AppCompatActivity {
         removeTextInputLayoutAnimation();
         addUnderlineToTextView();
 
+        backImageButton.setOnClickListener(v -> finish());
+
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -206,6 +206,8 @@ public class RegistrationActivity extends AppCompatActivity {
             passwordTextInputLayout = findViewById(R.id.passwordTextInputLayout);
             confirmPasswordTextInputLayout = findViewById(R.id.confirmPasswordTextInputLayout);
             ageTextInputLayout = findViewById(R.id.ageTextInputLayout);
+            ageTextInputEditText.setFocusable(false);
+            ageTextInputEditText.setClickable(false);
             houseNumberTextInputLayout = findViewById(R.id.houseNumberTextInputLayout);
             zoneTextInputLayout = findViewById(R.id.zoneTextInputLayout);
             streetTextInputLayout = findViewById(R.id.streetTextInputLayout);
@@ -239,7 +241,6 @@ public class RegistrationActivity extends AppCompatActivity {
                 registerUser();
             }
         });
-
         birthDateTextInputEditText.setOnClickListener(this::openDialog);
         backImageButton.setOnClickListener(v -> finish());
 
@@ -306,8 +307,24 @@ public class RegistrationActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 this,
                 (datePicker, year, month, day) -> {
+                    // Format and set the birth date
                     String formattedDate = String.format("%d-%02d-%02d", year, month + 1, day);
                     birthDateTextInputEditText.setText(formattedDate);
+
+                    // Calculate age
+                    Calendar birthCalendar = Calendar.getInstance();
+                    birthCalendar.set(year, month, day);
+                    Calendar currentCalendar = Calendar.getInstance();
+
+                    int age = currentCalendar.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR);
+
+                    // Adjust age if birthday hasn't occurred this year
+                    if (currentCalendar.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
+                        age--;
+                    }
+
+                    // Set the calculated age
+                    ageTextInputEditText.setText(String.valueOf(age));
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
