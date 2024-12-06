@@ -93,7 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Name (WARNING!: make sure to input the same name in your account or you will be rejected)"
+                    android:text="Name (WARNING!: make sure to input the proper details in your account or you will be rejected)"
                     android:textSize="14dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -105,6 +105,7 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusTopStart="13dp"
+                    app:boxBackgroundColor="#A0A0A0"
                     app:boxStrokeColor="@color/black"
                     app:endIconMode="clear_text">
 
@@ -193,6 +194,7 @@
                             app:boxCornerRadiusBottomStart="13dp"
                             app:boxCornerRadiusTopEnd="13dp"
                             app:boxCornerRadiusTopStart="13dp"
+                            app:boxBackgroundColor="#A0A0A0"
                             app:boxStrokeColor="@color/black"
                             app:endIconMode="clear_text">
 
@@ -255,14 +257,6 @@
                             android:layout_marginRight="5dp"
                             android:fontFamily="@font/poppins_light"
                             android:text="Female"
-                            android:textSize="14sp" />
-
-                        <RadioButton
-                            android:id="@+id/barangay_clearance_form_other_radiobutton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_light"
-                            android:text="Others"
                             android:textSize="14sp" />
 
                     </RadioGroup>
@@ -364,6 +358,7 @@
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusTopStart="13dp"
                     app:boxStrokeColor="@color/black"
+                    app:boxBackgroundColor="#A0A0A0"
                     app:endIconDrawable="@drawable/baseline_calendar_today_24"
                     app:endIconMode="custom">
 
@@ -481,6 +476,7 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusTopStart="13dp"
+                    app:boxBackgroundColor="#A0A0A0"
                     app:boxStrokeColor="@color/black"
                     app:endIconMode="clear_text">
 

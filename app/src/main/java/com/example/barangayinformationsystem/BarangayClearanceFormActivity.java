@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -19,185 +19,230 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BarangayClearanceFormActivity extends AppCompatActivity {
-
-    private TextInputEditText birthdayInput;
-    private Calendar calendar;
     private static final String TAG = "BarangayClearanceForm";
+
+    // UI Components
+    private TextInputEditText nameInput;
+    private TextInputEditText aliasInput;
+    private TextInputEditText ageInput;
+    private TextInputEditText birthdayInput;
+    private TextInputEditText addressInput;
+    private TextInputEditText citizenshipInput;
+    private TextInputEditText lengthOfStayInput;
+    private TextInputEditText tinInput;
+    private TextInputEditText ctcInput;
+    private TextInputEditText purposeInput;
+    private TextInputEditText occupationInput;
+    private TextInputEditText placeOfBirthInput;
+    private RadioGroup genderRadioGroup;
+    private RadioGroup civilStatusRadioGroup;
+    private Button submitButton;
     private ImageButton backButton;
-    private TextInputEditText nameInput, aliasInput, ageInput, addressInput;
-    private TextInputEditText citizenshipInput, lengthOfStayInput, tinInput, ctcInput, purposeInput, occupationInput, placeOfBirthInput;
-    private RadioGroup genderRadioGroup, civilStatusRadioGroup;
+
+    // Utility variables
+    private Calendar calendar;
     private ApiService apiService;
     private ProgressDialog progressDialog;
+    private int userId;
+    private SimpleDateFormat displayDateFormat;
+    private SimpleDateFormat databaseDateFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barangay_clearance_form);
 
-        calendar = Calendar.getInstance();
-        apiService = RetrofitClient.getApiService();
-        initializeComponents();
+        initializeVariables();
+        initializeViews();
         setupListeners();
-        setupDateInputHandling();
-
+        loadUserData();
     }
 
-    private void initializeComponents() {
-        birthdayInput = findViewById(R.id.barangay_clearance_form_date_of_birth_textInputEditText);
-        backButton = findViewById(R.id.barangay_clearance_form_back_button);
+    private void initializeVariables() {
+        calendar = Calendar.getInstance();
+        apiService = RetrofitClient.getApiService();
+        displayDateFormat = new SimpleDateFormat("MM-dd-yy", Locale.US);
+        databaseDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Processing...");
+        progressDialog.setCancelable(false);
+
+        // Get userId from SharedPreferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        userId = prefs.getInt("user_id", -1);
+    }
+
+    private void initializeViews() {
+        // Initialize all TextInputEditText fields
         nameInput = findViewById(R.id.barangay_clearance_form_name_textInputEditText);
         aliasInput = findViewById(R.id.barangay_clearance_form_alias_textInputEditText);
         ageInput = findViewById(R.id.barangay_clearance_form_age_textInputEditText);
+        birthdayInput = findViewById(R.id.barangay_clearance_form_date_of_birth_textInputEditText);
         addressInput = findViewById(R.id.barangay_clearance_form_address_textInputEditText);
         citizenshipInput = findViewById(R.id.barangay_clearance_form_citizenship_textInputEditText);
-        placeOfBirthInput = findViewById(R.id.barangay_clearance_form_place_of_birth_textInputEditText);
         lengthOfStayInput = findViewById(R.id.barangay_clearance_form_length_of_stay_textInputEditText);
-        occupationInput = findViewById(R.id.barangay_clearance_form_occupation_textInputEditText);
         tinInput = findViewById(R.id.barangay_clearance_form_tin_textInputEditText);
         ctcInput = findViewById(R.id.barangay_clearance_form_ctc_textInputEditText);
         purposeInput = findViewById(R.id.barangay_clearance_form_purpose_textInputEditText);
+        occupationInput = findViewById(R.id.barangay_clearance_form_occupation_textInputEditText);
+        placeOfBirthInput = findViewById(R.id.barangay_clearance_form_place_of_birth_textInputEditText);
+
+        // Initialize RadioGroups
         genderRadioGroup = findViewById(R.id.barangay_clearance_form_gender_radioGroup);
         civilStatusRadioGroup = findViewById(R.id.barangay_clearance_form_civil_status_radioGroup);
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Submitting request...");
-        progressDialog.setCancelable(false);
+        // Initialize Buttons
+        submitButton = findViewById(R.id.barangay_clearance_form_submit_button);
+        backButton = findViewById(R.id.barangay_clearance_form_back_button);
     }
 
-    private void setupDateInputHandling() {
-        // Set up date format watcher
-        birthdayInput.addTextChangedListener(new TextWatcher() {
-            private String current = "";
-            private String mmddyy = "MMDDYY";
-            private Calendar cal = Calendar.getInstance();
+    private void setupListeners() {
+        // Setup Birthday Input Click Listener
+        birthdayInput.setOnClickListener(v -> showDatePicker());
 
+        // Setup Submit Button Click Listener
+        submitButton.setOnClickListener(v -> submitForm());
+
+        // Setup Back Button Click Listener
+        backButton.setOnClickListener(v -> finish());
+    }
+
+    private void showDatePicker() {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    calendar.set(year, month, dayOfMonth);
+                    String dateStr = displayDateFormat.format(calendar.getTime());
+                    birthdayInput.setText(dateStr);
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+        datePickerDialog.show();
+    }
+
+    private void loadUserData() {
+        if (userId == -1) {
+            showError("User ID not found. Please log in again.");
+            finish();
+            return;
+        }
+
+        progressDialog.setMessage("Fetching user details...");
+        progressDialog.show();
+
+        Call<UserDetailsResponse> call = apiService.getUserDetails(userId);
+        call.enqueue(new Callback<UserDetailsResponse>() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!s.toString().equals(current)) {
-                    String clean = s.toString().replaceAll("[^\\d.]|\\.","");
-                    String cleanC = current.replaceAll("[^\\d.]|\\.","");
-
-                    int cl = clean.length();
-                    int sel = cl;
-                    for (int i = 2; i <= cl && i < 6; i += 2) {
-                        sel++;
+            public void onResponse(Call<UserDetailsResponse> call, Response<UserDetailsResponse> response) {
+                progressDialog.dismiss();
+                if (response.isSuccessful() && response.body() != null) {
+                    UserDetailsResponse.User user = response.body().getUser();
+                    if (user != null) {
+                        populateUserDetails(user);
                     }
-                    //Fix for pressing delete next to a forward slash
-                    if (clean.equals(cleanC)) sel--;
-
-                    if (clean.length() < 6){
-                        clean = clean + mmddyy.substring(clean.length());
-                    }else{
-                        //This part makes sure that when we finish entering numbers
-                        //the date is correct, fixing it if necessary
-                        int mon  = Integer.parseInt(clean.substring(0,2));
-                        int day  = Integer.parseInt(clean.substring(2,4));
-                        int year = Integer.parseInt(clean.substring(4,6));
-
-                        mon = mon < 1 ? 1 : mon > 12 ? 12 : mon;
-                        cal.set(Calendar.MONTH, mon-1);
-                        year = year + 2000;
-                        cal.set(Calendar.YEAR, year);
-
-                        // Adjust day based on month and year
-                        int maxDays = cal.getActualMaximum(Calendar.DATE);
-                        day = day < 1 ? 1 : day > maxDays ? maxDays : day;
-
-                        clean = String.format(Locale.US, "%02d%02d%02d", mon, day, year % 100);
-                    }
-
-                    clean = String.format("%s-%s-%s", clean.substring(0,2),
-                            clean.substring(2,4), clean.substring(4,6));
-
-                    sel = sel < 0 ? 0 : sel;
-                    current = clean;
-                    birthdayInput.setText(current);
-                    birthdayInput.setSelection(sel < current.length() ? sel : current.length());
+                } else {
+                    showError("Error fetching user details");
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
-        });
-
-        // Set up date picker dialog
-        birthdayInput.setOnClickListener(v -> {
-            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    this,
-                    (view, year, month, dayOfMonth) -> {
-                        calendar.set(year, month, dayOfMonth);
-                        String dateFormat = String.format(Locale.US, "%02d-%02d-%02d",
-                                month + 1, dayOfMonth, year % 100);
-                        birthdayInput.setText(dateFormat);
-                    },
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)
-            );
-            datePickerDialog.show();
+            public void onFailure(Call<UserDetailsResponse> call, Throwable t) {
+                progressDialog.dismiss();
+                showError("Network error: " + t.getMessage());
+            }
         });
     }
 
-    private void setupListeners() {
-        findViewById(R.id.barangay_clearance_form_submit_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submitForm();
+    private void populateUserDetails(UserDetailsResponse.User user) {
+        try {
+            // Set name
+            String fullName = String.format("%s %s", user.getFirstName(), user.getLastName());
+            nameInput.setText(fullName);
+
+            // Set age
+            ageInput.setText(String.valueOf(user.getAge()));
+
+            // Set birthday
+            if (!TextUtils.isEmpty(user.getDateOfBirth())) {
+                try {
+                    Date date = databaseDateFormat.parse(user.getDateOfBirth());
+                    if (date != null) {
+                        birthdayInput.setText(displayDateFormat.format(date));
+                    }
+                } catch (ParseException e) {
+                    Log.e(TAG, "Error parsing date: " + e.getMessage());
+                }
             }
-        });
+
+            // Set address
+            String fullAddress = String.format("%s %s Street Zone %s",
+                    user.getHouseNo(), user.getStreet(), user.getZone());
+            addressInput.setText(fullAddress);
+
+            // Set gender
+            if (user.getGender() != null) {
+                int radioButtonId = user.getGender().equalsIgnoreCase("male") ?
+                        R.id.barangay_clearance_form_male_radiobutton :
+                        R.id.barangay_clearance_form_female_radiobutton;
+                genderRadioGroup.check(radioButtonId);
+            }
+
+            // Disable pre-filled fields
+            nameInput.setEnabled(false);
+            ageInput.setEnabled(false);
+            birthdayInput.setEnabled(false);
+            addressInput.setEnabled(false);
+            genderRadioGroup.setEnabled(false);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error populating user details: " + e.getMessage());
+            showError("Error loading user details");
+        }
     }
 
     private void submitForm() {
+        if (!validateInputs()) {
+            return;
+        }
+
+        progressDialog.setMessage("Submitting request...");
+        progressDialog.show();
+
         try {
-            // Validate inputs
-            if (!validateInputs()) {
-                return;
-            }
+            String name = Objects.requireNonNull(nameInput.getText()).toString().trim();
+            String alias = Objects.requireNonNull(aliasInput.getText()).toString().trim();
+            int age = Integer.parseInt(Objects.requireNonNull(ageInput.getText()).toString().trim());
+            String address = Objects.requireNonNull(addressInput.getText()).toString().trim();
+            String tin = Objects.requireNonNull(tinInput.getText()).toString().trim();
+            String ctc = Objects.requireNonNull(ctcInput.getText()).toString().trim();
+            String citizenship = Objects.requireNonNull(citizenshipInput.getText()).toString().trim();
+            int lengthOfStay = Integer.parseInt(Objects.requireNonNull(lengthOfStayInput.getText()).toString().trim());
+            String purpose = Objects.requireNonNull(purposeInput.getText()).toString().trim();
+            String placeOfBirth = Objects.requireNonNull(placeOfBirthInput.getText()).toString().trim();
+            String occupation = Objects.requireNonNull(occupationInput.getText()).toString().trim();
+            String birthday = Objects.requireNonNull(birthdayInput.getText()).toString().trim();
 
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            int userId = prefs.getInt("user_id", -1);
+            RadioButton selectedGenderButton = findViewById(genderRadioGroup.getCheckedRadioButtonId());
+            RadioButton selectedCivilStatusButton = findViewById(civilStatusRadioGroup.getCheckedRadioButtonId());
 
-            Log.d(TAG, "Starting form submission");
-            progressDialog.show();
+            String gender = selectedGenderButton.getText().toString();
+            String civilStatus = selectedCivilStatusButton.getText().toString();
 
-            // Get all form values with proper error handling
-            String birthday = birthdayInput.getText().toString().trim();
-            if (!isValidDate(birthday)) {
-                birthdayInput.setError("Please enter a valid date (MM-DD-YY)");
-                return;
-            }
-            String name = getEditTextValue(nameInput);
-            String alias = getEditTextValue(aliasInput);
-            String address = getEditTextValue(addressInput);
-            String tin = getEditTextValue(tinInput);
-            String ctc = getEditTextValue(ctcInput);
-            String citizenship = getEditTextValue(citizenshipInput);
-            String purpose = getEditTextValue(purposeInput);
-            String placeOfBirth = getEditTextValue(placeOfBirthInput);
-            String occupation = getEditTextValue(occupationInput);
-
-            // Parse numeric values safely
-            int age = parseIntSafely(ageInput.getText().toString(), "age");
-            int lengthOfStay = parseIntSafely(lengthOfStayInput.getText().toString(), "length of stay");
-
-            String gender = getSelectedRadioButtonText(genderRadioGroup);
-            String civilStatus = getSelectedRadioButtonText(civilStatusRadioGroup);
-
-            Log.d(TAG, "Form data prepared. Making API call...");
-
-            // Create API call
             Call<DocumentRequestResponse> call = apiService.submitDocumentRequest(
                     userId,
                     "Barangay Clearance",
@@ -218,158 +263,92 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
                     1
             );
 
-
             call.enqueue(new Callback<DocumentRequestResponse>() {
                 @Override
                 public void onResponse(Call<DocumentRequestResponse> call, Response<DocumentRequestResponse> response) {
-                    try {
-                        progressDialog.dismiss();
-
-                        if (response.isSuccessful() && response.body() != null) {
-                            DocumentRequestResponse body = response.body();
-                            Log.d(TAG, "Response successful: " + body.isSuccess());
-
-                            if (body.isSuccess()) {
-                                int requestId = body.getRequestId();
-                                Log.d(TAG, "Request ID received: " + requestId);
-                                proceedToUploadRequirements(requestId);
-                            } else {
-                                String message = body.getMessage();
-                                Log.e(TAG, "Server returned error: " + message);
-                                showError("Server error: " + message);
-                            }
+                    progressDialog.dismiss();
+                    if (response.isSuccessful() && response.body() != null) {
+                        DocumentRequestResponse body = response.body();
+                        if (body.isSuccess()) {
+                            proceedToUploadRequirements(body.getRequestId());
                         } else {
-                            String errorBody = response.errorBody() != null ?
-                                    response.errorBody().string() : "Unknown error";
-                            Log.e(TAG, "Response not successful: " + errorBody);
-                            showError("Error submitting form: " + errorBody);
+                            showError(body.getMessage());
                         }
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error processing response", e);
-                        showError("Error processing response: " + e.getMessage());
+                    } else {
+                        showError("Error submitting request");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<DocumentRequestResponse> call, Throwable t) {
-                    Log.e(TAG, "Network error", t);
                     progressDialog.dismiss();
                     showError("Network error: " + t.getMessage());
                 }
             });
-        } catch (Exception e) {
-            Log.e(TAG, "Error in form submission", e);
-            progressDialog.dismiss();
-            showError("Error preparing form submission: " + e.getMessage());
-        }
-    }
 
-    private boolean isValidDate(String date) {
-        if (date == null || !date.matches("\\d{2}-\\d{2}-\\d{2}")) {
-            return false;
-        }
-        try {
-            String[] parts = date.split("-");
-            int month = Integer.parseInt(parts[0]);
-            int day = Integer.parseInt(parts[1]);
-            int year = Integer.parseInt(parts[2]);
-
-            if (month < 1 || month > 12) return false;
-            if (day < 1 || day > 31) return false;
-            if (year < 0 || year > 99) return false;
-
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.YEAR, 2000 + year);
-            cal.set(Calendar.MONTH, month - 1);
-
-            return day <= cal.getActualMaximum(Calendar.DATE);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private String getEditTextValue(TextInputEditText input) {
-        return input.getText() != null ? input.getText().toString().trim() : "";
-    }
-
-    private int parseIntSafely(String value, String fieldName) {
-        try {
-            return Integer.parseInt(value.trim());
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid " + fieldName + " value: " + value);
+            progressDialog.dismiss();
+            showError("Please enter valid numbers for age and length of stay");
+        } catch (Exception e) {
+            progressDialog.dismiss();
+            showError("Error submitting form: " + e.getMessage());
         }
     }
 
     private boolean validateInputs() {
-        try {
-            if (isEmpty(nameInput)) {
-                nameInput.setError("Name is required");
-                return false;
-            }
-            if (isEmpty(ageInput)) {
-                ageInput.setError("Age is required");
-                return false;
-            }
-            if (isEmpty(addressInput)) {
-                addressInput.setError("Address is required");
-                return false;
-            }
-            if (isEmpty(lengthOfStayInput)) {
-                lengthOfStayInput.setError("Length of stay is required");
-                return false;
-            }
-            if (isEmpty(citizenshipInput)) {
-                citizenshipInput.setError("Citizenship is required");
-                return false;
-            }
-            if (genderRadioGroup.getCheckedRadioButtonId() == -1) {
-                showError("Please select gender");
-                return false;
-            }
-            if (civilStatusRadioGroup.getCheckedRadioButtonId() == -1) {
-                showError("Please select civil status");
-                return false;
-            }
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG, "Error validating inputs", e);
-            showError("Error validating form: " + e.getMessage());
+        if (isEmpty(tinInput)) {
+            showError("Please enter TIN number");
             return false;
         }
+        if (isEmpty(ctcInput)) {
+            showError("Please enter CTC number");
+            return false;
+        }
+        if (isEmpty(lengthOfStayInput)) {
+            showError("Please enter length of stay");
+            return false;
+        }
+        if (isEmpty(citizenshipInput)) {
+            showError("Please enter citizenship");
+            return false;
+        }
+        if (isEmpty(purposeInput)) {
+            showError("Please enter purpose");
+            return false;
+        }
+        if (civilStatusRadioGroup.getCheckedRadioButtonId() == -1) {
+            showError("Please select civil status");
+            return false;
+        }
+
+        // Validate TIN and CTC format (assuming 12 digits)
+        String tin = Objects.requireNonNull(tinInput.getText()).toString().trim();
+        String ctc = Objects.requireNonNull(ctcInput.getText()).toString().trim();
+
+        if (!tin.matches("\\d{12}")) {
+            showError("TIN number must be 12 digits");
+            return false;
+        }
+        if (!ctc.matches("\\d{12}")) {
+            showError("CTC number must be 12 digits");
+            return false;
+        }
+
+        return true;
     }
 
     private boolean isEmpty(TextInputEditText input) {
         return input.getText() == null || input.getText().toString().trim().isEmpty();
     }
 
-    private String getSelectedRadioButtonText(RadioGroup radioGroup) {
-        int selectedId = radioGroup.getCheckedRadioButtonId();
-        if (selectedId == -1) return "";
-        RadioButton radioButton = findViewById(selectedId);
-        return radioButton != null ? radioButton.getText().toString() : "";
-    }
-
     private void proceedToUploadRequirements(int requestId) {
-        try {
-            Log.d(TAG, "Starting UploadRequirementsActivity with requestId: " + requestId);
-            Intent intent = new Intent(this, UploadRequirementsActivity.class);
-            intent.putExtra("requestId", requestId);
-            intent.putExtra("documentType", "Barangay Clearance");
-            startActivity(intent);
-            // Don't finish this activity yet
-        } catch (Exception e) {
-            Log.e(TAG, "Error starting UploadRequirementsActivity", e);
-            showError("Error proceeding to upload: " + e.getMessage());
-        }
+        Intent intent = new Intent(this, UploadRequirementsActivity.class);
+        intent.putExtra("requestId", requestId);
+        intent.putExtra("documentType", "Barangay Clearance");
+        startActivity(intent);
     }
 
     private void showError(String message) {
-        runOnUiThread(() -> {
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        });
-    }
-
-    public void back(View view) {
-        finish();
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_LONG).show());
     }
 }
