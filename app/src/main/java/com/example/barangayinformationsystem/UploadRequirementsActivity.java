@@ -227,11 +227,11 @@ public class UploadRequirementsActivity extends AppCompatActivity {
 
                     if (response.isSuccessful() && response.body() != null &&
                             response.body().isSuccess()) {
-                        // Show success dialog and navigate to home
-                        Intent homeIntent = new Intent(UploadRequirementsActivity.this,
-                                DocumentStatusFragment.class);
-                        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                                Intent.FLAG_ACTIVITY_NEW_TASK);
+                        // Create intent for HomeActivity
+                        Intent homeIntent = new Intent(UploadRequirementsActivity.this, HomeActivity.class);
+                        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        // Add extra to indicate which fragment to show
+                        homeIntent.putExtra("navigate_to", "document_status");
 
                         SuccessDialog.showSuccess(
                                 UploadRequirementsActivity.this,

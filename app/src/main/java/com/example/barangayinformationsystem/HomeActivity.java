@@ -45,7 +45,22 @@ public class HomeActivity extends AppCompatActivity {
         initializeComponents();
         loadUserDetails();
         updateUserActivity();
-        replaceFragment(new HomeFragment());
+
+        // Handle navigation from document request
+        if (getIntent().hasExtra("navigate_to")) {
+            String navigateTo = getIntent().getStringExtra("navigate_to");
+            if ("document_status".equals(navigateTo)) {
+                replaceFragment(new DocumentStatusFragment());
+                // Update navigation drawer selection if needed
+                navigationView.setCheckedItem(R.id.navDocumentStatus);
+            } else {
+                // Default to home fragment
+                replaceFragment(new HomeFragment());
+            }
+        } else {
+            // Default to home fragment
+            replaceFragment(new HomeFragment());
+        }
     }
 
     private void updateUserActivity() {
