@@ -120,7 +120,7 @@ public class CedulaFormActivity extends AppCompatActivity {
         // Make the API call with DOCUMENT_TYPE constant
         Call<DocumentRequestResponse> call = apiService.submitDocumentRequest(
                 userId,
-                DOCUMENT_TYPE,  // Using constant instead of hardcoded string
+                DOCUMENT_TYPE,
                 name,
                 address,
                 tin,
@@ -128,6 +128,8 @@ public class CedulaFormActivity extends AppCompatActivity {
                 alias,
                 age,
                 birthday,
+                placeOfBirth,
+                occupation,
                 lengthOfStay,
                 citizenship,
                 gender,

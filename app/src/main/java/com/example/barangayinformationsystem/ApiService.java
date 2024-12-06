@@ -82,7 +82,7 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("submit_document_request.php")
     Call<DocumentRequestResponse> submitDocumentRequest(
-            @Field("userId") int userId,  // Added userId
+            @Field("userId") int userId,
             @Field("documentType") String documentType,
             @Field("name") String name,
             @Field("address") String address,
@@ -91,6 +91,8 @@ public interface ApiService {
             @Field("alias") String alias,
             @Field("age") int age,
             @Field("birthday") String birthday,
+            @Field("placeOfBirth") String placeOfBirth,  // New field
+            @Field("occupation") String occupation,       // New field
             @Field("lengthOfStay") int lengthOfStay,
             @Field("citizenship") String citizenship,
             @Field("gender") String gender,

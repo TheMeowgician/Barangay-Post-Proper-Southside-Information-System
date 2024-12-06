@@ -29,6 +29,7 @@ public class BarangayCertificationFormActivity extends AppCompatActivity {
     private ImageButton barangay_certification_form_back_button;
     private TextInputEditText nameInput, aliasInput, ageInput, addressInput;
     private TextInputEditText citizenshipInput, lengthOfStayInput, tinInput, ctcInput, purposeInput;
+    private TextInputEditText placeOfBirthInput, occupationInput;
     private TextInputEditText birthdayInput;
     private RadioGroup genderRadioGroup, civilStatusRadioGroup;
     private ApiService apiService;
@@ -46,6 +47,8 @@ public class BarangayCertificationFormActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
+        placeOfBirthInput = findViewById(R.id.barangay_certification_form_place_of_birth_textInputEditText);
+        occupationInput = findViewById(R.id.barangay_certification_form_occupation_textInputEditText);
         barangay_certification_form_back_button = findViewById(R.id.barangay_certification_form_back_button);
         nameInput = findViewById(R.id.barangay_certification_form_name_textInputEditText);
         aliasInput = findViewById(R.id.barangay_certification_form_alias_textInputEditText);
@@ -106,6 +109,8 @@ public class BarangayCertificationFormActivity extends AppCompatActivity {
         String address = addressInput.getText().toString();
         String citizenship = citizenshipInput.getText().toString();
         int lengthOfStay = Integer.parseInt(lengthOfStayInput.getText().toString());
+        String placeOfBirth = placeOfBirthInput.getText().toString();
+        String occupation = occupationInput.getText().toString();
         String tin = tinInput.getText().toString();
         String ctc = ctcInput.getText().toString();
         String purpose = purposeInput.getText().toString();
@@ -123,6 +128,8 @@ public class BarangayCertificationFormActivity extends AppCompatActivity {
                 alias,
                 age,
                 birthday,
+                placeOfBirth,
+                occupation,
                 lengthOfStay,
                 citizenship,
                 gender,
@@ -166,6 +173,14 @@ public class BarangayCertificationFormActivity extends AppCompatActivity {
         }
         if (lengthOfStayInput.getText().toString().isEmpty()) {
             lengthOfStayInput.setError("Length of stay is required");
+            return false;
+        }
+        if (placeOfBirthInput.getText().toString().isEmpty()) {
+            placeOfBirthInput.setError("Place of birth is required");
+            return false;
+        }
+        if (occupationInput.getText().toString().isEmpty()) {
+            occupationInput.setError("Occupation is required");
             return false;
         }
         if (citizenshipInput.getText().toString().isEmpty()) {

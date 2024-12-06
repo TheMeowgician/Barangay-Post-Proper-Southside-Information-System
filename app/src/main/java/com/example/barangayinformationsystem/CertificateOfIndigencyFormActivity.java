@@ -29,6 +29,7 @@ public class CertificateOfIndigencyFormActivity extends AppCompatActivity {
     private ImageButton certificate_of_indigency_form_back_button;
     private TextInputEditText nameInput, aliasInput, ageInput, addressInput;
     private TextInputEditText citizenshipInput, lengthOfStayInput, tinInput, ctcInput, purposeInput;
+    private TextInputEditText placeOfBirthInput, occupationInput;
     private TextInputEditText birthdayInput;
     private RadioGroup genderRadioGroup, civilStatusRadioGroup;
     private ApiService apiService;
@@ -46,6 +47,8 @@ public class CertificateOfIndigencyFormActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
+        placeOfBirthInput = findViewById(R.id.certificate_of_indigency_form_place_of_birth_textInputEditText);
+        occupationInput = findViewById(R.id.certificate_of_indigency_form_occupation_textInputEditText);
         certificate_of_indigency_form_back_button = findViewById(R.id.certificate_of_indigency_form_back_button);
         nameInput = findViewById(R.id.certificate_of_indigency_form_name_textInputEditText);
         aliasInput = findViewById(R.id.certificate_of_indigency_form_alias_textInputEditText);
@@ -102,6 +105,8 @@ public class CertificateOfIndigencyFormActivity extends AppCompatActivity {
         // Get all form values
         String name = nameInput.getText().toString();
         String alias = aliasInput.getText().toString();
+        String placeOfBirth = placeOfBirthInput.getText().toString();
+        String occupation = occupationInput.getText().toString();
         int age = Integer.parseInt(ageInput.getText().toString());
         String address = addressInput.getText().toString();
         String citizenship = citizenshipInput.getText().toString();
@@ -123,6 +128,8 @@ public class CertificateOfIndigencyFormActivity extends AppCompatActivity {
                 alias,
                 age,
                 birthday,
+                placeOfBirth,
+                occupation,
                 lengthOfStay,
                 citizenship,
                 gender,
@@ -154,6 +161,14 @@ public class CertificateOfIndigencyFormActivity extends AppCompatActivity {
     private boolean validateInputs() {
         if (nameInput.getText().toString().isEmpty()) {
             nameInput.setError("Name is required");
+            return false;
+        }
+        if (placeOfBirthInput.getText().toString().isEmpty()) {
+            placeOfBirthInput.setError("Place of birth is required");
+            return false;
+        }
+        if (occupationInput.getText().toString().isEmpty()) {
+            occupationInput.setError("Occupation is required");
             return false;
         }
         if (ageInput.getText().toString().isEmpty()) {

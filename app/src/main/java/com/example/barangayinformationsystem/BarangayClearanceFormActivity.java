@@ -33,7 +33,7 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
     private static final String TAG = "BarangayClearanceForm";
     private ImageButton backButton;
     private TextInputEditText nameInput, aliasInput, ageInput, addressInput;
-    private TextInputEditText citizenshipInput, lengthOfStayInput, tinInput, ctcInput, purposeInput;
+    private TextInputEditText citizenshipInput, lengthOfStayInput, tinInput, ctcInput, purposeInput, occupationInput, placeOfBirthInput;
     private RadioGroup genderRadioGroup, civilStatusRadioGroup;
     private ApiService apiService;
     private ProgressDialog progressDialog;
@@ -59,7 +59,9 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
         ageInput = findViewById(R.id.barangay_clearance_form_age_textInputEditText);
         addressInput = findViewById(R.id.barangay_clearance_form_address_textInputEditText);
         citizenshipInput = findViewById(R.id.barangay_clearance_form_citizenship_textInputEditText);
+        placeOfBirthInput = findViewById(R.id.barangay_clearance_form_place_of_birth_textInputEditText);
         lengthOfStayInput = findViewById(R.id.barangay_clearance_form_length_of_stay_textInputEditText);
+        occupationInput = findViewById(R.id.barangay_clearance_form_occupation_textInputEditText);
         tinInput = findViewById(R.id.barangay_clearance_form_tin_textInputEditText);
         ctcInput = findViewById(R.id.barangay_clearance_form_ctc_textInputEditText);
         purposeInput = findViewById(R.id.barangay_clearance_form_purpose_textInputEditText);
@@ -183,6 +185,8 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
             String ctc = getEditTextValue(ctcInput);
             String citizenship = getEditTextValue(citizenshipInput);
             String purpose = getEditTextValue(purposeInput);
+            String placeOfBirth = getEditTextValue(placeOfBirthInput);
+            String occupation = getEditTextValue(occupationInput);
 
             // Parse numeric values safely
             int age = parseIntSafely(ageInput.getText().toString(), "age");
@@ -195,7 +199,7 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
 
             // Create API call
             Call<DocumentRequestResponse> call = apiService.submitDocumentRequest(
-                    userId,  // Add userId here
+                    userId,
                     "Barangay Clearance",
                     name,
                     address,
@@ -204,6 +208,8 @@ public class BarangayClearanceFormActivity extends AppCompatActivity {
                     alias,
                     age,
                     birthday,
+                    placeOfBirth,
+                    occupation,
                     lengthOfStay,
                     citizenship,
                     gender,
