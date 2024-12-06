@@ -84,7 +84,7 @@
                 android:id="@+id/barangay_certification_form_name_textview_textInputEditText_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/barangay_clearance_form_personal_information_textview"
+                android:layout_below="@+id/barangay_certification_form_personal_information_textview"
                 android:layout_marginTop="20dp">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -92,7 +92,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Name (WARNING!: make sure to input the same name in your account or you will be rejected)"
+                    android:text="Name (WARNING!: make sure to input the proper details in your account or you will be rejected)"
                     android:textSize="14dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -104,6 +104,7 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusTopStart="13dp"
+                    app:boxBackgroundColor="#A0A0A0"
                     app:boxStrokeColor="@color/black"
                     app:endIconMode="clear_text">
 
@@ -192,6 +193,7 @@
                             app:boxCornerRadiusBottomStart="13dp"
                             app:boxCornerRadiusTopEnd="13dp"
                             app:boxCornerRadiusTopStart="13dp"
+                            app:boxBackgroundColor="#A0A0A0"
                             app:boxStrokeColor="@color/black"
                             app:endIconMode="clear_text">
 
@@ -200,7 +202,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins"
-                                android:hint="Example: 20,36,45"
                                 android:inputType="text"
                                 android:textSize="14dp" />
                         </com.google.android.material.textfield.TextInputLayout>
@@ -254,14 +255,6 @@
                             android:layout_marginRight="5dp"
                             android:fontFamily="@font/poppins_light"
                             android:text="Female"
-                            android:textSize="14sp" />
-
-                        <RadioButton
-                            android:id="@+id/barangay_certification_form_other_radiobutton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_light"
-                            android:text="Others"
                             android:textSize="14sp" />
 
                     </RadioGroup>
@@ -362,6 +355,7 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusTopStart="13dp"
+                    app:boxBackgroundColor="#A0A0A0"
                     app:boxStrokeColor="@color/black"
                     app:endIconDrawable="@drawable/baseline_calendar_today_24"
                     app:endIconMode="custom">
@@ -371,7 +365,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
-                        android:hint="MM-DD-YY"
                         android:inputType="date"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -478,6 +471,7 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusTopStart="13dp"
+                    app:boxBackgroundColor="#A0A0A0"
                     app:boxStrokeColor="@color/black"
                     app:endIconMode="clear_text">
 
@@ -486,7 +480,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins"
-                        android:hint="Example: 888-A Kalaw Street Zone 4"
                         android:inputType="text"
                         android:textSize="14dp" />
                 </com.google.android.material.textfield.TextInputLayout>
