@@ -106,7 +106,8 @@ public interface ApiService {
     Call<UploadRequirementsResponse> uploadRequirements(
             @Part("requestId") RequestBody requestId,
             @Part("quantity") RequestBody quantity,
-            @Part MultipartBody.Part validId
+            @Part MultipartBody.Part frontId,
+            @Part MultipartBody.Part backId
     );
 
     @GET("get_user_requests.php")

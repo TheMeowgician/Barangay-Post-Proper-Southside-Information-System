@@ -7,7 +7,9 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -16,14 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -33,9 +30,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class UploadRequirementsActivity extends AppCompatActivity {
-    private ImageView imagePreview;
-    private TextInputEditText copiesInput;
-    private Uri validIdUri;
+    private ImageView frontImagePreview;
+    private ImageView backImagePreview;
+    private Spinner copiesSpinner;
+    private Uri frontIdUri;
+    private Uri backIdUri;
     private int requestId;
     private String documentType;
     private ApiService apiService;
@@ -43,24 +42,43 @@ public class UploadRequirementsActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-                    openCamera();
+                    openCamera(true); // Default to front ID camera
                 } else {
                     Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show();
                 }
             });
 
-    private final ActivityResultLauncher<Intent> cameraLauncher =
+    private final ActivityResultLauncher<Intent> frontCameraLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
-                    imagePreview.setImageURI(validIdUri);
+                    frontImagePreview.setImageURI(frontIdUri);
+                    frontImagePreview.setVisibility(ImageView.VISIBLE);
                 }
             });
 
-    private final ActivityResultLauncher<String> galleryLauncher =
+    private final ActivityResultLauncher<Intent> backCameraLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    backImagePreview.setImageURI(backIdUri);
+                    backImagePreview.setVisibility(ImageView.VISIBLE);
+                }
+            });
+
+    private final ActivityResultLauncher<String> frontGalleryLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
-                    validIdUri = uri;
-                    imagePreview.setImageURI(uri);
+                    frontIdUri = uri;
+                    frontImagePreview.setImageURI(uri);
+                    frontImagePreview.setVisibility(ImageView.VISIBLE);
+                }
+            });
+
+    private final ActivityResultLauncher<String> backGalleryLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    backIdUri = uri;
+                    backImagePreview.setImageURI(uri);
+                    backImagePreview.setVisibility(ImageView.VISIBLE);
                 }
             });
 
@@ -84,49 +102,78 @@ public class UploadRequirementsActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
-        imagePreview = findViewById(R.id.upload_requirements_browse_file_imageview);
-        copiesInput = findViewById(R.id.upload_requirements_number_of_copies_textInputEditText);
+        frontImagePreview = findViewById(R.id.upload_requirements_front_preview);
+        backImagePreview = findViewById(R.id.upload_requirements_back_preview);
+        copiesSpinner = findViewById(R.id.upload_requirements_copies_spinner);
 
         MaterialTextView titleText = findViewById(R.id.upload_requirements_form_textview);
         titleText.setText("Upload Requirements for " + documentType);
+
+        // Setup spinner
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new Integer[]{1, 2, 3, 4, 5}
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        copiesSpinner.setAdapter(adapter);
+        copiesSpinner.setSelection(0); // Default to 1 copy
     }
 
     private void setupListeners() {
-        findViewById(R.id.upload_requirements_browse_file_imageview).setOnClickListener(v ->
-                galleryLauncher.launch("image/*")
-        );
-
-        findViewById(R.id.upload_requirements_open_camera_take_photo_button).setOnClickListener(v -> {
+        findViewById(R.id.upload_requirements_front_camera_button).setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                     == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
+                openCamera(true);
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA);
             }
         });
 
+        findViewById(R.id.upload_requirements_back_camera_button).setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED) {
+                openCamera(false);
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.CAMERA);
+            }
+        });
+
+        findViewById(R.id.upload_requirements_front_gallery_button).setOnClickListener(v ->
+                frontGalleryLauncher.launch("image/*")
+        );
+
+        findViewById(R.id.upload_requirements_back_gallery_button).setOnClickListener(v ->
+                backGalleryLauncher.launch("image/*")
+        );
+
         findViewById(R.id.upload_requirements_submit_button).setOnClickListener(v -> uploadRequirements());
     }
 
-    private void openCamera() {
+    private void openCamera(boolean isFrontId) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photoFile = new File(getExternalCacheDir(), "valid_id_photo.jpg");
-        validIdUri = FileProvider.getUriForFile(this,
+        File photoFile = new File(getExternalCacheDir(),
+                isFrontId ? "valid_id_front.jpg" : "valid_id_back.jpg");
+
+        Uri photoUri = FileProvider.getUriForFile(this,
                 "com.example.barangayinformationsystem.fileprovider",
                 photoFile);
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, validIdUri);
-        cameraLauncher.launch(takePictureIntent);
+
+        if (isFrontId) {
+            frontIdUri = photoUri;
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, frontIdUri);
+            frontCameraLauncher.launch(takePictureIntent);
+        } else {
+            backIdUri = photoUri;
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, backIdUri);
+            backCameraLauncher.launch(takePictureIntent);
+        }
     }
 
     private void uploadRequirements() {
-        if (validIdUri == null) {
-            Toast.makeText(this, "Please select or capture a valid ID image", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String copies = copiesInput.getText().toString();
-        if (copies.isEmpty()) {
-            Toast.makeText(this, "Please enter number of copies", Toast.LENGTH_SHORT).show();
+        if (frontIdUri == null || backIdUri == null) {
+            Toast.makeText(this, "Please provide both front and back images of your valid ID",
+                    Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -137,8 +184,9 @@ public class UploadRequirementsActivity extends AppCompatActivity {
             progressDialog.setCancelable(false);
             progressDialog.show();
 
-            // Process and compress the valid ID image
-            File compressedValidId = ImageUploadUtil.prepareImageForUpload(this, validIdUri, "valid_id");
+            // Process and compress both ID images
+            File compressedFrontId = ImageUploadUtil.prepareImageForUpload(this, frontIdUri, "front_id");
+            File compressedBackId = ImageUploadUtil.prepareImageForUpload(this, backIdUri, "back_id");
 
             // Create request parts
             RequestBody requestIdPart = RequestBody.create(
@@ -148,36 +196,42 @@ public class UploadRequirementsActivity extends AppCompatActivity {
 
             RequestBody quantityPart = RequestBody.create(
                     MediaType.parse("text/plain"),
-                    copies
+                    String.valueOf(copiesSpinner.getSelectedItem())
             );
 
-            RequestBody validIdRequestFile = RequestBody.create(
-                    MediaType.parse("image/jpeg"),
-                    compressedValidId
+            MultipartBody.Part frontIdPart = MultipartBody.Part.createFormData(
+                    "frontId",
+                    compressedFrontId.getName(),
+                    RequestBody.create(MediaType.parse("image/jpeg"), compressedFrontId)
             );
 
-            MultipartBody.Part validIdPart = MultipartBody.Part.createFormData(
-                    "validId",
-                    compressedValidId.getName(),
-                    validIdRequestFile
+            MultipartBody.Part backIdPart = MultipartBody.Part.createFormData(
+                    "backId",
+                    compressedBackId.getName(),
+                    RequestBody.create(MediaType.parse("image/jpeg"), compressedBackId)
             );
 
             // Make the API call
             Call<UploadRequirementsResponse> call = apiService.uploadRequirements(
                     requestIdPart,
                     quantityPart,
-                    validIdPart
+                    frontIdPart,
+                    backIdPart
             );
 
             call.enqueue(new Callback<UploadRequirementsResponse>() {
                 @Override
-                public void onResponse(Call<UploadRequirementsResponse> call, Response<UploadRequirementsResponse> response) {
+                public void onResponse(Call<UploadRequirementsResponse> call,
+                                       Response<UploadRequirementsResponse> response) {
                     progressDialog.dismiss();
 
-                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    if (response.isSuccessful() && response.body() != null &&
+                            response.body().isSuccess()) {
                         // Show success dialog and navigate to home
-                        Intent homeIntent = new Intent(UploadRequirementsActivity.this, DocumentStatusFragment.class);
-                        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Intent homeIntent = new Intent(UploadRequirementsActivity.this,
+                                DocumentStatusFragment.class);
+                        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                Intent.FLAG_ACTIVITY_NEW_TASK);
 
                         SuccessDialog.showSuccess(
                                 UploadRequirementsActivity.this,
@@ -202,29 +256,6 @@ public class UploadRequirementsActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Error preparing upload: " + e.getMessage(),
                     Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private File createFileFromUri(Uri uri) {
-        try {
-            File destinationFile = new File(getCacheDir(), "temp_upload_file");
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            OutputStream outputStream = new FileOutputStream(destinationFile);
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-
-            outputStream.close();
-            inputStream.close();
-
-            return destinationFile;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 }

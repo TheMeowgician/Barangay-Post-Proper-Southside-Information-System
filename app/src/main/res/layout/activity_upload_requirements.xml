@@ -12,7 +12,7 @@
     <RelativeLayout
         android:id="@+id/upload_requirements_main_relative_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:id="@+id/upload_requirements_header_relative_layout"
@@ -28,7 +28,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_marginTop="20dp"
                 android:fontFamily="@font/poppins_bold"
-                android:text="Upload a picture of your Valid ID"
+                android:text="Upload Requirements"
                 android:textColor="@color/white"
                 android:textSize="22sp" />
 
@@ -40,7 +40,7 @@
                 android:layout_marginTop="15dp"
                 android:layout_alignParentLeft="true"
                 android:fontFamily="@font/poppins"
-                android:text="Upload a clear photo of your valid ID. You can browse files or take a new picture. Ensure all details are visible, select the number of copies, and click 'Submit' to proceed."
+                android:text="Please upload clear photos of both sides of your valid ID. You can either take photos or choose from your gallery. Ensure all details are visible."
                 android:textColor="@color/white"
                 android:textSize="14sp" />
 
@@ -49,140 +49,153 @@
         <RelativeLayout
             android:id="@+id/upload_requirements_body_relative_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/upload_requirements_header_relative_layout"
             android:padding="28dp">
 
-            <ImageView
-                android:id="@+id/upload_requirements_browse_file_imageview"
-                android:layout_width="match_parent"
+            <!-- Front ID Section -->
+            <TextView
+                android:id="@+id/upload_requirements_front_id_label"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Front of Valid ID"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins_medium"
+                android:layout_marginBottom="8dp"/>
+
+            <ImageView
+                android:id="@+id/upload_requirements_front_preview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@id/upload_requirements_front_id_label"
                 android:src="@drawable/browse_file_photo"
-                android:scaleType="fitXY"
+                android:scaleType="centerInside"
                 android:layout_centerHorizontal="true"/>
 
-            <RelativeLayout
-                android:id="@+id/upload_requirements_line_design_relative_layout"
+            <LinearLayout
+                android:id="@+id/upload_requirements_front_buttons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:layout_below="@+id/upload_requirements_browse_file_imageview">
+                android:layout_below="@id/upload_requirements_front_preview"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp">
 
-                <ImageView
-                    android:id="@+id/upload_requirements_line_design_left"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/line"
-                    android:layout_centerVertical="true"
-                    android:scaleType="fitXY"
-                    android:layout_toLeftOf="@+id/upload_requirements_or"/>
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/upload_requirements_or"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/upload_requirements_front_camera_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="or"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                    android:text="Take Photo"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/custom_button_submit"
+                    android:textColor="@color/white"
                     android:fontFamily="@font/poppins_medium"
+                    android:textAllCaps="false"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/upload_requirements_front_gallery_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Choose Photo"
+                    android:background="@drawable/custom_button_submit"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textAllCaps="false"/>
+            </LinearLayout>
+
+            <!-- Back ID Section -->
+            <TextView
+                android:id="@+id/upload_requirements_back_id_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/upload_requirements_front_buttons"
+                android:text="Back of Valid ID"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins_medium"
+                android:layout_marginBottom="8dp"/>
+
+            <ImageView
+                android:id="@+id/upload_requirements_back_preview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@id/upload_requirements_back_id_label"
+                android:src="@drawable/browse_file_photo"
+                android:scaleType="centerInside"
+                android:layout_centerHorizontal="true"/>
+
+            <LinearLayout
+                android:id="@+id/upload_requirements_back_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/upload_requirements_back_preview"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/upload_requirements_back_camera_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Take Photo"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/custom_button_submit"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textAllCaps="false"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/upload_requirements_back_gallery_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Choose Photo"
+                    android:background="@drawable/custom_button_submit"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textAllCaps="false"/>
+            </LinearLayout>
+
+            <!-- Number of Copies Section -->
+            <RelativeLayout
+                android:id="@+id/upload_requirements_copies_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/upload_requirements_back_buttons"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:id="@+id/upload_requirements_copies_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Number of Copies"
                     android:textSize="16sp"
-                    android:layout_centerInParent="true"/>
-
-                <ImageView
-                    android:id="@+id/upload_requirements_line_design_right"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/line"
                     android:layout_centerVertical="true"
-                    android:scaleType="fitXY"
-                    android:layout_toRightOf="@+id/upload_requirements_or"/>
+                    android:fontFamily="@font/poppins_medium"/>
 
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/upload_requirements_open_camera_take_photo_button_relative_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_below="@+id/upload_requirements_line_design_relative_layout">
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/upload_requirements_open_camera_take_photo_button"
-                    android:layout_width="match_parent"
+                <Spinner
+                    android:id="@+id/upload_requirements_copies_spinner"
+                    android:layout_width="120dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/custom_button_submit"
-                    android:fontFamily="@font/poppins_medium"
-                    android:text="Open Camera and Take Photo"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="16dp" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/upload_requirements_number_of_copies_textInputEditText_relative_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_below="@+id/upload_requirements_open_camera_take_photo_button_relative_layout">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/upload_requirements_number_of_copies_textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="How many copies?"
-                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="5dp"
-                    android:textSize="14sp"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/upload_requirements_number_of_copies_textInputLayout"
-                    android:layout_width="135dp"
-                    android:layout_height="21dp"
-                    android:layout_toRightOf="@+id/upload_requirements_number_of_copies_textView"
-                    app:boxCornerRadiusBottomEnd="13dp"
-                    app:boxCornerRadiusBottomStart="13dp"
-                    app:boxCornerRadiusTopEnd="13dp"
-                    app:boxCornerRadiusTopStart="13dp"
-                    app:boxStrokeColor="@color/black"
-                    app:boxBackgroundColor="#A0A0A0"
-                    app:endIconMode="clear_text">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/upload_requirements_number_of_copies_textInputEditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins"
-                        android:inputType="text"
-                        android:textSize="14dp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:background="@drawable/custom_spinner_background"
+                    android:padding="12dp"/>
 
             </RelativeLayout>
 
-            <RelativeLayout
-                android:id="@+id/upload_requirements_submit_button_relative_layout"
+            <!-- Submit Button -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/upload_requirements_submit_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_below="@+id/upload_requirements_number_of_copies_textInputEditText_relative_layout">
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/upload_requirements_submit_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/custom_button_submit"
-                    android:fontFamily="@font/poppins_medium"
-                    android:text="Submit"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="18dp" />
-
-            </RelativeLayout>
+                android:layout_below="@id/upload_requirements_copies_layout"
+                android:background="@drawable/custom_button_submit"
+                android:fontFamily="@font/poppins_medium"
+                android:text="Submit"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="18dp" />
 
         </RelativeLayout>
 
