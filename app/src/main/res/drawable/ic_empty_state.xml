@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Background Circle -->
+    <path
+        android:fillColor="#F5F5F5"
+        android:pathData="M60,60m-55,0a55,55 0,1 1,110 0a55,55 0,1 1,-110 0"/>
+
+    <!-- Document outline -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M40,30h40a4,4 0,0 1,4 4v52a4,4 0,0 1,-4 4h-40a4,4 0,0 1,-4 -4v-52a4,4 0,0 1,4 -4z"/>
+
+    <!-- Document lines -->
+    <path
+        android:fillColor="#BDBDBD"
+        android:pathData="M45,45h30a2,2 0,0 1,0 4h-30a2,2 0,0 1,0 -4z"/>
+
+    <path
+        android:fillColor="#BDBDBD"
+        android:pathData="M45,55h30a2,2 0,0 1,0 4h-30a2,2 0,0 1,0 -4z"/>
+
+    <path
+        android:fillColor="#BDBDBD"
+        android:pathData="M45,65h20a2,2 0,0 1,0 4h-20a2,2 0,0 1,0 -4z"/>
+
+    <!-- Search icon -->
+    <path
+        android:fillColor="#9E9E9E"
+        android:pathData="M85,75m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0"/>
+
+    <path
+        android:strokeColor="#F5F5F5"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M93,83l8,8"/>
+</vector>

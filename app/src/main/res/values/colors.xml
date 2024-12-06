@@ -7,4 +7,11 @@
     <color name="selected_item_color">#7C33B0</color>
     <color name="pressed_item_color">#7C33B0</color>
     <color name="green">#4CAF50</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="text_primary">#DE000000</color>
+    <color name="text_secondary">#99000000</color>
+    <color name="background">#FFF8F9FA</color>
+    <color name="error">#FFB00020</color>
 </resources>

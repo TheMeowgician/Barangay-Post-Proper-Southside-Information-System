@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- item_announcement.xml -->
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="28dp"
-    android:layout_marginEnd="28dp"
-    android:layout_marginBottom="20dp"
-    app:cardCornerRadius="15dp"
-    app:cardElevation="4dp">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,84 +18,86 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header with logo and date -->
+        <!-- Header with improved layout -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/logoImageView"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="2dp"
+                app:shapeAppearanceOverlay="@style/CircularImageView"
+                app:strokeColor="@color/purple_500"
+                app:strokeWidth="1dp"
                 android:src="@drawable/post_proper_southside_barangay_logo"/>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="8dp">
+                android:layout_marginStart="12dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Post Proper Southside"
+                    android:textColor="@color/text_primary"
                     android:fontFamily="@font/poppins_semibold"
-                    android:textSize="14sp"/>
+                    android:textSize="16sp"/>
 
                 <TextView
                     android:id="@+id/dateTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins"
+                    android:textColor="@color/text_secondary"
                     android:textSize="14sp"/>
             </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/shareButton"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_share"
+                app:iconTint="@color/purple_500"/>
         </LinearLayout>
 
-        <!-- Description -->
-        <TextView
+        <!-- Description with material design -->
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/expandableTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/poppins"
-            android:textSize="12sp"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:lineSpacingExtra="4dp"
             android:maxLines="4"
             android:ellipsize="end"/>
 
-        <TextView
-            android:id="@+id/seeMoreTextView"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/seeMoreButton"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="See More..."
-            android:fontFamily="@font/poppins_light"
-            android:textColor="@android:color/black"
-            android:layout_marginTop="4dp"/>
+            android:text="See More"
+            android:textColor="@color/purple_500"
+            android:minHeight="36dp"
+            android:paddingVertical="4dp"/>
 
-        <!-- Images Container -->
-        <LinearLayout
-            android:id="@+id/imagesContainer"
+        <!-- Improved Images Grid -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/imagesRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false"/>
 
-            <!-- Left side images (2) -->
-            <LinearLayout
-                android:id="@+id/leftImagesLayout"
-                android:layout_width="0dp"
-                android:layout_height="200dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginEnd="1dp"/>
-
-            <!-- Right side images (3) -->
-            <LinearLayout
-                android:id="@+id/rightImagesLayout"
-                android:layout_width="0dp"
-                android:layout_height="200dp"
-                android:layout_weight="1.2"
-                android:orientation="vertical"/>
-        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
