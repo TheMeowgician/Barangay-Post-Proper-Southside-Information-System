@@ -2,6 +2,11 @@ package com.example.barangayinformationsystem;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 public class DocumentRequest {
     @SerializedName("Id")
     private int id;
@@ -145,58 +150,42 @@ public class DocumentRequest {
                 return false;
             }
 
-            String[] dateTimeParts = this.getDateRequested().split(" ");
-            String[] dateParts = dateTimeParts[0].split("-");
-            String[] timeParts = dateTimeParts[1].split(":");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            sdf.setTimeZone(TimeZone.getTimeZone("Asia/Manila")); // Add this line for Philippine time
+            Date requestDate = sdf.parse(this.getDateRequested());
 
-            java.util.Calendar requestTime = java.util.Calendar.getInstance();
-            requestTime.set(
-                    Integer.parseInt(dateParts[0]), // year
-                    Integer.parseInt(dateParts[1]) - 1, // month (0-based)
-                    Integer.parseInt(dateParts[2]), // day
-                    Integer.parseInt(timeParts[0]), // hour
-                    Integer.parseInt(timeParts[1]), // minute
-                    Integer.parseInt(timeParts[2])  // second
-            );
+            if (requestDate != null) {
+                Date currentTime = new Date();
 
-            java.util.Calendar currentTime = java.util.Calendar.getInstance();
+                // Calculate difference in minutes
+                long diffInMillis = currentTime.getTime() - requestDate.getTime();
+                long diffInMinutes = diffInMillis / (60 * 1000);
 
-            // Get difference in minutes
-            long diffInMillis = currentTime.getTimeInMillis() - requestTime.getTimeInMillis();
-            long diffInMinutes = diffInMillis / (60 * 1000);
-
-            return diffInMinutes <= 15;
-        } catch (Exception e) {
+                return diffInMinutes <= 15;
+            }
+        } catch (ParseException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     public long getRemainingMinutes() {
         try {
-            String[] dateTimeParts = this.getDateRequested().split(" ");
-            String[] dateParts = dateTimeParts[0].split("-");
-            String[] timeParts = dateTimeParts[1].split(":");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            sdf.setTimeZone(TimeZone.getTimeZone("Asia/Manila")); // Add this line for Philippine time
+            Date requestDate = sdf.parse(this.getDateRequested());
 
-            java.util.Calendar requestTime = java.util.Calendar.getInstance();
-            requestTime.set(
-                    Integer.parseInt(dateParts[0]),
-                    Integer.parseInt(dateParts[1]) - 1,
-                    Integer.parseInt(dateParts[2]),
-                    Integer.parseInt(timeParts[0]),
-                    Integer.parseInt(timeParts[1]),
-                    Integer.parseInt(timeParts[2])
-            );
+            if (requestDate != null) {
+                Date currentTime = new Date();
+                long diffInMillis = currentTime.getTime() - requestDate.getTime();
+                long diffInMinutes = diffInMillis / (60 * 1000);
 
-            java.util.Calendar currentTime = java.util.Calendar.getInstance();
-
-            long diffInMillis = currentTime.getTimeInMillis() - requestTime.getTimeInMillis();
-            long diffInMinutes = diffInMillis / (60 * 1000);
-
-            return Math.max(0, 15 - diffInMinutes);
-        } catch (Exception e) {
+                long remainingMinutes = 15 - diffInMinutes;
+                return Math.max(0, Math.min(remainingMinutes, 15)); // Ensure between 0 and 15
+            }
+        } catch (ParseException e) {
             e.printStackTrace();
-            return 0;
         }
+        return 0;
     }
 }
