@@ -4,7 +4,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -12,23 +11,17 @@ import android.Manifest;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -38,16 +31,10 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.Date;
-import java.util.Locale;
-import java.text.SimpleDateFormat;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -402,84 +389,91 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private boolean validateInputs() {
         boolean isValid = true;
+        String errorMessage = "Please fill in: ";
+        List<String> missingFields = new ArrayList<>();
 
         // Clear all previous errors
         clearAllErrors();
 
-        // Validate required fields
         if (isEmpty(firstNameTextInputEditText)) {
             firstNameTextInputLayout.setError("First name is required");
+            missingFields.add("First Name");
             isValid = false;
         }
 
         if (isEmpty(lastNameTextInputEditText)) {
             lastNameTextInputLayout.setError("Last name is required");
+            missingFields.add("Last Name");
             isValid = false;
         }
 
         if (isEmpty(usernameTextInputEditText)) {
             usernameTextInputLayout.setError("Username is required");
+            missingFields.add("Username");
             isValid = false;
         }
 
-        if (isEmpty(passwordTextInputEditText)) {
-            passwordTextInputLayout.setError("Password is required");
-            isValid = false;
-        }
-
-        // Validate password match
-        String password = passwordTextInputEditText.getText().toString();
-        if (!validatePassword(password)) {
-            isValid = false;
-        }
-
-        // Validate gender selection
-        if (genderRadioGroup.getCheckedRadioButtonId() == -1) {
-            Toast.makeText(this, "Please select a gender", Toast.LENGTH_SHORT).show();
-            isValid = false;
-        }
-
-        // Validate age
-        if (isEmpty(ageTextInputEditText)) {
-            ageTextInputLayout.setError("Age is required");
-            isValid = false;
-        } else {
-            try {
-                int age = Integer.parseInt(ageTextInputEditText.getText().toString().trim());
-                if (age <= 0 || age > 150) {
-                    ageTextInputLayout.setError("Please enter a valid age");
-                    isValid = false;
-                }
-            } catch (NumberFormatException e) {
-                ageTextInputLayout.setError("Please enter a valid number");
-                isValid = false;
-            }
-        }
-
-        // Validate other required fields
         if (isEmpty(birthDateTextInputEditText)) {
             birthdateTextInputLayout.setError("Birth date is required");
+            missingFields.add("Birth Date");
+            isValid = false;
+        }
+
+        if (genderRadioGroup.getCheckedRadioButtonId() == -1) {
+            missingFields.add("Gender");
             isValid = false;
         }
 
         if (isEmpty(houseNumberTextInputEditText)) {
             houseNumberTextInputLayout.setError("House number is required");
+            missingFields.add("House Number");
             isValid = false;
         }
 
         if (isEmpty(zoneTextInputEditText)) {
             zoneTextInputLayout.setError("Zone is required");
+            missingFields.add("Zone");
             isValid = false;
         }
 
         if (isEmpty(streetTextInputEditText)) {
-            streetTextInputLayout.setError("Street is required");
+            streetTextInputLayout.setError("Street");
+            missingFields.add("Street");
+            isValid = false;
+        }
+
+        // Password validations
+        String password = passwordTextInputEditText.getText().toString().trim();
+        String confirmPassword = confirmPasswordTextInputEditText.getText().toString().trim();
+
+        if (isEmpty(passwordTextInputEditText)) {
+            passwordTextInputLayout.setError("Password is required");
+            missingFields.add("Password");
+            isValid = false;
+        } else if (!validatePassword(password)) {
+            missingFields.add("Valid Password");
+            isValid = false;
+        }
+
+        if (isEmpty(confirmPasswordTextInputEditText)) {
+            confirmPasswordTextInputLayout.setError("Please confirm your password");
+            missingFields.add("Confirm Password");
+            isValid = false;
+        } else if (!password.equals(confirmPassword)) {
+            confirmPasswordTextInputLayout.setError("Passwords do not match");
+            missingFields.add("Matching Passwords");
             isValid = false;
         }
 
         if (validIdUri == null || backValidIdUri == null) {
-            Toast.makeText(this, "Please provide both front and back images of your valid ID", Toast.LENGTH_SHORT).show();
+            missingFields.add("Valid ID (Front and Back)");
             isValid = false;
+        }
+
+        // Show toast with missing fields if any
+        if (!isValid) {
+            String fieldsMessage = String.join(", ", missingFields);
+            Toast.makeText(this, errorMessage + fieldsMessage, Toast.LENGTH_LONG).show();
         }
 
         return isValid;
