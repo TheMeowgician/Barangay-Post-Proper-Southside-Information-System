@@ -10,12 +10,12 @@
             android:title="Home"
             android:icon="@drawable/nav_drawer_home"
             android:checked="true"/>
-
+        <!--
         <item
             android:id="@+id/navUpdates"
             android:title="Updates"
             android:icon="@drawable/nav_drawer_commercial" />
-
+            -->
         <item
             android:id="@+id/navDocumentRequest"
             android:title="Document Request"

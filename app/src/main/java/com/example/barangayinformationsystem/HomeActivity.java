@@ -225,9 +225,10 @@ public class HomeActivity extends AppCompatActivity {
 
                 if(id == R.id.navHome) {
                     replaceFragment(new HomeFragment());
-                } else if(id == R.id.navUpdates) {
-                    replaceFragment(new NewsFragment());
-                } else if(id == R.id.navDocumentRequest) {
+                } //else if(id == R.id.navUpdates) {
+                //replaceFragment(new NewsFragment());
+                //}
+                else if(id == R.id.navDocumentRequest) {
                     replaceFragment(new DocumentRequestFragment());
                 } else if(id == R.id.navDocumentStatus) {
                     replaceFragment(new DocumentStatusFragment());
