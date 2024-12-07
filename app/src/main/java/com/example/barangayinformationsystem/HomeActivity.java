@@ -255,4 +255,27 @@ public class HomeActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
     }
+
+    @Override
+    public void onBackPressed() {
+        if (homeDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            homeDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.dialog_exit_confirmation);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            Button noButton = dialog.findViewById(R.id.noButton);
+            Button yesButton = dialog.findViewById(R.id.yesButton);
+
+            noButton.setOnClickListener(v -> dialog.dismiss());
+
+            yesButton.setOnClickListener(v -> {
+                dialog.dismiss();
+                finish();
+            });
+
+            dialog.show();
+        }
+    }
 }
