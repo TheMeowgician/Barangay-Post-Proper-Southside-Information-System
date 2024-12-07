@@ -14,14 +14,20 @@ import java.util.List;
 public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAdapter.ViewHolder> {
     private List<DocumentRequest> requests;
     private OnCancelClickListener cancelListener;
+    private OnItemClickListener itemClickListener;
 
     public interface OnCancelClickListener {
         void onCancelClick(DocumentRequest request);
     }
 
-    public DocumentStatusAdapter(List<DocumentRequest> requests, OnCancelClickListener cancelListener) {
+    public interface OnItemClickListener {
+        void onItemClick(DocumentRequest request);
+    }
+
+    public DocumentStatusAdapter(List<DocumentRequest> requests, OnCancelClickListener cancelListener, OnItemClickListener itemClickListener) {
         this.requests = requests;
         this.cancelListener = cancelListener;
+        this.itemClickListener = itemClickListener;
     }
 
     public void setRequests(List<DocumentRequest> requests) {
@@ -40,6 +46,12 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DocumentRequest request = requests.get(position);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (itemClickListener != null) {
+                itemClickListener.onItemClick(request);
+            }
+        });
 
         holder.transactionNumber.setText("TXN-" + request.getId());
         holder.documentType.setText(request.getDocumentType());

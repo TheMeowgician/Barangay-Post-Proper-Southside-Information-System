@@ -1,6 +1,5 @@
 package com.example.barangayinformationsystem;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -8,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -42,9 +42,58 @@ public class DocumentStatusFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        adapter = new DocumentStatusAdapter(new ArrayList<>(), this::showCancellationDialog);
+        adapter = new DocumentStatusAdapter(new ArrayList<>(),
+                this::showCancellationDialog,
+                this::showDetailsDialog); // Add this
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+    }
+
+    private void showDetailsDialog(DocumentRequest request) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = LayoutInflater.from(getContext())
+                .inflate(R.layout.dialog_document_details, null);
+
+        // Find views in dialog
+        TextView nameText = dialogView.findViewById(R.id.name_text);
+        TextView addressText = dialogView.findViewById(R.id.address_text);
+        TextView birthdayText = dialogView.findViewById(R.id.birthday_text);
+        TextView purposeText = dialogView.findViewById(R.id.purpose_text);
+        TextView quantityText = dialogView.findViewById(R.id.quantity_text);
+        TextView dateRequestedText = dialogView.findViewById(R.id.date_requested_text);
+        TextView documentTypeText = dialogView.findViewById(R.id.document_type_text);
+        TextView statusText = dialogView.findViewById(R.id.status_text);
+
+        // Set values with better formatting
+        documentTypeText.setText(request.getDocumentType());
+        nameText.setText("Name: " + request.getName());
+        addressText.setText("Address: " + request.getAddress());
+        birthdayText.setText("Birthday: " + request.getBirthday());
+        purposeText.setText("Purpose: " + request.getPurpose());
+        quantityText.setText("Quantity: " + String.valueOf(request.getQuantity()));
+        dateRequestedText.setText("Date Requested: " + request.getDateRequested());
+
+        // Set status with color
+        String status = "Status: " + request.getStatus();
+        statusText.setText(status);
+        switch(request.getStatus().toLowerCase()) {
+            case "pending":
+                statusText.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
+                break;
+            case "approved":
+                statusText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                break;
+            case "rejected":
+                statusText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                break;
+        }
+
+        AlertDialog dialog = builder.setView(dialogView)
+                .setPositiveButton("Close", null)
+                .create();
+
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
     }
 
     private void loadDocumentRequests() {
