@@ -1,8 +1,12 @@
 package com.example.barangayinformationsystem;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -107,5 +111,23 @@ public class ChooseActivity extends AppCompatActivity {
     private void initializeComponents() {
         logInButton = findViewById(R.id.logInButton);
         registerButton = findViewById(R.id.registerButton);
+    }
+    @Override
+    public void onBackPressed() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_exit_confirmation);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        Button noButton = dialog.findViewById(R.id.noButton);
+        Button yesButton = dialog.findViewById(R.id.yesButton);
+
+        noButton.setOnClickListener(v -> dialog.dismiss());
+
+        yesButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            finish();
+        });
+
+        dialog.show();
     }
 }

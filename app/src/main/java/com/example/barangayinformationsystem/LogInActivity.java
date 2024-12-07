@@ -69,7 +69,11 @@ public class LogInActivity extends AppCompatActivity {
         removeTextInputLayoutAnimation();
         addUnderlineToTextView();
 
-        backImageButton.setOnClickListener(v -> finish());
+        backImageButton.setOnClickListener(v -> {
+            Intent intent = new Intent(LogInActivity.this, ChooseActivity.class);
+            startActivity(intent);
+            finish();
+        });
 
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,11 +168,12 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     public void goToRegisterActivity(View view) {
-        Intent intent = new Intent(LogInActivity.this, RegistrationActivity.class);
+        Intent intent = new Intent(LogInActivity.this, TermsAndConditionsActivity.class);
         startActivity(intent);
     }
-
     public void back(View view) {
+        Intent intent = new Intent(LogInActivity.this, ChooseActivity.class);
+        startActivity(intent);
         finish();
     }
 
@@ -182,5 +187,11 @@ public class LogInActivity extends AppCompatActivity {
 
         passwordTextInputLayout.setHintAnimationEnabled(false);
         passwordTextInputLayout.setHintEnabled(false);
+    }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(LogInActivity.this, ChooseActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
