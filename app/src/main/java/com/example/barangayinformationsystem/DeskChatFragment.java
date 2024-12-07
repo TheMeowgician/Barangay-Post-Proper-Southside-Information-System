@@ -194,6 +194,8 @@ public class DeskChatFragment extends Fragment {
 
         private final List<ChatMessage> messages;
         private final int userId;
+        private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
         ChatAdapter(List<ChatMessage> messages, int userId) {
             this.messages = messages;
@@ -224,14 +226,30 @@ public class DeskChatFragment extends Fragment {
                 holder.senderNameText.setVisibility(View.VISIBLE);
                 holder.senderNameText.setText(message.getSenderName());
             } else {
-                // Hide sender name for user's own messages
                 holder.senderNameText.setVisibility(View.GONE);
             }
 
             // Format and set timestamp
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-            String formattedTime = sdf.format(new Date(message.getTimestamp()));
-            holder.timestampText.setText(formattedTime);
+            Date messageDate = new Date(message.getTimestamp());
+            Date currentDate = new Date();
+
+            // Check if message is from a different day
+            boolean isSameDay = isSameDay(messageDate, currentDate);
+
+            String formattedTime = timeFormat.format(messageDate);
+            if (!isSameDay) {
+                // If message is not from today, show date and time
+                String formattedDate = dateFormat.format(messageDate);
+                holder.timestampText.setText(formattedDate + " " + formattedTime);
+            } else {
+                // If message is from today, show only time
+                holder.timestampText.setText(formattedTime);
+            }
+        }
+
+        private boolean isSameDay(Date date1, Date date2) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+            return sdf.format(date1).equals(sdf.format(date2));
         }
 
         @Override
