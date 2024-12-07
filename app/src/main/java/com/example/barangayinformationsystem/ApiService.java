@@ -113,10 +113,11 @@ public interface ApiService {
     @GET("get_user_requests.php")
     Call<DocumentRequestListResponse> getUserRequests(@Query("userId") int userId);
 
-    @FormUrlEncoded
     @POST("cancel_request.php")
+    @FormUrlEncoded
     Call<DocumentRequestResponse> cancelRequest(
-            @Field("requestId") int requestId
+            @Field("requestId") int requestId,
+            @Field("reason") String reason
     );
 
     @FormUrlEncoded

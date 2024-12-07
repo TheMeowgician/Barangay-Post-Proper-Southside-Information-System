@@ -7,6 +7,15 @@
     android:padding="20dp">
 
     <TextView
+        android:id="@+id/warning_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF5722"
+        android:textSize="14sp"
+        android:fontFamily="@font/poppins"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Please select a reason for cancelling your request."
@@ -43,19 +52,28 @@
             android:text="Incorrect information"
             android:fontFamily="@font/poppins"
             android:padding="8dp"/>
+
+        <RadioButton
+            android:id="@+id/reason_others"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Others"
+            android:fontFamily="@font/poppins"
+            android:padding="8dp"/>
     </RadioGroup>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/other_reason_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="16dp"
+        android:visibility="gone">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/other_reason_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Other (please specify):"
+            android:hint="Please specify reason:"
             android:fontFamily="@font/poppins"/>
     </com.google.android.material.textfield.TextInputLayout>
 

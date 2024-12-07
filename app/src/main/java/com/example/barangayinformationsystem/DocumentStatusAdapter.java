@@ -98,13 +98,25 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
         holder.statusIndicator.setBackgroundColor(statusColor);
 
         // Handle cancel button visibility
-        if (canCancel) {
+        if (request.getStatus().toLowerCase().equals("pending")) {
+            canCancel = request.canBeCancelled();
             holder.cancelButton.setVisibility(View.VISIBLE);
-            holder.cancelButton.setOnClickListener(v -> {
-                if (cancelListener != null) {
-                    cancelListener.onCancelClick(request);
-                }
-            });
+
+            if (canCancel) {
+                long remainingMinutes = request.getRemainingMinutes();
+                holder.cancelButton.setText("Cancel (" + remainingMinutes + "m)");
+                holder.cancelButton.setEnabled(true);
+                holder.cancelButton.setAlpha(1.0f);
+                holder.cancelButton.setOnClickListener(v -> {
+                    if (cancelListener != null) {
+                        cancelListener.onCancelClick(request);
+                    }
+                });
+            } else {
+                holder.cancelButton.setText("Cannot Cancel");
+                holder.cancelButton.setEnabled(false);
+                holder.cancelButton.setAlpha(0.5f);
+            }
         } else {
             holder.cancelButton.setVisibility(View.GONE);
         }

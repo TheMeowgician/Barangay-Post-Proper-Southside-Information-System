@@ -1,19 +1,27 @@
 package com.example.barangayinformationsystem;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +96,12 @@ public class DocumentStatusFragment extends Fragment {
                 break;
         }
 
+        if ("cancelled".equalsIgnoreCase(request.getStatus()) && request.getCancellationReason() != null) {
+            TextView cancellationText = dialogView.findViewById(R.id.cancellation_reason);
+            cancellationText.setVisibility(View.VISIBLE);
+            cancellationText.setText("Cancellation Reason: " + request.getCancellationReason());
+        }
+
         AlertDialog dialog = builder.setView(dialogView)
                 .setPositiveButton("Close", null)
                 .create();
@@ -141,30 +155,85 @@ public class DocumentStatusFragment extends Fragment {
     }
 
     private void showCancellationDialog(DocumentRequest request) {
+        if (!request.canBeCancelled()) {
+            Toast.makeText(getContext(),
+                    "Requests can only be cancelled within 15 minutes of submission",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
         View dialogView = LayoutInflater.from(getContext())
                 .inflate(R.layout.dialog_cancel_request, null);
 
-        new AlertDialog.Builder(getContext())
+        RadioGroup reasonGroup = dialogView.findViewById(R.id.cancel_reason_group);
+        TextInputLayout otherReasonLayout = dialogView.findViewById(R.id.other_reason_layout);
+        TextInputEditText otherReasonInput = dialogView.findViewById(R.id.other_reason_input);
+        TextView warningText = dialogView.findViewById(R.id.warning_text);
+
+        warningText.setText("You have " + request.getRemainingMinutes() + " minutes left to cancel this request");
+
+        // Handle radio button changes
+        reasonGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.reason_others) {
+                otherReasonLayout.setVisibility(View.VISIBLE);
+            } else {
+                otherReasonLayout.setVisibility(View.GONE);
+                otherReasonInput.setText("");  // Clear the text when hiding
+            }
+        });
+
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle("Cancel Request")
                 .setView(dialogView)
-                .setPositiveButton("Continue", (dialog, which) ->
-                        showConfirmationDialog(request))
-                .setNegativeButton("No, cancel", null)
-                .show();
-    }
+                .setPositiveButton("Continue", null)  // Set to null initially
+                .setNegativeButton("Keep request", null)
+                .create();
 
-    private void showConfirmationDialog(DocumentRequest request) {
+        dialog.setOnShowListener(dialogInterface -> {
+            Button continueButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            continueButton.setOnClickListener(v -> {
+                // Get the selected reason
+                int selectedId = reasonGroup.getCheckedRadioButtonId();
+
+                if (selectedId == -1) {
+                    Toast.makeText(getContext(), "Please select a reason", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String reason;
+                if (selectedId == R.id.reason_others) {
+                    String otherReason = otherReasonInput.getText().toString().trim();
+                    if (otherReason.isEmpty()) {
+                        Toast.makeText(getContext(), "Please specify your reason", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    reason = otherReason;
+                } else {
+                    RadioButton selectedButton = dialogView.findViewById(selectedId);
+                    reason = selectedButton.getText().toString();
+                }
+
+                dialog.dismiss();
+                showFinalConfirmationDialog(request, reason);
+            });
+        });
+
+        dialog.show();
+    }
+    private void showFinalConfirmationDialog(DocumentRequest request, String reason) {
         new AlertDialog.Builder(getContext())
-                .setTitle("Cancel Request Confirmation")
-                .setMessage("Are you sure you want to cancel your request? This action cannot be undone.")
-                .setPositiveButton("Yes, confirm", (dialog, which) ->
-                        cancelRequest(request))
-                .setNegativeButton("No, cancel", null)
+                .setTitle("Confirm Cancellation")
+                .setMessage("Are you sure you want to cancel this request?\n\nReason: " + reason)
+                .setPositiveButton("Yes, cancel request", (dialog, which) -> {
+                    cancelRequest(request, reason);
+                })
+                .setNegativeButton("No", null)
                 .show();
     }
+    private void cancelRequest(DocumentRequest request, String reason) {
+        ApiService apiService = RetrofitClient.getApiService();
+        Call<DocumentRequestResponse> call = apiService.cancelRequest(request.getId(), reason);
 
-    private void cancelRequest(DocumentRequest request) {
-        Call<DocumentRequestResponse> call = apiService.cancelRequest(request.getId());
         call.enqueue(new Callback<DocumentRequestResponse>() {
             @Override
             public void onResponse(Call<DocumentRequestResponse> call, Response<DocumentRequestResponse> response) {
