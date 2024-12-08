@@ -9,7 +9,7 @@
     android:layout_height="match_parent"
     android:scrollbars="none"
     android:background="#F0F0FA">
-    
+
     <RelativeLayout
         android:id="@+id/profileActivityMainRelativeLayout"
         android:layout_width="match_parent"
@@ -59,14 +59,17 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/default_profile_picture"/>  <!-- Add a default profile picture drawable -->
             </com.google.android.material.card.MaterialCardView>
+
                 <ImageView
                     android:id="@+id/editProfilePictureButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_gravity="bottom|end"
-                    android:layout_margin="8dp"
+                    android:layout_marginEnd="-8dp"
+                    android:layout_marginBottom="-8dp"
                     android:background="@drawable/circular_background"
-                    android:padding="8dp"
+                    android:padding="12dp"
+                    android:elevation="4dp"
                     android:src="@drawable/ic_camera"/>
 
             </FrameLayout>
@@ -586,7 +589,14 @@
                 android:textSize="20dp" />
 
         </RelativeLayout>
-        
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
 </ScrollView>
