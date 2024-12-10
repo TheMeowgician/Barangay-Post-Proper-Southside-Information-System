@@ -37,6 +37,12 @@
             android:icon="@drawable/nav_drawer_alert" />
 
         <item
+            android:id="@+id/navIncidentStatus"
+            android:title="Incident Status"
+            android:icon="@drawable/nav_drawer_document_status" />
+
+
+        <item
             android:id="@+id/navHotlineNumbers"
             android:title="Hotline Numbers"
             android:icon="@drawable/nav_drawer_hotline" />

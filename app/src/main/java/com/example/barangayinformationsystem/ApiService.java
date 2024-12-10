@@ -146,5 +146,8 @@ public interface ApiService {
             @Query("user_id") int userId,
             @Query("last_message_timestamp") long lastMessageTimestamp
     );
+
+    @GET("get_user_incident_reports.php")
+    Call<IncidentReportListResponse> getUserIncidentReports(@Query("userId") int userId);
 }
 
