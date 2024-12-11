@@ -162,14 +162,22 @@ public class DeskChatFragment extends Fragment {
             public void onResponse(Call<MessageCheckResponse> call, Response<MessageCheckResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().hasNewMessages()) {
-                        // Add new messages and update the UI
-                        chatMessages.addAll(response.body().getNewMessages());
-                        chatAdapter.notifyDataSetChanged();
-                        chatRecyclerView.scrollToPosition(chatMessages.size() - 1);
+                        List<ChatMessage> newMessages = response.body().getNewMessages();
+                        if (newMessages != null && !newMessages.isEmpty()) {
+                            // Add new messages
+                            chatMessages.addAll(newMessages);
 
-                        // Update last message timestamp
-                        if (!chatMessages.isEmpty()) {
-                            lastMessageTimestamp = chatMessages.get(chatMessages.size() - 1).getTimestamp();
+                            // Update the UI
+                            requireActivity().runOnUiThread(() -> {
+                                chatAdapter.notifyDataSetChanged();
+                                chatRecyclerView.scrollToPosition(chatMessages.size() - 1);
+                            });
+
+                            // Update last message timestamp
+                            ChatMessage lastMessage = newMessages.get(newMessages.size() - 1);
+                            if (lastMessage != null) {
+                                lastMessageTimestamp = lastMessage.getTimestamp();
+                            }
                         }
                     }
                 }
