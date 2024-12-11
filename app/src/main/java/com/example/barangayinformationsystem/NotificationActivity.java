@@ -14,11 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import android.content.SharedPreferences; // Import SharedPreferences
+import android.preference.PreferenceManager;
 
 public class NotificationActivity extends AppCompatActivity {
 
@@ -28,6 +32,7 @@ public class NotificationActivity extends AppCompatActivity {
     private NotificationAdapter notificationAdapter;
     private List<NotificationRecyclerViewItem> notificationItems;
     private ApiService apiService;
+    private HashSet<Integer> displayedRequestIds = new HashSet<>();
 
     private final Handler handler = new Handler();
     private final int POLLING_INTERVAL = 5000; // Poll every 5 seconds
@@ -51,10 +56,13 @@ public class NotificationActivity extends AppCompatActivity {
         // Initialize the API service
         apiService = RetrofitClient.getApiService();
 
+        displayedRequestIds.clear();
         startPolling();
 
         // Fetch announcements
         fetchAnnouncements();
+        fetchDocumentRequestUpdates();
+
     }
 
     public void goBack(View view) {
@@ -66,6 +74,7 @@ public class NotificationActivity extends AppCompatActivity {
             @Override
             public void run() {
                 fetchNewAnnouncements(); // Fetch new announcements
+                fetchDocumentRequestUpdates();
                 handler.postDelayed(this, POLLING_INTERVAL); // Re-run after interval
             }
         }, POLLING_INTERVAL);
@@ -179,6 +188,48 @@ public class NotificationActivity extends AppCompatActivity {
                 Toast.makeText(NotificationActivity.this, "An error occurred while fetching recent notifications", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void fetchDocumentRequestUpdates() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int userId = prefs.getInt("user_id", -1);
+
+        if (userId != -1) {
+            Call<List<DocumentRequestUpdate>> call = apiService.getDocumentRequestUpdates(userId);
+            call.enqueue(new Callback<List<DocumentRequestUpdate>>() {
+                @Override
+                public void onResponse(Call<List<DocumentRequestUpdate>> call, Response<List<DocumentRequestUpdate>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<DocumentRequestUpdate> updates = response.body();
+                        for (DocumentRequestUpdate update : updates) {
+                            // Generate unique hashcode from ID and status
+                            int uniqueId = (update.getId() + "_" + update.getStatus()).hashCode();
+
+                            // Check if this uniqueId has already been displayed
+                            if (!displayedRequestIds.contains(uniqueId)) {
+                                String notificationText = "Your " + update.getDocumentType() + " request submitted on " + update.getDateRequested() + " is " + update.getStatus();
+                                notificationItems.add(0, new NotificationRecyclerViewItem(notificationText));
+
+                                // Mark this uniqueId as displayed
+                                displayedRequestIds.add(uniqueId);
+                            }
+                        }
+                        notificationAdapter.notifyDataSetChanged();
+                    } else {
+                        // ... (handle unsuccessful response)
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<DocumentRequestUpdate>> call, Throwable t) {
+                    // Handle failure
+                    Toast.makeText(NotificationActivity.this, "Error fetching document request updates: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Handle case where user ID is not found
+            Toast.makeText(NotificationActivity.this, "User not logged in", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

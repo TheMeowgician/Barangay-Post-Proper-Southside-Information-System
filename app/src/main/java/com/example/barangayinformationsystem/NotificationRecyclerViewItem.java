@@ -11,6 +11,12 @@ public class NotificationRecyclerViewItem {
         this.image = image;
     }
 
+    public NotificationRecyclerViewItem(String caption) {
+        this.nameOfUser = "Post Proper Southside"; // Fixed value
+        this.caption = caption;
+        this.image = R.drawable.notification_pps_logo; // Fixed value
+    }
+
     public String getNameOfUser() {
         return nameOfUser;
     }

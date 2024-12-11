@@ -32,11 +32,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     @Override
+
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         NotificationRecyclerViewItem item = notificationItems.get(position);
+
+        // Set the nameOfUser to "Post Proper Southside"
+        holder.notification_recycler_view_item_name_of_user_material_text_view.setText("Post Proper Southside");
+
+        // Set the caption
         holder.notification_recycler_view_item_caption_of_user_material_text_view.setText(item.getCaption());
-        holder.notification_recycler_view_item_name_of_user_material_text_view.setText(item.getNameOfUser());
-        holder.notification_recycler_view_item_image_view.setImageResource(item.getImage());
+
+        // Set the image to notification_pps_logo
+        holder.notification_recycler_view_item_image_view.setImageResource(R.drawable.notification_pps_logo);
     }
 
     @Override

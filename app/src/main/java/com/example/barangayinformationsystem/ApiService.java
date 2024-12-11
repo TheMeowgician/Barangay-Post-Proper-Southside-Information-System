@@ -150,5 +150,9 @@ public interface ApiService {
 
     @GET("get_user_incident_reports.php")
     Call<IncidentReportListResponse> getUserIncidentReports(@Query("userId") int userId);
+
+    @GET("get_document_request_updates.php") // Assuming the above PHP script is named get_document_request_updates.php
+    Call<List<DocumentRequestUpdate>> getDocumentRequestUpdates(@Query("user_id") int userId);
+
 }
 
