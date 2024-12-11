@@ -20,7 +20,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
         android:gravity="center"
-        android:text="Please wait while your account is being verified.\n\nOnce verified, you will be notified and can log in again."
+        android:text="Please wait while your account is being verified.\n\nOnce verified, you will be notified and can log in again.
+        \n\n If you were already verified and you are seeing this message, you have failed to claim and pay for your document request, contact the barangay to pay for your outstanding fee to access your account again."
         android:textSize="18sp" />
 
     <Button

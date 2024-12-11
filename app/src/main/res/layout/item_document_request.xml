@@ -71,6 +71,17 @@
                     android:fontFamily="@font/poppins"
                     android:textSize="14sp"
                     android:layout_marginStart="8dp"/>
+
+                <TextView
+                    android:id="@+id/pickup_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Complete"
+                    android:textColor="#4CAF50"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone"/>
             </LinearLayout>
 
             <!-- For approved documents -->
@@ -78,7 +89,7 @@
                 android:id="@+id/pickup_instructions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Claim at Brgy. Hall (7AM-5PM)"
+                android:text="Claim at Brgy. Hall (7AM-5PM) FAILURE TO CLAIM WITHIN 3 DAYS WILL RESULT TO ACCOUNT SUSPENSION"
                 android:textColor="#FFEB3B"
                 android:fontFamily="@font/poppins"
                 android:textSize="14sp"

@@ -55,43 +55,56 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
 
         holder.transactionNumber.setText("TXN-" + request.getId());
         holder.documentType.setText(request.getDocumentType());
-        holder.statusText.setText(request.getStatus());
+
+        // Update status text based on pickup status
+        if (request.isComplete()) {
+            holder.statusText.setText("Complete");
+            holder.pickupStatus.setVisibility(View.GONE); // Hide the separate pickup status since we're showing it in status
+        } else {
+            holder.statusText.setText(request.getStatus());
+            holder.pickupStatus.setVisibility(View.GONE);
+        }
 
         // Set status indicator color based on status
         int statusColor;
         boolean canCancel = false;
 
-        switch(request.getStatus().toLowerCase()) {
-            case "pending":
-                statusColor = 0xFFFFD700; // Gold color for pending
-                canCancel = true;
-                holder.pickupInstructions.setVisibility(View.GONE);
-                holder.rejectionReason.setVisibility(View.GONE);
-                break;
-            case "approved":
-                statusColor = 0xFF00FF00; // Green color for approved
-                canCancel = false;
-                holder.pickupInstructions.setVisibility(View.VISIBLE);
-                holder.rejectionReason.setVisibility(View.GONE);
-                break;
-            case "rejected":
-                statusColor = 0xFFFF0000; // Red color for rejected
-                canCancel = false;
-                holder.pickupInstructions.setVisibility(View.GONE);
-                // Show rejection reason if available
-                if (request.getRejectionReason() != null && !request.getRejectionReason().isEmpty()) {
-                    holder.rejectionReason.setVisibility(View.VISIBLE);
-                    holder.rejectionReason.setText("Reason: " + request.getRejectionReason());
-                } else {
+        if (request.isComplete()) {
+            statusColor = 0xFF4CAF50; // Green color for completed
+            holder.pickupInstructions.setVisibility(View.GONE);
+            holder.rejectionReason.setVisibility(View.GONE);
+        } else {
+            switch(request.getStatus().toLowerCase()) {
+                case "pending":
+                    statusColor = 0xFFFFD700; // Gold color for pending
+                    canCancel = true;
+                    holder.pickupInstructions.setVisibility(View.GONE);
                     holder.rejectionReason.setVisibility(View.GONE);
-                }
-                break;
-            default:
-                statusColor = 0xFFFFFFFF; // White color for unknown status
-                canCancel = false;
-                holder.pickupInstructions.setVisibility(View.GONE);
-                holder.rejectionReason.setVisibility(View.GONE);
-                break;
+                    break;
+                case "approved":
+                    statusColor = 0xFF00FF00; // Green color for approved
+                    canCancel = false;
+                    holder.pickupInstructions.setVisibility(View.VISIBLE);
+                    holder.rejectionReason.setVisibility(View.GONE);
+                    break;
+                case "rejected":
+                    statusColor = 0xFFFF0000; // Red color for rejected
+                    canCancel = false;
+                    holder.pickupInstructions.setVisibility(View.GONE);
+                    if (request.getRejectionReason() != null && !request.getRejectionReason().isEmpty()) {
+                        holder.rejectionReason.setVisibility(View.VISIBLE);
+                        holder.rejectionReason.setText("Reason: " + request.getRejectionReason());
+                    } else {
+                        holder.rejectionReason.setVisibility(View.GONE);
+                    }
+                    break;
+                default:
+                    statusColor = 0xFFFFFFFF; // White color for unknown status
+                    canCancel = false;
+                    holder.pickupInstructions.setVisibility(View.GONE);
+                    holder.rejectionReason.setVisibility(View.GONE);
+                    break;
+            }
         }
 
         // Set the status indicator color
@@ -133,6 +146,7 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
         TextView statusText;
         TextView pickupInstructions;
         TextView rejectionReason;
+        TextView pickupStatus;      // Added this field
         View statusIndicator;
         Button cancelButton;
 
@@ -145,6 +159,7 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
             cancelButton = itemView.findViewById(R.id.cancel_request_button);
             pickupInstructions = itemView.findViewById(R.id.pickup_instructions);
             rejectionReason = itemView.findViewById(R.id.rejection_reason);
+            pickupStatus = itemView.findViewById(R.id.pickup_status);  // Added this line
         }
     }
 }

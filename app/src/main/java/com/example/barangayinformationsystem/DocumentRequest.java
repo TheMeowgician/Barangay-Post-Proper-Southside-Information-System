@@ -74,6 +74,9 @@ public class DocumentRequest {
     @SerializedName("cancellation_reason")
     private String cancellationReason;
 
+    @SerializedName("pickup_status")
+    private String pickupStatus;
+
     // Constructor
     public DocumentRequest() {}
 
@@ -143,6 +146,22 @@ public class DocumentRequest {
 
     public String getCancellationReason() { return cancellationReason; }
     public void setCancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; }
+
+    public String getPickupStatus() {
+        return pickupStatus;
+    }
+
+    public void setPickupStatus(String pickupStatus) {
+        this.pickupStatus = pickupStatus;
+    }
+
+    public boolean isPickedUp() {
+        return "picked_up".equalsIgnoreCase(pickupStatus);
+    }
+
+    public boolean isComplete() {
+        return "approved".equalsIgnoreCase(status) && isPickedUp();
+    }
 
     public boolean canBeCancelled() {
         try {
