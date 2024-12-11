@@ -480,7 +480,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/profilePasswordTextInputEditTextLinearLayout"
+                android:id="@+id/profileCurrentPasswordTextInputEditTextLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -488,15 +488,15 @@
                 android:layout_below="@+id/profileDateOfBirthTextInputEditTextLinearLayout">
 
                 <TextView
-                    android:id="@+id/profilePasswordTextView"
+                    android:id="@+id/profileCurrentPasswordTextView"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Password"
+                    android:text="Current Password"
                     android:textSize="18dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/profilePasswordTextInputLayout"
+                    android:id="@+id/profileCurrentPasswordTextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:boxCornerRadiusTopStart="13dp"
@@ -504,43 +504,38 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusBottomEnd="13dp"
                     app:boxStrokeColor="@color/black"
-                    app:endIconMode="password_toggle"
-                    >
+                    app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/profilePasswordTextInputEditText"
+                        android:id="@+id/profileCurrentPasswordTextInputEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
                         android:textSize="14dp"
                         android:fontFamily="@font/poppins"
                         android:drawableStart="@drawable/profile_password_icon"
-                        android:drawablePadding="16dp"
-                        app:endIconCheckable="false"
-                        />
+                        android:drawablePadding="16dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
-
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/profileConfirmPasswordTextInputEditTextLinearLayout"
+                android:id="@+id/profileNewPasswordTextInputEditTextLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="20dp"
-                android:layout_below="@+id/profilePasswordTextInputEditTextLinearLayout"
-                >
+                android:layout_below="@+id/profileCurrentPasswordTextInputEditTextLinearLayout">
 
                 <TextView
-                    android:id="@+id/profileConfirmPasswordTextView"
+                    android:id="@+id/profileNewPasswordTextView"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Confirm Password"
+                    android:text="New Password"
                     android:textSize="18dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/profileConfirmPasswordTextInputLayout"
+                    android:id="@+id/profileNewPasswordTextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:boxCornerRadiusTopStart="13dp"
@@ -548,21 +543,57 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusBottomEnd="13dp"
                     app:boxStrokeColor="@color/black"
-                    app:endIconMode="password_toggle"
-                    >
+                    app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/profileConfirmPasswordTextInputEditText"
+                        android:id="@+id/profileNewPasswordTextInputEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
                         android:textSize="14dp"
                         android:fontFamily="@font/poppins"
                         android:drawableStart="@drawable/profile_password_icon"
-                        android:drawablePadding="16dp"
-                        />
+                        android:drawablePadding="16dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/profileConfirmNewPasswordTextInputEditTextLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_below="@+id/profileNewPasswordTextInputEditTextLinearLayout">
+
+                <TextView
+                    android:id="@+id/profileConfirmNewPasswordTextView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Confirm New Password"
+                    android:textSize="18dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profileConfirmNewPasswordTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:boxCornerRadiusTopStart="13dp"
+                    app:boxCornerRadiusTopEnd="13dp"
+                    app:boxCornerRadiusBottomStart="13dp"
+                    app:boxCornerRadiusBottomEnd="13dp"
+                    app:boxStrokeColor="@color/black"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profileConfirmNewPasswordTextInputEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins"
+                        android:drawableStart="@drawable/profile_password_icon"
+                        android:drawablePadding="16dp"/>
+                </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
         </RelativeLayout>

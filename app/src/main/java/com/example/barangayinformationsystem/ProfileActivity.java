@@ -50,8 +50,8 @@ public class ProfileActivity extends AppCompatActivity {
     private TextInputEditText nameTextInputEditText, profileUsernameTextInputEditText,
             profileHouseNoTextInputEditText, profileStreetTextInputEditText, profileZoneTextInputEditText,
             profileAddressTextInputEditText, profileAgeTextInputEditText, profileGenderTextInputEditText,
-            profileDateOfBirthTextInputEditText, profilePasswordTextInputEditText,
-            profileConfirmPasswordTextInputEditText;
+            profileDateOfBirthTextInputEditText, profileCurrentPasswordTextInputEditText,
+            profileNewPasswordTextInputEditText, profileConfirmNewPasswordTextInputEditText;
     private ImageView profileImageView;
     private Uri selectedImageUri;
     private Button saveChangesButton;
@@ -92,11 +92,12 @@ public class ProfileActivity extends AppCompatActivity {
         profileAgeTextInputEditText = findViewById(R.id.profileAgeTextInputEditText);
         profileGenderTextInputEditText = findViewById(R.id.profileGenderTextInputEditText);
         profileDateOfBirthTextInputEditText = findViewById(R.id.profileDateOfBirthTextInputEditText);
-        profilePasswordTextInputEditText = findViewById(R.id.profilePasswordTextInputEditText);
         profileHouseNoTextInputEditText = findViewById(R.id.profileHouseNoTextInputEditText);
         profileStreetTextInputEditText = findViewById(R.id.profileStreetTextInputEditText);
         profileZoneTextInputEditText = findViewById(R.id.profileZoneTextInputEditText);
-        profileConfirmPasswordTextInputEditText = findViewById(R.id.profileConfirmPasswordTextInputEditText);
+        profileCurrentPasswordTextInputEditText = findViewById(R.id.profileCurrentPasswordTextInputEditText);
+        profileNewPasswordTextInputEditText = findViewById(R.id.profileNewPasswordTextInputEditText);
+        profileConfirmNewPasswordTextInputEditText = findViewById(R.id.profileConfirmNewPasswordTextInputEditText);
         profileImageView = findViewById(R.id.profileImageView);
         saveChangesButton = findViewById(R.id.editProfileButton);
         progressBar = findViewById(R.id.progressBar); // Make sure to add this to your layout
@@ -292,12 +293,24 @@ public class ProfileActivity extends AppCompatActivity {
     private void updateUserProfile(Map<String, String> updates, @Nullable MultipartBody.Part profilePicturePart) {
         showLoading(true);
 
+        // Debug logging
+        Log.d("ProfileActivity", "Updates to be sent: " + updates.toString());
+
+        // Create RequestBody objects for all fields
         RequestBody userIdBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(userId));
         RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), updates.get("username"));
         RequestBody houseNoBody = RequestBody.create(MediaType.parse("text/plain"), updates.get("houseNo"));
         RequestBody streetBody = RequestBody.create(MediaType.parse("text/plain"), updates.get("street"));
         RequestBody zoneBody = RequestBody.create(MediaType.parse("text/plain"), updates.get("zone"));
-        RequestBody passwordBody = RequestBody.create(MediaType.parse("text/plain"), updates.get("password"));
+
+        // Create password-related RequestBody objects if they exist
+        RequestBody currentPasswordBody = null;
+        RequestBody passwordBody = null;
+        if (updates.containsKey("currentPassword") && updates.containsKey("password")) {
+            currentPasswordBody = RequestBody.create(MediaType.parse("text/plain"), updates.get("currentPassword"));
+            passwordBody = RequestBody.create(MediaType.parse("text/plain"), updates.get("password"));
+            Log.d("ProfileActivity", "Including password update in request");
+        }
 
         apiService.updateUserProfile(
                 userIdBody,
@@ -306,23 +319,34 @@ public class ProfileActivity extends AppCompatActivity {
                 streetBody,
                 zoneBody,
                 passwordBody,
+                currentPasswordBody,  // Add this parameter
                 profilePicturePart
         ).enqueue(new Callback<UpdateProfileResponse>() {
             @Override
             public void onResponse(Call<UpdateProfileResponse> call, Response<UpdateProfileResponse> response) {
                 showLoading(false);
+                Log.d("ProfileActivity", "Response code: " + response.code());
+
+                if (!response.isSuccessful()) {
+                    try {
+                        Log.e("ProfileActivity", "Error body: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if (response.isSuccessful() && response.body() != null) {
                     UpdateProfileResponse updateResponse = response.body();
-                    if ("success".equals(updateResponse.getStatus())) {
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ProfileActivity.this);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("houseNo", updates.get("houseNo"));
-                        editor.putString("street", updates.get("street"));
-                        editor.putString("zone", updates.get("zone"));
-                        editor.apply();
+                    Log.d("ProfileActivity", "Update response: " + updateResponse.getStatus() + " - " + updateResponse.getMessage());
 
+                    if ("success".equals(updateResponse.getStatus())) {
                         UpdateProfileResponse.User updatedUser = updateResponse.getUser();
                         updateUIWithUserData(updatedUser);
+
+                        // Clear password fields after successful update
+                        profileCurrentPasswordTextInputEditText.setText("");
+                        profileNewPasswordTextInputEditText.setText("");
+                        profileConfirmNewPasswordTextInputEditText.setText("");
 
                         SuccessDialog.showSuccess(
                                 ProfileActivity.this,
@@ -341,8 +365,8 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<UpdateProfileResponse> call, Throwable t) {
                 showLoading(false);
+                Log.e("ProfileActivity", "Update failed", t);
                 Toast.makeText(ProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("ProfileActivity", "Profile update failed", t);
             }
         });
     }
@@ -356,8 +380,9 @@ public class ProfileActivity extends AppCompatActivity {
             profileZoneTextInputEditText.setText(user.getZone());
 
             // Clear password fields after successful update
-            profilePasswordTextInputEditText.setText("");
-            profileConfirmPasswordTextInputEditText.setText("");
+            profileNewPasswordTextInputEditText.setText("");
+            profileCurrentPasswordTextInputEditText.setText("");
+            profileConfirmNewPasswordTextInputEditText.setText("");
 
             // Update profile picture
             if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
@@ -372,8 +397,9 @@ public class ProfileActivity extends AppCompatActivity {
         String houseNo = profileHouseNoTextInputEditText.getText().toString().trim();
         String street = profileStreetTextInputEditText.getText().toString().trim();
         String zone = profileZoneTextInputEditText.getText().toString().trim();
-        String password = profilePasswordTextInputEditText.getText().toString();
-        String confirmPassword = profileConfirmPasswordTextInputEditText.getText().toString();
+        String currentPassword = profileCurrentPasswordTextInputEditText.getText().toString();
+        String newPassword = profileNewPasswordTextInputEditText.getText().toString();
+        String confirmNewPassword = profileConfirmNewPasswordTextInputEditText.getText().toString();
 
         // Basic validation
         if (username.isEmpty()) {
@@ -382,13 +408,17 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         // Password validation
-        if (!password.isEmpty()) {
-            if (password.length() < 6) {
-                profilePasswordTextInputEditText.setError("Password must be at least 6 characters");
+        if (!newPassword.isEmpty()) {
+            if (currentPassword.isEmpty()) {
+                profileCurrentPasswordTextInputEditText.setError("Current password is required to change password");
                 return;
             }
-            if (!password.equals(confirmPassword)) {
-                profileConfirmPasswordTextInputEditText.setError("Passwords do not match");
+            if (newPassword.length() < 6) {
+                profileNewPasswordTextInputEditText.setError("New password must be at least 6 characters");
+                return;
+            }
+            if (!newPassword.equals(confirmNewPassword)) {
+                profileConfirmNewPasswordTextInputEditText.setError("Passwords do not match");
                 return;
             }
         }
@@ -399,7 +429,19 @@ public class ProfileActivity extends AppCompatActivity {
         updates.put("houseNo", houseNo);
         updates.put("street", street);
         updates.put("zone", zone);
-        updates.put("password", password);
+
+        // Hash passwords if being updated
+        if (!newPassword.isEmpty()) {
+            String hashedCurrentPassword = PasswordHasher.hashPassword(currentPassword);
+            String hashedNewPassword = PasswordHasher.hashPassword(newPassword);
+            if (hashedCurrentPassword != null && hashedNewPassword != null) {
+                updates.put("currentPassword", hashedCurrentPassword);
+                updates.put("password", hashedNewPassword);
+            } else {
+                Toast.makeText(this, "Error processing password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
         // If image is selected, upload it first
         if (selectedImageUri != null) {

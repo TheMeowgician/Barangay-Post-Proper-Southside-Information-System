@@ -76,6 +76,7 @@ public interface ApiService {
             @Part("adrStreet") RequestBody street,
             @Part("adrZone") RequestBody zone,
             @Part("password") RequestBody password,
+            @Part("currentPassword") RequestBody currentPassword,
             @Part MultipartBody.Part profilePicture
     );
 
