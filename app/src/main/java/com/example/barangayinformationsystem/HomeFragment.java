@@ -63,9 +63,6 @@ public class HomeFragment extends Fragment {
         SpannableStringBuilder spannableStringBuilder1 = new SpannableStringBuilder("See Info");
         spannableStringBuilder1.setSpan(new UnderlineSpan(), 0, spannableStringBuilder1.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        seeInfoTextView1.setText(spannableStringBuilder1);
-        seeInfoTextView2.setText(spannableStringBuilder1);
-        seeInfoTextView3.setText(spannableStringBuilder1);
 
         String text = notableProjectsTextView.getText().toString();
         SpannableStringBuilder spannableStringBuilder2 = new SpannableStringBuilder(text);
