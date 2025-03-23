@@ -69,7 +69,7 @@ public interface ApiService {
     );
 
     @Multipart
-    @POST("update_user_profile.php")
+    @POST("user_update_profile")
     Call<UpdateProfileResponse> updateUserProfile(
             @Part("user_id") RequestBody userId,
             @Part("username") RequestBody username,
