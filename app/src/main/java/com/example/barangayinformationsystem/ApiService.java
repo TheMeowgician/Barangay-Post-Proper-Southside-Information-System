@@ -63,7 +63,7 @@ public interface ApiService {
     );
 
     @FormUrlEncoded
-    @POST("update_user_activity.php")
+    @POST("user/activity")
     Call<ActivityResponse> updateUserActivity(
             @Field("user_id") int userId
     );
