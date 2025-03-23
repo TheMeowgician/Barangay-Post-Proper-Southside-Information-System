@@ -19,16 +19,16 @@ import retrofit2.http.Query;
 
 public interface ApiService {
     @FormUrlEncoded
-    @POST("Android_login.php")  // This is correct
+    @POST("login")
     Call<LoginResponse> loginUser(
             @Field("username") String username,
-            @Field("password") String hashedPassword
+            @Field("password") String password
     );
 
-    @GET("check_verification_status.php")
+    @GET("check_verification_status")
     Call<VerificationResponse> checkVerificationStatus(@Query("user_id") int userId);
 
-    @GET("fetch_user_details.php")
+    @GET("user_details")
     Call<UserDetailsResponse> getUserDetails(@Query("id") int userId);
 
     @Multipart

@@ -8,8 +8,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
 
-    // Use the appropriate base URL
-    public static final String BASE_URL = "http://10.0.2.2/PostProperAdmin/"; // For Android Emulator
+    // Use for new laravel apis
+    public static final String BASE_URL = "http://10.0.2.2:8000/api/";
+
+    // Use for legacy apis
+    //public static final String BASE_URL = "http://10.0.2.2/PostProperAdmin/";
+
     // If testing on a physical device, replace with your computer's local IP:
     //public static final String BASE_URL = "http://192.168.100.45/PostProperAdmin/";
 
