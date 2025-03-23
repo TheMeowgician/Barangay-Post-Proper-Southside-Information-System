@@ -15,6 +15,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.PartMap;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiService {
@@ -28,8 +29,8 @@ public interface ApiService {
     @GET("check_verification_status")
     Call<VerificationResponse> checkVerificationStatus(@Query("user_id") int userId);
 
-    @GET("user_details")
-    Call<UserDetailsResponse> getUserDetails(@Query("id") int userId);
+    @GET("user/{id}")
+    Call<UserDetailsResponse> getUserDetails(@Path("id") int id);
 
     @Multipart
     @POST("register_user.php")
