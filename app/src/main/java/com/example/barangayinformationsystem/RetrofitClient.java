@@ -15,7 +15,7 @@ public class RetrofitClient {
     //public static final String BASE_URL = "http://10.0.2.2/PostProperAdmin/";
 
     // If testing on a physical device, replace with your computer's local IP:
-    //public static final String BASE_URL = "http://192.168.100.45/PostProperAdmin/";
+    //public static final String BASE_URL = "http://192.168.0.24:8000/api/";
 
     private static Retrofit retrofit = null;
     private static OkHttpClient okHttpClient = null;
@@ -27,9 +27,9 @@ public class RetrofitClient {
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             okHttpClient = new OkHttpClient.Builder()
-                    .connectTimeout(60, TimeUnit.SECONDS)
-                    .readTimeout(60, TimeUnit.SECONDS)
-                    .writeTimeout(60, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
                     .addInterceptor(logging)
                     .build();
         }
