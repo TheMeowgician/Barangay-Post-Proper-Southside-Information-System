@@ -33,7 +33,7 @@ public interface ApiService {
     Call<UserDetailsResponse> getUserDetails(@Path("id") int id);
 
     @Multipart
-    @POST("register_user.php")
+    @POST("android/register")
     Call<RegistrationResponse> registerUser(
             @Part("firstName") RequestBody firstName,
             @Part("lastName") RequestBody lastName,
