@@ -8,14 +8,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
 
-    // Use for new laravel apis
-    public static final String BASE_URL = "http://10.0.2.2:8000/api/";
+    // For Laravel API (development)
+    public static final String BASE_URL = "http://10.0.2.2:8000/api/"; // Default Laravel port
+
+    // For physical device testing (replace with your computer's IP)
+    // public static final String BASE_URL = "http://192.168.0.24:8000/api/";
 
     // Use for legacy apis
     //public static final String BASE_URL = "http://10.0.2.2/PostProperAdmin/";
-
-    // If testing on a physical device, replace with your computer's local IP:
-    //public static final String BASE_URL = "http://192.168.0.24:8000/api/";
 
     private static Retrofit retrofit = null;
     private static OkHttpClient okHttpClient = null;
