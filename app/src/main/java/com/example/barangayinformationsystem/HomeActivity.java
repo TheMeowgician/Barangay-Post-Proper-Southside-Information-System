@@ -128,7 +128,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Update both profile pictures (nav header and top bar)
         if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
-            String imageUrl = RetrofitClient.BASE_URL + user.getProfilePicture();
+            String imageUrl = user.getProfilePicture();
 
             // Load image for navigation header
             Glide.with(this)

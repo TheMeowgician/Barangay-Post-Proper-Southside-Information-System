@@ -230,7 +230,7 @@ public class ProfileActivity extends AppCompatActivity {
                             }
 
                             if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
-                                String imageUrl = RetrofitClient.BASE_URL + user.getProfilePicture();
+                                String imageUrl = user.getProfilePicture();
                                 loadProfilePicture(imageUrl);
                             } else {
                                 profileImageView.setImageResource(R.drawable.default_profile_picture);
