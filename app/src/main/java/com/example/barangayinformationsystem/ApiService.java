@@ -15,25 +15,24 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.PartMap;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiService {
     @FormUrlEncoded
-    @POST("login")
+    @POST("Android_login.php")  // This is correct
     Call<LoginResponse> loginUser(
             @Field("username") String username,
-            @Field("password") String password
+            @Field("password") String hashedPassword
     );
 
-    @GET("check_verification_status")
+    @GET("check_verification_status.php")
     Call<VerificationResponse> checkVerificationStatus(@Query("user_id") int userId);
 
-    @GET("user/{id}")
-    Call<UserDetailsResponse> getUserDetails(@Path("id") int id);
+    @GET("fetch_user_details.php")
+    Call<UserDetailsResponse> getUserDetails(@Query("id") int userId);
 
     @Multipart
-    @POST("android/register")
+    @POST("register_user.php")
     Call<RegistrationResponse> registerUser(
             @Part("firstName") RequestBody firstName,
             @Part("lastName") RequestBody lastName,
@@ -63,13 +62,13 @@ public interface ApiService {
     );
 
     @FormUrlEncoded
-    @POST("user/activity")
+    @POST("update_user_activity.php")
     Call<ActivityResponse> updateUserActivity(
             @Field("user_id") int userId
     );
 
     @Multipart
-    @POST("user_update_profile")
+    @POST("update_user_profile.php")
     Call<UpdateProfileResponse> updateUserProfile(
             @Part("user_id") RequestBody userId,
             @Part("username") RequestBody username,
