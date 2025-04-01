@@ -110,22 +110,14 @@ public interface ApiService {
             @Part MultipartBody.Part backId
     );
 
-    @GET("get_user_requests.php")
+    @GET("android/get-user-requests")
     Call<DocumentRequestListResponse> getUserRequests(@Query("userId") int userId);
 
-    @POST("cancel_request.php")
+    @POST("android/cancel-request")
     @FormUrlEncoded
     Call<DocumentRequestResponse> cancelRequest(
             @Field("requestId") int requestId,
             @Field("reason") String reason
-    );
-
-    @FormUrlEncoded
-    @POST("send_message.php")
-    Call<MessageResponse> sendMessage(
-            @Field("message") String message,
-            @Field("sender_id") int senderId,
-            @Field("is_admin") int isAdmin
     );
 
     @FormUrlEncoded
