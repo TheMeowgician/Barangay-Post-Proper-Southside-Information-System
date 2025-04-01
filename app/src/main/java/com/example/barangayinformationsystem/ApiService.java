@@ -80,7 +80,7 @@ public interface ApiService {
     );
 
     @FormUrlEncoded
-    @POST("submit_document_request.php")
+    @POST("android/document-requests")
     Call<DocumentRequestResponse> submitDocumentRequest(
             @Field("userId") int userId,
             @Field("documentType") String documentType,
@@ -91,8 +91,8 @@ public interface ApiService {
             @Field("alias") String alias,
             @Field("age") int age,
             @Field("birthday") String birthday,
-            @Field("placeOfBirth") String placeOfBirth,  // New field
-            @Field("occupation") String occupation,       // New field
+            @Field("placeOfBirth") String placeOfBirth,
+            @Field("occupation") String occupation,
             @Field("lengthOfStay") int lengthOfStay,
             @Field("citizenship") String citizenship,
             @Field("gender") String gender,
@@ -102,7 +102,7 @@ public interface ApiService {
     );
 
     @Multipart
-    @POST("upload_requirements.php")
+    @POST("android/upload-requirements")
     Call<UploadRequirementsResponse> uploadRequirements(
             @Part("requestId") RequestBody requestId,
             @Part("quantity") RequestBody quantity,
