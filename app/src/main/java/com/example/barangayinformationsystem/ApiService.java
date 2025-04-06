@@ -52,7 +52,7 @@ public interface ApiService {
     Call<List<AnnouncementResponse>> getAnnouncements();
 
     @FormUrlEncoded
-    @POST("submit_incident_report.php")
+    @POST("android/incident-reports")
     Call<IncidentReportResponse> submitIncidentReport(
             @Field("user_id") int userId,
             @Field("title") String title,
@@ -139,7 +139,7 @@ public interface ApiService {
             @Query("last_message_timestamp") long lastMessageTimestamp
     );
 
-    @GET("get_user_incident_reports.php")
+    @GET("android/user-incident-reports")
     Call<IncidentReportListResponse> getUserIncidentReports(@Query("userId") int userId);
 }
 
