@@ -48,7 +48,7 @@ public interface ApiService {
             @Part MultipartBody.Part validIdBack
     );
     
-    @GET("get_announcements.php")
+    @GET("android/get_announcements")
     Call<List<AnnouncementResponse>> getAnnouncements();
 
     @FormUrlEncoded
