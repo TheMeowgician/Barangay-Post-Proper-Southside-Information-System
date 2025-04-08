@@ -1,13 +1,29 @@
 package com.example.barangayinformationsystem;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 public class IncidentReport {
     private int id;
     private String name;
     private String title;
     private String description;
+
+    @SerializedName("incident_picture")
     private String incident_picture;
+
+    @SerializedName("date_submitted")
     private String date_submitted;
+
     private String status;
+
+    @SerializedName("resolved_at")
+    private String resolved_at;
 
     // Getters and Setters
     public int getId() { return id; }
@@ -30,4 +46,35 @@ public class IncidentReport {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getResolvedAt() { return resolved_at; }
+    public void setResolvedAt(String resolved_at) { this.resolved_at = resolved_at; }
+
+    // Helper methods
+    public boolean isResolved() {
+        return "resolved".equalsIgnoreCase(status);
+    }
+
+    // Format resolved time to Manila, Philippines time (PHT/Asia/Manila)
+    public String getFormattedResolvedTime() {
+        if (resolved_at == null || resolved_at.isEmpty()) {
+            return "";
+        }
+
+        try {
+            // Parse the database datetime format
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+
+            Date date = inputFormat.parse(resolved_at);
+
+            // Format to Manila time (PHT)
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy h:mm a", Locale.US);
+            outputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Manila"));
+
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return resolved_at; // Return original if parsing fails
+        }
+    }
 }

@@ -70,6 +70,34 @@
                     android:textSize="14sp"
                     android:layout_marginStart="8dp"/>
             </LinearLayout>
+
+            <!-- Resolved Time Container - Only visible when status is resolved -->
+            <LinearLayout
+                android:id="@+id/resolved_time_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Resolved on: "
+                    android:textColor="#CCCCCC"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/resolved_time_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
