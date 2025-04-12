@@ -50,8 +50,7 @@
                 android:layout_below="@+id/incident_report_general_instructions_textview"
                 android:layout_alignParentLeft="true"
                 android:fontFamily="@font/poppins"
-                android:text="Please provide accurate information for each field. Ensure that the incident description is clear and concise. If applicable, upload  images to support your report. All fields marked as required must be completed before submitting"
-
+                android:text="Please provide accurate information for each field. Ensure that the incident description is clear and concise. You can upload up to 3 images and 1 video clip (max 1 minute) to support your report. All fields marked as required must be completed before submitting."
                 android:textColor="@color/white"
                 android:textSize="14sp" />
 
@@ -149,45 +148,47 @@
 
             </RelativeLayout>
 
+            <!-- Images Section -->
             <RelativeLayout
-                android:id="@+id/incident_report_upload_image_imageview_relative_layout"
+                android:id="@+id/incident_report_upload_image_section_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:layout_below="@+id/incident_report_description_textInputEditText_relative_layout">
 
-                <ImageView
-                    android:id="@+id/incident_report_upload_image_here_imageview_"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/incident_upload_image_here" />
-
-                <com.google.android.material.textview.MaterialTextView
+                <TextView
+                    android:id="@+id/incident_report_images_title_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Upload Image Here"
+                    android:text="Upload Images (Max 3)"
+                    android:textSize="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/poppins_medium"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/upload_image_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/incident_report_images_title_textview"
+                    android:text="Upload Images"
+                    android:textAllCaps="false"
+                    app:icon="@android:drawable/ic_menu_camera"
+                    app:iconGravity="textStart"
+                    android:padding="16dp"
                     android:textSize="16sp"
-                    android:fontFamily="@font/poppins_light"
-                    android:layout_centerInParent="true"/>
+                    android:fontFamily="@font/poppins"
+                    app:cornerRadius="8dp"
+                    android:backgroundTint="#5E35B1"
+                    android:textColor="@android:color/white"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
 
             </RelativeLayout>
-
-            <TextView
-                android:id="@+id/incident_report_images_file_upload_percentage_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Images: (Max 3)"
-                android:fontFamily="@font/poppins_medium"
-                android:layout_below="@+id/incident_report_upload_image_imageview_relative_layout"/>
 
             <HorizontalScrollView
                 android:id="@+id/images_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/incident_report_images_file_upload_percentage_textview"
+                android:layout_below="@id/incident_report_upload_image_section_relative_layout"
                 android:layout_marginTop="10dp"
                 android:scrollbars="none">
 
@@ -199,23 +200,60 @@
                     android:padding="8dp"/>
 
             </HorizontalScrollView>
+
+            <!-- Video Section -->
             <RelativeLayout
-                android:id="@+id/incident_report_images_file_upload_percentage_relative_layout"
+                android:id="@+id/incident_report_upload_video_section_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:layout_below="@+id/incident_report_images_file_upload_percentage_textview">
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/images_scroll_view">
 
+                <TextView
+                    android:id="@+id/incident_report_video_title_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Upload Video (Max 1 minute)"
+                    android:textSize="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/poppins_medium"/>
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/upload_video_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/incident_report_video_title_textview"
+                    android:text="Upload Video"
+                    android:textAllCaps="false"
+                    app:icon="@android:drawable/ic_menu_slideshow"
+                    app:iconGravity="textStart"
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins"
+                    app:cornerRadius="8dp"
+                    android:backgroundTint="#3F51B5"
+                    android:textColor="@android:color/white"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
 
             </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/video_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_below="@id/incident_report_upload_video_section_relative_layout"
+                android:layout_marginTop="10dp"
+                android:padding="8dp"/>
 
             <RelativeLayout
                 android:id="@+id/incident_report_submit_button_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:layout_below="@+id/images_scroll_view">
+                android:layout_below="@+id/video_container">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/incident_report_submit_button"

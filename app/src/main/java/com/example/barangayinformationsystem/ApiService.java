@@ -57,7 +57,18 @@ public interface ApiService {
             @Field("user_id") int userId,
             @Field("title") String title,
             @Field("description") String description,
-            @Field("incident_picture") String encodedImage
+            @Field("media_data") String mediaData
+    );
+
+    @Multipart
+    @POST("android/incident-reports-video")
+    Call<VideoUploadResponse> uploadVideo(
+            @Part("api_key") RequestBody apiKey,
+            @Part("timestamp") RequestBody timestamp,
+            @Part("signature") RequestBody signature,
+            @Part("folder") RequestBody folder,
+            @Part("public_id") RequestBody publicId,
+            @Part MultipartBody.Part file
     );
 
     @FormUrlEncoded

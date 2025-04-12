@@ -15,4 +15,12 @@
     <external-path
         name="my_images"
         path="Android/data/com.example.barangayinformationsystem/files/Pictures/" />
+    <cache-path
+        name="shared_videos" path="/" />
+    <files-path
+        name="shared_files" path="/" />
+    <external-path
+        name="external_files" path="." />
+    <external-cache-path
+        name="external_cache" path="." />
 </paths>

@@ -17,6 +17,9 @@ public class IncidentReport {
     @SerializedName("incident_picture")
     private String incident_picture;
 
+    @SerializedName("incident_video")
+    private String incident_video;
+
     @SerializedName("date_submitted")
     private String date_submitted;
 
@@ -41,6 +44,9 @@ public class IncidentReport {
     public String getIncidentPicture() { return incident_picture; }
     public void setIncidentPicture(String incident_picture) { this.incident_picture = incident_picture; }
 
+    public String getIncidentVideo() { return incident_video; }
+    public void setIncidentVideo(String incident_video) { this.incident_video = incident_video; }
+
     public String getDateSubmitted() { return date_submitted; }
     public void setDateSubmitted(String date_submitted) { this.date_submitted = date_submitted; }
 
@@ -53,6 +59,10 @@ public class IncidentReport {
     // Helper methods
     public boolean isResolved() {
         return "resolved".equalsIgnoreCase(status);
+    }
+
+    public boolean hasVideo() {
+        return incident_video != null && !incident_video.isEmpty();
     }
 
     // Format resolved time to Manila, Philippines time (PHT/Asia/Manila)
