@@ -23,4 +23,8 @@
         name="external_files" path="." />
     <external-cache-path
         name="external_cache" path="." />
+    <cache-path
+        name="shared_videos" path="." />
+    <external-cache-path
+        name="external_videos" path="." />
 </paths>

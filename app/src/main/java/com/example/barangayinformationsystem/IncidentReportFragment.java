@@ -285,44 +285,127 @@ public class IncidentReportFragment extends Fragment {
         videoThumbnail.setOnClickListener(v -> {
             if (selectedVideoUri != null) {
                 try {
-                    // Create a temporary file in the cache directory
-                    File videoFile = new File(requireContext().getCacheDir(), "temp_video_" + System.currentTimeMillis() + ".mp4");
-                    try (InputStream inputStream = requireActivity().getContentResolver().openInputStream(selectedVideoUri);
-                         OutputStream outputStream = new FileOutputStream(videoFile)) {
+                    // For Android 11+ use the system video player explicitly to avoid permission issues
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                        // Try opening directly with the original URI first
+                        Intent directIntent = new Intent(Intent.ACTION_VIEW);
+                        directIntent.setDataAndType(selectedVideoUri, "video/*");
+                        directIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                        if (inputStream == null) {
-                            Toast.makeText(getContext(), "Could not open video", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        // Copy the content
-                        byte[] buffer = new byte[8192];
-                        int bytesRead;
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, bytesRead);
+                        try {
+                            startActivity(directIntent);
+                            return; // Exit if successful
+                        } catch (Exception e) {
+                            Log.d("VideoPlayer", "Could not play directly, trying alternative method");
+                            // Continue to the file-based approach if this fails
                         }
                     }
 
-                    // Get a content URI using FileProvider
+                    // If above approach fails or on older Android, use file-based approach
+                    String uniqueFileName = "temp_video_" + System.currentTimeMillis() + ".mp4";
+                    File videoFile = new File(requireContext().getCacheDir(), uniqueFileName);
+
+                    // Log the process
+                    Log.d("VideoPlayer", "Creating temp file: " + videoFile.getAbsolutePath());
+
+                    // Make sure we're not creating the file in a background thread that might get killed
+                    try (InputStream inputStream = requireActivity().getContentResolver().openInputStream(selectedVideoUri);
+                         FileOutputStream outputStream = new FileOutputStream(videoFile)) {
+
+                        if (inputStream == null) {
+                            Toast.makeText(getContext(), "Could not open video stream", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Copy with progress updates
+                        byte[] buffer = new byte[16384]; // Larger buffer for faster copying
+                        int bytesRead;
+                        long totalBytesRead = 0;
+                        long fileSize = 0;
+
+                        try {
+                            fileSize = requireActivity().getContentResolver()
+                                    .openFileDescriptor(selectedVideoUri, "r").getStatSize();
+                        } catch (Exception e) {
+                            Log.e("VideoPlayer", "Could not determine file size", e);
+                        }
+
+                        // Show a progress dialog for large files
+                        AlertDialog progressDialog = null;
+                        if (fileSize > 5 * 1024 * 1024) { // 5MB
+                            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                            builder.setTitle("Preparing Video");
+                            builder.setMessage("Please wait...");
+                            builder.setCancelable(false);
+                            progressDialog = builder.create();
+                            progressDialog.show();
+                        }
+
+                        final AlertDialog finalProgressDialog = progressDialog;
+
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                            totalBytesRead += bytesRead;
+
+                            // Update progress dialog if needed
+                            if (finalProgressDialog != null && fileSize > 0) {
+                                final int progress = (int) ((totalBytesRead * 100) / fileSize);
+                                if (progress % 10 == 0) { // Update every 10%
+                                    requireActivity().runOnUiThread(() -> {
+                                        finalProgressDialog.setMessage("Preparing video... " + progress + "%");
+                                    });
+                                }
+                            }
+                        }
+
+                        // Ensure all bytes are written to disk
+                        outputStream.flush();
+
+                        // Dismiss progress dialog if shown
+                        if (finalProgressDialog != null) {
+                            finalProgressDialog.dismiss();
+                        }
+                    }
+
+                    Log.d("VideoPlayer", "File created, size: " + videoFile.length() + " bytes");
+
+                    // Create a content URI via FileProvider
                     Uri fileUri = FileProvider.getUriForFile(
                             requireContext(),
                             requireContext().getPackageName() + ".fileprovider",
                             videoFile);
 
-                    // Create and start the intent
+                    Log.d("VideoPlayer", "FileProvider URI: " + fileUri.toString());
+
+                    // Create explicit intent for video playback
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(fileUri, "video/mp4");
+                    intent.setDataAndType(fileUri, "video/*");
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                    // Check if there's an app to handle this
+                    // Check for available apps
                     if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
+                        Log.d("VideoPlayer", "Starting video activity");
                         startActivity(intent);
                     } else {
-                        Toast.makeText(getContext(), "No app available to play video", Toast.LENGTH_SHORT).show();
+                        // Try with a more specific MIME type
+                        intent.setDataAndType(fileUri, "video/mp4");
+                        if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
+                            Log.d("VideoPlayer", "Starting video activity with specific MIME type");
+                            startActivity(intent);
+                        } else {
+                            // Try with Intent.createChooser as a last resort
+                            try {
+                                Log.d("VideoPlayer", "Trying createChooser approach");
+                                startActivity(Intent.createChooser(intent, "Play video using"));
+                            } catch (Exception e) {
+                                Log.e("VideoPlayer", "All playback attempts failed", e);
+                                Toast.makeText(getContext(), "No app available to play video. Please install a video player app.", Toast.LENGTH_LONG).show();
+                            }
+                        }
                     }
                 } catch (Exception e) {
-                    Toast.makeText(getContext(), "Error playing video: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("VideoPlayer", "Error playing video", e);
+                    Toast.makeText(getContext(), "Error playing video: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
