@@ -285,38 +285,44 @@ public class IncidentReportFragment extends Fragment {
         videoThumbnail.setOnClickListener(v -> {
             if (selectedVideoUri != null) {
                 try {
-                    InputStream inputStream = requireActivity().getContentResolver().openInputStream(selectedVideoUri);
-                    if (inputStream != null) {
-                        File videoFile = new File(requireContext().getCacheDir(), "temp_video.mp4");
-                        FileOutputStream outputStream = new FileOutputStream(videoFile);
+                    // Create a temporary file in the cache directory
+                    File videoFile = new File(requireContext().getCacheDir(), "temp_video_" + System.currentTimeMillis() + ".mp4");
+                    try (InputStream inputStream = requireActivity().getContentResolver().openInputStream(selectedVideoUri);
+                         OutputStream outputStream = new FileOutputStream(videoFile)) {
 
+                        if (inputStream == null) {
+                            Toast.makeText(getContext(), "Could not open video", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Copy the content
                         byte[] buffer = new byte[8192];
                         int bytesRead;
                         while ((bytesRead = inputStream.read(buffer)) != -1) {
                             outputStream.write(buffer, 0, bytesRead);
                         }
+                    }
 
-                        inputStream.close();
-                        outputStream.close();
+                    // Get a content URI using FileProvider
+                    Uri fileUri = FileProvider.getUriForFile(
+                            requireContext(),
+                            requireContext().getPackageName() + ".fileprovider",
+                            videoFile);
 
-                        Uri fileUri = FileProvider.getUriForFile(
-                                requireContext(),
-                                requireContext().getPackageName() + ".fileprovider",
-                                videoFile);
+                    // Create and start the intent
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(fileUri, "video/mp4");
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setDataAndType(fileUri, "video/mp4");
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                        if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(getContext(), "No app available to play video", Toast.LENGTH_SHORT).show();
-                        }
+                    // Check if there's an app to handle this
+                    if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(getContext(), "No app available to play video", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error playing video: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    Log.e("VideoPlayer", "Error playing video", e);
                 }
             }
         });
@@ -505,19 +511,40 @@ public class IncidentReportFragment extends Fragment {
         try {
             selectedVideoUri = videoUri;
 
-            long videoSize = getVideoSize(videoUri);
+            // Get video size - using content resolver for Android 10+
+            long videoSize = 0;
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    try (InputStream is = requireActivity().getContentResolver().openInputStream(videoUri)) {
+                        if (is != null) {
+                            byte[] buffer = new byte[8192];
+                            int bytesRead;
+                            while ((bytesRead = is.read(buffer)) != -1) {
+                                videoSize += bytesRead;
+                            }
+                        }
+                    }
+                } else {
+                    videoSize = getVideoSize(videoUri);
+                }
+            } catch (Exception e) {
+                Log.e("VideoUpload", "Error getting video size", e);
+            }
+
             if (videoSize > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
                 showError("Video too large", "Please select a video smaller than " + MAX_VIDEO_SIZE_MB + "MB");
                 return;
             }
 
+            // Get video duration safely
             long duration = getVideoDuration(videoUri);
             if (duration > MAX_VIDEO_DURATION_MS) {
                 showError("Video too long", "Please select a video shorter than 1 minute");
                 return;
             }
 
-            Bitmap thumbnail = getVideoThumbnail(videoUri);
+            // Get thumbnail safely using MediaMetadataRetriever rather than path
+            Bitmap thumbnail = getVideoThumbnailSafe(videoUri);
             if (thumbnail != null) {
                 addVideoToContainer(thumbnail);
                 hasVideo = true;
@@ -528,7 +555,24 @@ public class IncidentReportFragment extends Fragment {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Video Error", "Failed to process video. Please try another video.");
+            showError("Video Error", "Failed to process video: " + e.getMessage());
+        }
+    }
+
+    private Bitmap getVideoThumbnailSafe(Uri videoUri) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        try {
+            retriever.setDataSource(requireContext(), videoUri);
+            return retriever.getFrameAtTime();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                retriever.release();
+            } catch (Exception e) {
+                // Ignore
+            }
         }
     }
 
@@ -852,15 +896,30 @@ public class IncidentReportFragment extends Fragment {
 
     // Helper method to get real path from URI
     private String getRealPathFromURI(Uri contentUri) {
-        String[] proj = {MediaStore.Video.Media.DATA};
-        Cursor cursor = requireActivity().getContentResolver().query(contentUri, proj, null, null, null);
+        // For Android 10 (API 29) and above, we can't directly get the file path
+        // Instead, we need to work with the URI and copy the file if needed
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            try {
+                return createTempFileFromUri(contentUri).getAbsolutePath();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
 
-        if (cursor != null) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-            cursor.moveToFirst();
-            String path = cursor.getString(column_index);
-            cursor.close();
-            return path;
+        // For older Android versions, we can try to get the path directly
+        String[] proj = {MediaStore.Video.Media.DATA};
+        try {
+            Cursor cursor = requireActivity().getContentResolver().query(contentUri, proj, null, null, null);
+            if (cursor != null) {
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+                cursor.moveToFirst();
+                String path = cursor.getString(column_index);
+                cursor.close();
+                return path;
+            }
+        } catch (Exception e) {
+            Log.e("VideoUpload", "Error getting real path", e);
         }
 
         return contentUri.getPath();
