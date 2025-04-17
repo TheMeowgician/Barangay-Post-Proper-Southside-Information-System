@@ -35,6 +35,9 @@
             android:name=".BarangayCertificationFormActivity"
             android:exported="false" />
         <activity
+            android:name=".FirstTimeJobCertificateFormActivity"
+            android:exported="false" />
+        <activity
             android:name=".TermsAndConditionsActivity"
             android:exported="false" />
         <provider
