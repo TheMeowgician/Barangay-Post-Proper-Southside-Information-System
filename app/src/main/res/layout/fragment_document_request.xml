@@ -457,7 +457,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 app:cardBackgroundColor="#3F0070"
-                android:layout_below="@+id/document_request_barangay_certification_material_cardview">
+                android:layout_below="@+id/document_request_certificate_of_indigency_material_cardview">
 
                 <RelativeLayout
                     android:id="@+id/document_request_first_time_job_certificate_material_cardview_relative_layout"
