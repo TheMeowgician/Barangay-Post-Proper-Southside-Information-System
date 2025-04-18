@@ -8,6 +8,9 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -16,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -174,6 +178,7 @@ public class DocumentVerificationActivity extends AppCompatActivity {
         TextView tvAddress = dialogView.findViewById(R.id.tv_address);
         TextView tvPurpose = dialogView.findViewById(R.id.tv_purpose);
         TextView tvIssued = dialogView.findViewById(R.id.tv_issued_date);
+        TextView tvSignature = dialogView.findViewById(R.id.tv_signature);
         ImageView ivVerified = dialogView.findViewById(R.id.iv_verified_badge);
 
         tvDocType.setText(docInfo.getString("document_type"));
@@ -181,6 +186,37 @@ public class DocumentVerificationActivity extends AppCompatActivity {
         tvAddress.setText(docInfo.getString("address"));
         tvPurpose.setText(docInfo.getString("purpose"));
         tvIssued.setText("Issued on: " + docInfo.getString("issued_date").substring(0, 10));
+
+        // Show partial signature (first 20 chars + "...")
+        String signature = docInfo.getString("signature");
+        String displaySignature = signature.length() > 20
+                ? signature.substring(0, 20) + "..."
+                : signature;
+        tvSignature.setText(displaySignature);
+
+        // Set an onClick listener on the signature to show the full signature
+        tvSignature.setOnClickListener(v -> {
+            AlertDialog.Builder fullSigBuilder = new AlertDialog.Builder(this);
+            fullSigBuilder.setTitle("Digital Signature");
+
+            // Create ScrollView to make long signatures scrollable
+            ScrollView scrollView = new ScrollView(this);
+            TextView fullSigTextView = new TextView(this);
+            fullSigTextView.setPadding(30, 30, 30, 30);
+            fullSigTextView.setText(signature);
+            scrollView.addView(fullSigTextView);
+
+            fullSigBuilder.setView(scrollView);
+            fullSigBuilder.setPositiveButton("Copy", (dialog, which) -> {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Document Signature", signature);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(this, "Signature copied to clipboard", Toast.LENGTH_SHORT).show();
+            });
+            fullSigBuilder.setNegativeButton("Close", null);
+            fullSigBuilder.show();
+        });
+
         ivVerified.setVisibility(View.VISIBLE);
 
         AlertDialog alertDialog = builder.create();
