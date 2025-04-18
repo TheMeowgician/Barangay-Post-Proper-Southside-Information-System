@@ -244,8 +244,11 @@ public class HomeActivity extends AppCompatActivity {
                     replaceFragment(new IncidentReportFragment());
                 }else if(id == R.id.navIncidentStatus) {
                     replaceFragment(new IncidentReportStatusFragment());
+                }else if(id == R.id.navVerifyDocument) {
+                    Intent verifyIntent = new Intent(HomeActivity.this, DocumentVerificationActivity.class);
+                    startActivity(verifyIntent);
                 } else if(id == R.id.navLogOut) {
-                    showLogoutConfirmationDialog();  // Show confirmation instead of direct logout
+                    showLogoutConfirmationDialog();
                 }
                 return true;
             }

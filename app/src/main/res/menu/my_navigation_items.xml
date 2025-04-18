@@ -27,6 +27,11 @@
             android:icon="@drawable/nav_drawer_document_status" />
 
         <item
+            android:id="@+id/navVerifyDocument"
+            android:title="Verify Document"
+            android:icon="@drawable/nav_drawer_document" />
+
+        <item
             android:id="@+id/navDeskChat"
             android:title="Desk Chat"
             android:icon="@drawable/nav_drawer_chat_bubble" />
