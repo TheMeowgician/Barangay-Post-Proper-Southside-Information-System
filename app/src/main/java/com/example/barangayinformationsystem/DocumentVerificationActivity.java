@@ -72,6 +72,10 @@ public class DocumentVerificationActivity extends AppCompatActivity {
         integrator.setPrompt("Scan document QR code");
         integrator.setBeepEnabled(true);
         integrator.setOrientationLocked(false);
+        integrator.setCameraId(0);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        integrator.setBarcodeImageEnabled(true);
+        integrator.setCaptureActivity(CaptureActivityPortrait.class);
         integrator.initiateScan();
     }
 
