@@ -18,6 +18,8 @@ import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 
 public interface ApiService {
+
+    // --- Existing Non-Chat Methods (Unchanged) ---
     @FormUrlEncoded
     @POST("android/login")
     Call<LoginResponse> loginUser(
@@ -47,7 +49,7 @@ public interface ApiService {
             @Part MultipartBody.Part validId,
             @Part MultipartBody.Part validIdBack
     );
-    
+
     @GET("android/get_announcements")
     Call<List<AnnouncementResponse>> getAnnouncements();
 
@@ -131,26 +133,46 @@ public interface ApiService {
             @Field("reason") String reason
     );
 
+    @GET("android/user-incident-reports")
+    Call<IncidentReportListResponse> getUserIncidentReports(@Query("userId") int userId);
+
+
+    // --- UPDATED Chat Methods ---
+
+    /**
+     * Sends a chat message from the user.
+     * Calls the new Laravel API endpoint POST /api/chat/messages
+     */
     @FormUrlEncoded
-    @POST("send_user_message.php")
+    @POST("chat/messages") // <-- UPDATED PATH
     Call<MessageResponse> sendMessage(
             @Field("message") String message,
+            // Added sender_id back to match DeskChatFragment call.
+            // IMPORTANT: Backend should ideally ignore this and use authenticated user ID from token/session.
             @Field("sender_id") int senderId
     );
 
 
-    @GET("get_messages.php")
+    /**
+     * Gets the message history for a user's chat.
+     * Calls the new Laravel API endpoint GET /api/chat/messages
+     */
+    @GET("chat/messages") // <-- UPDATED PATH
     Call<List<ChatMessage>> getMessages(
+            // Keep user_id query param for now to match temporary backend logic.
+            // Ideally, backend should get this from authenticated user.
             @Query("user_id") int userId
     );
 
-    @GET("check_new_messages.php")
+    /**
+     * Checks for new messages since the last known timestamp.
+     * Calls the new Laravel API endpoint GET /api/chat/messages/new
+     */
+    @GET("chat/messages/new") // <-- UPDATED PATH
     Call<MessageCheckResponse> checkNewMessages(
+            // Keep user_id query param for now.
             @Query("user_id") int userId,
-            @Query("last_message_timestamp") long lastMessageTimestamp
+            @Query("last_message_timestamp") long lastMessageTimestamp // Keep timestamp param (milliseconds)
     );
 
-    @GET("android/user-incident-reports")
-    Call<IncidentReportListResponse> getUserIncidentReports(@Query("userId") int userId);
 }
-
