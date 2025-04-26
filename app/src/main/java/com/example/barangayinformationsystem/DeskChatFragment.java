@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.util.Log; // Import Log
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +23,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet; // Import HashSet
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set; // Import Set
+import java.util.Set;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -281,16 +283,17 @@ public class DeskChatFragment extends Fragment {
         messageCheckHandler.removeCallbacksAndMessages(null); // Stop handler when view is destroyed
     }
 
-    // --- ChatAdapter Class (Remains the same as previous version) ---
+    // --- ChatAdapter Class with Fixed Timezone ---
     private static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
         private static final int VIEW_TYPE_USER = 1;
         private static final int VIEW_TYPE_ADMIN = 2;
         private final List<ChatMessage> messages;
         private final int userId;
-        private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-        private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
-        ChatAdapter(List<ChatMessage> messages, int userId) { this.messages = messages; this.userId = userId; }
+        ChatAdapter(List<ChatMessage> messages, int userId) {
+            this.messages = messages;
+            this.userId = userId;
+        }
 
         @NonNull @Override
         public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -307,28 +310,68 @@ public class DeskChatFragment extends Fragment {
         public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
             ChatMessage message = messages.get(position);
             holder.messageText.setText(message.getMessage());
-            if (holder.senderNameText != null) { // Check if senderNameText exists in the layout
+            if (holder.senderNameText != null) {
                 if (message.isAdmin()) {
                     holder.senderNameText.setVisibility(View.VISIBLE);
-                    holder.senderNameText.setText(message.getSenderName() != null ? message.getSenderName() : "Admin"); // Use sender_name from API
+                    holder.senderNameText.setText(message.getSenderName() != null ? message.getSenderName() : "Admin");
                 } else {
-                    holder.senderNameText.setVisibility(View.GONE); // Hide for user messages
+                    holder.senderNameText.setVisibility(View.GONE);
                 }
             }
-            Date messageDate = new Date(message.getTimestamp()); Date currentDate = new Date();
-            boolean isSameDay = isSameDay(messageDate, currentDate);
-            String formattedTime = timeFormat.format(messageDate);
-            if (!isSameDay) { String formattedDate = dateFormat.format(messageDate); holder.timestampText.setText(formattedDate + " " + formattedTime); }
-            else { holder.timestampText.setText(formattedTime); }
+
+            // Get the raw timestamp (in milliseconds since epoch)
+            long timestampMillis = message.getTimestamp();
+
+            // Create a Calendar instance for Philippines timezone
+            Calendar philCalendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Manila"));
+            philCalendar.setTimeInMillis(timestampMillis);
+
+            // Get current time in Philippines timezone
+            Calendar currentPhilCalendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Manila"));
+
+            // Create formatters with Philippines timezone - use 12-hour format with AM/PM
+            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+            timeFormat.setTimeZone(TimeZone.getTimeZone("Asia/Manila"));
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+            dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Manila"));
+
+            // Format the time
+            String formattedTime = timeFormat.format(philCalendar.getTime());
+
+            // Check if the message is from today (same year, month, and day)
+            boolean isSameDay = (philCalendar.get(Calendar.YEAR) == currentPhilCalendar.get(Calendar.YEAR) &&
+                    philCalendar.get(Calendar.MONTH) == currentPhilCalendar.get(Calendar.MONTH) &&
+                    philCalendar.get(Calendar.DAY_OF_MONTH) == currentPhilCalendar.get(Calendar.DAY_OF_MONTH));
+
+            if (isSameDay) {
+                holder.timestampText.setText(formattedTime);
+            } else {
+                String formattedDate = dateFormat.format(philCalendar.getTime());
+                holder.timestampText.setText(formattedDate + " " + formattedTime);
+            }
         }
 
-        private boolean isSameDay(Date date1, Date date2) { SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()); return sdf.format(date1).equals(sdf.format(date2)); }
-        @Override public int getItemCount() { return messages.size(); }
-        @Override public int getItemViewType(int position) { ChatMessage message = messages.get(position); return message.isAdmin() ? VIEW_TYPE_ADMIN : VIEW_TYPE_USER; }
+        @Override public int getItemCount() {
+            return messages.size();
+        }
+
+        @Override public int getItemViewType(int position) {
+            ChatMessage message = messages.get(position);
+            return message.isAdmin() ? VIEW_TYPE_ADMIN : VIEW_TYPE_USER;
+        }
 
         static class ChatViewHolder extends RecyclerView.ViewHolder {
-            TextView messageText; TextView timestampText; TextView senderNameText;
-            ChatViewHolder(@NonNull View itemView) { super(itemView); messageText = itemView.findViewById(R.id.messageText); timestampText = itemView.findViewById(R.id.timestampText); senderNameText = itemView.findViewById(R.id.senderNameText); /* Might be null in user layout */ }
+            TextView messageText;
+            TextView timestampText;
+            TextView senderNameText;
+
+            ChatViewHolder(@NonNull View itemView) {
+                super(itemView);
+                messageText = itemView.findViewById(R.id.messageText);
+                timestampText = itemView.findViewById(R.id.timestampText);
+                senderNameText = itemView.findViewById(R.id.senderNameText); /* Might be null in user layout */
+            }
         }
     }
     // --- End ChatAdapter ---
@@ -341,5 +384,4 @@ public class DeskChatFragment extends Fragment {
         chatRecyclerView.setAdapter(chatAdapter);
         Log.d(TAG, "RecyclerView setup complete.");
     }
-
 }
