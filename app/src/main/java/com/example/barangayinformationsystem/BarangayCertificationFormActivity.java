@@ -188,10 +188,14 @@ public class BarangayCertificationFormActivity extends AppCompatActivity {
                 }
             }
 
-            // Set address
-            String fullAddress = String.format("%s %s Street Zone %s",
-                    user.getHouseNo(), user.getStreet(), user.getZone());
-            addressInput.setText(fullAddress);
+            // Set address - using the new formatted address method
+            String formattedAddress = user.getFormattedAddress();
+            if (!TextUtils.isEmpty(formattedAddress)) {
+                addressInput.setText(formattedAddress);
+            } else {
+                // Fallback to original address or empty string if everything fails
+                addressInput.setText(user.getAddress() != null ? user.getAddress() : "");
+            }
 
             // Set gender
             if (user.getGender() != null) {
