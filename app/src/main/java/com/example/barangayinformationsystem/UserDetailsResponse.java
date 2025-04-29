@@ -55,15 +55,30 @@ public class UserDetailsResponse {
         @SerializedName("profilePicture")  // Changed to match PHP
         private String profilePicture;
 
+        // Direct field access for server-provided address components
+        @SerializedName("houseNo")
+        private String houseNoField;
+        
+        @SerializedName("zone")
+        private String zoneField;
+        
+        @SerializedName("street")
+        private String streetField;
+        
         // Improved methods to parse the address with better handling of edge cases
         public String getHouseNo() {
+            // First check if the server provided this field directly
+            if (houseNoField != null && !houseNoField.isEmpty()) {
+                return houseNoField;
+            }
+            
             if (address == null || address.isEmpty()) {
                 return "";
             }
             
             try {
-                // Try to extract house number - typically the first numeric part of the address
-                Pattern pattern = Pattern.compile("^([0-9]+[a-zA-Z]?)\\b");
+                // Try to extract house number - now handles hyphenated forms like "497-A"
+                Pattern pattern = Pattern.compile("^([0-9]+(-[A-Za-z0-9]+)?)\\b");
                 Matcher matcher = pattern.matcher(address);
                 if (matcher.find()) {
                     return matcher.group(1);
@@ -72,7 +87,10 @@ public class UserDetailsResponse {
                 // Fallback: just take the first part if it exists
                 String[] parts = address.split("\\s+", 2);
                 if (parts.length > 0) {
-                    return parts[0];
+                    // Check if the first part might be a house number (contains digits)
+                    if (parts[0].matches(".*\\d.*")) {
+                        return parts[0];
+                    }
                 }
             } catch (Exception e) {
                 Log.e("UserDetailsResponse", "Error parsing house number: " + e.getMessage());
@@ -82,24 +100,39 @@ public class UserDetailsResponse {
         }
 
         public String getZone() {
+            // First check if the server provided this field directly
+            if (zoneField != null && !zoneField.isEmpty()) {
+                return zoneField;
+            }
+            
             if (address == null || address.isEmpty()) {
                 return "";
             }
             
             try {
-                // Pattern to find "Zone X" or "zone X" where X is a number, possibly followed by other text
-                Pattern pattern = Pattern.compile("\\b[Zz]one\\s+([0-9]+)\\b");
+                // Check for Village name format (like "ISU Village")
+                Pattern villagePattern = Pattern.compile("\\b([A-Za-z0-9]+)\\s+Village\\b");
+                Matcher villageMatcher = villagePattern.matcher(address);
+                if (villageMatcher.find()) {
+                    return villageMatcher.group(1) + " Village";
+                }
+                
+                // Pattern to find "Zone X" or "zone X" where X is a number or text
+                Pattern pattern = Pattern.compile("\\b[Zz]one\\s+([0-9A-Za-z]+)\\b");
                 Matcher matcher = pattern.matcher(address);
                 if (matcher.find()) {
                     return matcher.group(1);
                 }
                 
-                // Fallback: look for zone at the end of address
-                if (address.toLowerCase().contains("zone")) {
-                    String[] parts = address.split("\\s+[Zz]one\\s+");
-                    if (parts.length > 1) {
-                        // Get the first word after "Zone"
-                        return parts[1].split("\\s+")[0];
+                // Fallback: look for other identifying parts after street name
+                if (address.contains("Street")) {
+                    String[] parts = address.split("Street\\s+", 2);
+                    if (parts.length > 1 && !parts[1].trim().isEmpty()) {
+                        // Return everything after "Street" that's not a Zone indicator
+                        String afterStreet = parts[1].trim();
+                        if (!afterStreet.toLowerCase().startsWith("zone")) {
+                            return afterStreet;
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -110,37 +143,36 @@ public class UserDetailsResponse {
         }
 
         public String getStreet() {
+            // First check if the server provided this field directly
+            if (streetField != null && !streetField.isEmpty()) {
+                return streetField;
+            }
+            
             if (address == null || address.isEmpty()) {
                 return "";
             }
             
             try {
-                // Pattern to capture multi-word street names before the word "Street"
-                // This looks for 1+ words (not containing "Zone") followed by "Street"
-                Pattern pattern = Pattern.compile("\\b((?:[^\\s]+\\s+)(?!Zone|zone)[^\\s]+)\\s+[Ss]treet\\b");
-                Matcher matcher = pattern.matcher(address);
-                if (matcher.find()) {
-                    return matcher.group(1);
+                // First extract any content followed by "Street"
+                Pattern streetPattern = Pattern.compile("\\b([A-Za-z]+)\\s+Street\\b");
+                Matcher streetMatcher = streetPattern.matcher(address);
+                if (streetMatcher.find()) {
+                    return streetMatcher.group(1);
                 }
                 
-                // Simpler approach looking for the word before "Street"
-                if (address.contains("Street") || address.contains("street")) {
-                    Pattern simplePattern = Pattern.compile("\\b([^\\s]+)\\s+[Ss]treet\\b");
-                    Matcher simpleMatcher = simplePattern.matcher(address);
-                    if (simpleMatcher.find()) {
-                        return simpleMatcher.group(1);
-                    }
-                }
-                
-                // Fallback - if address has a structure like "123 Main Street Zone 4"
-                // Extract the part between the first word and "Zone" or end of string
-                String[] parts = address.split("\\s+", 2);
-                if (parts.length > 1) {
-                    String afterHouseNumber = parts[1];
-                    String[] streetParts = afterHouseNumber.split("\\s+[Zz]one\\s+");
-                    if (streetParts.length > 0) {
-                        // Remove "Street" keyword if present
-                        return streetParts[0].replace("Street", "").replace("street", "").trim();
+                // If we couldn't find a clear street pattern, try to infer it
+                // Skip the house number and look for the first word that's not a number
+                String[] addressParts = address.split("\\s+");
+                if (addressParts.length > 1) {
+                    // Start from the second part (index 1) assuming first part is house number
+                    for (int i = 1; i < addressParts.length; i++) {
+                        // If this part is a text word (not numeric, not "Street", not "Zone")
+                        if (!addressParts[i].matches(".*\\d.*") && 
+                            !addressParts[i].equalsIgnoreCase("Street") &&
+                            !addressParts[i].equalsIgnoreCase("Zone") &&
+                            !addressParts[i].equalsIgnoreCase("Village")) {
+                            return addressParts[i];
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -155,8 +187,8 @@ public class UserDetailsResponse {
          * @return Formatted address string
          */
         public String getFormattedAddress() {
+            // If the server provided the full address, use it directly
             if (address != null && !address.trim().isEmpty()) {
-                // Just return the original address if it's already provided
                 return address.trim();
             }
 
@@ -175,19 +207,30 @@ public class UserDetailsResponse {
                     addressBuilder.append(" ");
                 }
                 addressBuilder.append(street);
-                // Add "Street" keyword if not already in the street name
-                if (!street.toLowerCase().contains("street")) {
+                // Add "Street" keyword if not already in the address
+                if (!addressBuilder.toString().toLowerCase().contains("street")) {
                     addressBuilder.append(" Street");
                 }
             }
             
-            // Add zone if available
+            // Add zone/village if available
             String zone = getZone();
             if (!TextUtils.isEmpty(zone)) {
                 if (addressBuilder.length() > 0) {
                     addressBuilder.append(" ");
                 }
-                addressBuilder.append("Zone ").append(zone);
+                
+                // Check if zone already contains special suffixes like "Village"
+                if (zone.toLowerCase().contains("village")) {
+                    // Just add the zone as is without prefix
+                    addressBuilder.append(zone);
+                } else if (zone.matches("\\d+")) {
+                    // If zone is just a number, add "Zone" prefix
+                    addressBuilder.append("Zone ").append(zone);
+                } else {
+                    // For other zones that aren't villages and not just numbers, don't add any prefix
+                    addressBuilder.append(zone);
+                }
             }
             
             return addressBuilder.toString();

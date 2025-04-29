@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -207,18 +208,31 @@ public class ProfileActivity extends AppCompatActivity {
                             if (user.getUsername() != null) {
                                 profileUsernameTextInputEditText.setText(user.getUsername());
                             }
-                            if (user.getHouseNo() != null) {
-                                profileHouseNoTextInputEditText.setText(user.getHouseNo());
+                            
+                            // Set address fields with correct parsing - use hints to show original values
+                            String houseNo = user.getHouseNo();
+                            String street = user.getStreet();  
+                            String zone = user.getZone();
+                            
+                            if (!TextUtils.isEmpty(houseNo)) {
+                                profileHouseNoTextInputEditText.setHint(houseNo);
+                                profileHouseNoTextInputEditText.setText("");
                             }
-                            if (user.getStreet() != null) {
-                                profileStreetTextInputEditText.setText(user.getStreet());
+                            if (!TextUtils.isEmpty(street)) {
+                                profileStreetTextInputEditText.setHint(street);
+                                profileStreetTextInputEditText.setText("");
                             }
-                            if (user.getZone() != null) {
-                                profileZoneTextInputEditText.setText(user.getZone());
+                            if (!TextUtils.isEmpty(zone)) {
+                                profileZoneTextInputEditText.setHint(zone);
+                                profileZoneTextInputEditText.setText("");
                             }
+                            
+                            // Set the full address in the disabled address field
                             if (user.getAddress() != null) {
-                                profileAddressTextInputEditText.setText(user.getAddress());
+                                profileAddressTextInputEditText.setText(user.getFormattedAddress());
                             }
+                            
+                            // Other fields
                             if (user.getAge() > 0) {
                                 profileAgeTextInputEditText.setText(String.valueOf(user.getAge()));
                             }
@@ -236,6 +250,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 profileImageView.setImageResource(R.drawable.default_profile_picture);
                             }
 
+                            // Save the original address values in SharedPreferences for later use
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ProfileActivity.this);
                             SharedPreferences.Editor editor = prefs.edit();
                             editor.putString("houseNo", user.getHouseNo());
@@ -375,9 +390,20 @@ public class ProfileActivity extends AppCompatActivity {
         if (user != null) {
             usernameTextView.setText(user.getFirstName() + " " + user.getLastName());
             profileUsernameTextInputEditText.setText(user.getUsername());
-            profileHouseNoTextInputEditText.setText(user.getHouseNo());
-            profileStreetTextInputEditText.setText(user.getStreet());
-            profileZoneTextInputEditText.setText(user.getZone());
+            
+            // Set address fields as hints, not text
+            if (user.getHouseNo() != null) {
+                profileHouseNoTextInputEditText.setHint(user.getHouseNo());
+                profileHouseNoTextInputEditText.setText("");
+            }
+            if (user.getStreet() != null) {
+                profileStreetTextInputEditText.setHint(user.getStreet());
+                profileStreetTextInputEditText.setText("");
+            }
+            if (user.getZone() != null) {
+                profileZoneTextInputEditText.setHint(user.getZone());
+                profileZoneTextInputEditText.setText("");
+            }
 
             // Clear password fields after successful update
             profileNewPasswordTextInputEditText.setText("");
@@ -423,12 +449,17 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
 
+        // Get saved address values from SharedPreferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        
         // Create a map of updated fields
         Map<String, String> updates = new HashMap<>();
         updates.put("username", username);
-        updates.put("houseNo", houseNo);
-        updates.put("street", street);
-        updates.put("zone", zone);
+        
+        // Use entered value if not empty, otherwise use the stored value from SharedPreferences
+        updates.put("houseNo", !houseNo.isEmpty() ? houseNo : prefs.getString("houseNo", ""));
+        updates.put("street", !street.isEmpty() ? street : prefs.getString("street", ""));
+        updates.put("zone", !zone.isEmpty() ? zone : prefs.getString("zone", ""));
 
         // Hash passwords if being updated
         if (!newPassword.isEmpty()) {
