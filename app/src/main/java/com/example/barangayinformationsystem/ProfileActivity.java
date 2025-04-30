@@ -25,6 +25,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import android.graphics.drawable.Drawable;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.io.IOUtils;
 
@@ -36,6 +41,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
 import android.content.Intent;
+import android.os.Handler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -59,6 +65,8 @@ public class ProfileActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private ApiService apiService;
     private int userId;
+    // Add a class-level variable to store the selected image bitmap
+    private Bitmap selectedImageBitmap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,12 +167,21 @@ public class ProfileActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             selectedImageUri = data.getData();
             if (selectedImageUri != null) {
-                Glide.with(this)
-                        .load(selectedImageUri)
-                        .placeholder(R.drawable.default_profile_picture)
-                        .error(R.drawable.default_profile_picture)
-                        .centerCrop()
-                        .into(profileImageView);
+                try {
+                    // Store the bitmap for later use
+                    selectedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+                    
+                    // Display the selected image
+                    Glide.with(this)
+                            .load(selectedImageUri)
+                            .placeholder(R.drawable.default_profile_picture)
+                            .error(R.drawable.default_profile_picture)
+                            .centerCrop()
+                            .into(profileImageView);
+                } catch (IOException e) {
+                    Log.e("ProfileActivity", "Error loading selected image", e);
+                    Toast.makeText(this, "Error loading selected image", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
@@ -279,10 +296,21 @@ public class ProfileActivity extends AppCompatActivity {
     private void loadProfilePicture(String imageUrl) {
         if (imageUrl != null && !imageUrl.isEmpty()) {
             Log.d("ProfileActivity", "Loading profile picture from: " + imageUrl);
+            
+            // Ensure URL is complete with BASE_URL if it's a relative path
+            if (!imageUrl.startsWith("http")) {
+                imageUrl = RetrofitClient.BASE_URL + imageUrl;
+            }
+            
+            // Add cache busting parameter to force fresh image loading
+            String finalUrl = imageUrl + "?t=" + System.currentTimeMillis();
+            Log.d("ProfileActivity", "Final image URL with cache busting: " + finalUrl);
+            
             Glide.with(this)
-                    .load(imageUrl)
+                    .load(finalUrl)
                     .placeholder(R.drawable.default_profile_picture)
                     .error(R.drawable.default_profile_picture)
+                    .skipMemoryCache(true) // Skip memory cache
                     .centerCrop()
                     .into(profileImageView);
         } else {
@@ -356,19 +384,24 @@ public class ProfileActivity extends AppCompatActivity {
 
                     if ("success".equals(updateResponse.getStatus())) {
                         UpdateProfileResponse.User updatedUser = updateResponse.getUser();
-                        updateUIWithUserData(updatedUser);
 
-                        // Clear password fields after successful update
-                        profileCurrentPasswordTextInputEditText.setText("");
-                        profileNewPasswordTextInputEditText.setText("");
-                        profileConfirmNewPasswordTextInputEditText.setText("");
-
+                        // Show success dialog
                         SuccessDialog.showSuccess(
                                 ProfileActivity.this,
                                 "Your profile has been successfully saved. All changes have been applied",
                                 null,
-                                2000
+                                1500  // Show for 1.5 seconds before proceeding
                         );
+
+                        // Schedule the activity restart after the success dialog is shown
+                        new Handler().postDelayed(() -> {
+                            // Restart the activity to reload everything with fresh data
+                            Intent intent = getIntent();
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            finish();
+                            startActivity(intent);
+                            overridePendingTransition(0, 0); // No animation on restart
+                        }, 2000); // Wait for 2 seconds to ensure the success dialog is seen
                     } else {
                         Toast.makeText(ProfileActivity.this, "Update failed: " + updateResponse.getMessage(), Toast.LENGTH_SHORT).show();
                     }

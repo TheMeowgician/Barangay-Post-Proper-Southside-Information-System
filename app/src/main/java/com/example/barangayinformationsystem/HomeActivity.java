@@ -129,20 +129,30 @@ public class HomeActivity extends AppCompatActivity {
         // Update both profile pictures (nav header and top bar)
         if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
             String imageUrl = user.getProfilePicture();
+            
+            // Ensure URL is complete with BASE_URL if it's a relative path
+            if (!imageUrl.startsWith("http")) {
+                imageUrl = RetrofitClient.BASE_URL + imageUrl;
+            }
+            
+            // Add cache busting parameter to force fresh image loading
+            String finalUrl = imageUrl + "?t=" + System.currentTimeMillis();
 
             // Load image for navigation header
             Glide.with(this)
-                    .load(imageUrl)
+                    .load(finalUrl)
                     .placeholder(R.drawable.default_profile_picture)
                     .error(R.drawable.default_profile_picture)
+                    .skipMemoryCache(true) // Skip memory cache
                     .centerCrop()
                     .into(navHeaderImageView);
 
             // Load image for top bar mini icon
             Glide.with(this)
-                    .load(imageUrl)
+                    .load(finalUrl)
                     .placeholder(R.drawable.default_profile_picture)
                     .error(R.drawable.default_profile_picture)
+                    .skipMemoryCache(true) // Skip memory cache
                     .centerCrop()
                     .into(profileMiniIconCircleImageView);
         } else {
@@ -154,7 +164,10 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Update user activity status
         updateUserActivity();
+        // Reload user details to get the latest profile picture
+        loadUserDetails();
     }
 
     public void openNotificationActivity(View view) {
