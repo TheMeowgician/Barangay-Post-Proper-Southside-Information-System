@@ -14,17 +14,29 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Store API credentials in BuildConfig to avoid hardcoding
+        buildConfigField "String", "CLOUDINARY_CLOUD_NAME", "\"hwovp9krt\""
+        buildConfigField "String", "CLOUDINARY_API_KEY", "\"613375141957299\""
+        buildConfigField "String", "CLOUDINARY_API_SECRET", "\"ip4PaEblMwn5dtzcnUPCLPwVmM0\""
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Add signatures for common libraries to avoid false positives
+            proguardFile 'proguard-rules.pro'
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
+    buildFeatures {
+        buildConfig true
     }
 }
 

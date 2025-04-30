@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <!-- Development servers - only allow cleartext for specific development IPs -->
     <domain-config cleartextTrafficPermitted="true">
+        <!-- Android emulator localhost -->
         <domain includeSubdomains="true">10.0.2.2</domain>
+        <!-- Development IP addresses -->
         <domain includeSubdomains="true">192.168.0.24</domain>
         <domain includeSubdomains="true">192.168.100.45</domain>
         <domain includeSubdomains="true">192.168.100.190</domain>
+        <!-- Trust system certificates and user-added certificates -->
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
     </domain-config>
+
+    <!-- For all other domains, require HTTPS -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
 </network-security-config>
 

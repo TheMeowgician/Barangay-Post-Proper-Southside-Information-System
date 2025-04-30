@@ -35,58 +35,70 @@
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/termsHeaderTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="I. Privacy and Security"
+                    android:text="Terms of Service"
                     android:textStyle="bold"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:layout_marginBottom="8dp"/>
 
                 <TextView
+                    android:id="@+id/termsTextView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="We respect your privacy and are committed to protecting your personal information. Our Privacy Policy outlines how we collect, use, and secure your data. We implement encryption and secure storage methods to protect your personal details."/>
+                    android:layout_height="200dp"
+                    android:scrollbars="vertical"
+                    android:text="I. Privacy and Security\n\nWe respect your privacy and are committed to protecting your personal information. Our Privacy Policy outlines how we collect, use, and secure your data. We implement encryption and secure storage methods to protect your personal details.\n\nII. User Registration\n\nTo use certain features of the App, you may be required to create an account. When you create an account, you agree to provide accurate and complete information. You are responsible for maintaining the confidentiality of your account credentials.\n\nIII. User Account and Responsibilities\n\nTo access certain features, you may need to create an account. You agree to provide accurate information and keep your account details current. You are responsible for all activities conducted under your account and agree to:\n\n• Not share your login details with others\n• Notify us immediately if you suspect any unauthorized access to your account\n• Use the App only for lawful purposes and refrain from any activity that may harm or disrupt the App or other users."
+                    android:textSize="14sp"/>
 
                 <TextView
+                    android:id="@+id/privacyHeaderTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="II. User Registration"
+                    android:text="Privacy Policy"
                     android:textStyle="bold"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp"/>
 
                 <TextView
+                    android:id="@+id/privacyPolicyTextView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="To use certain features of the App, you may be required to create an account. When you create an account, you agree to provide accurate and complete information. You are responsible for maintaining the confidentiality of your account credentials."/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="III. User Account and Responsibilities"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="To access certain features, you may need to create an account. You agree to provide accurate information and keep your account details current. You are responsible for all activities conducted under your account and agree to:\n\n• Not share your login details with others\n• Notify us immediately if you suspect any unauthorized access to your account\n• Use the App only for lawful purposes and refrain from any activity that may harm or disrupt the App or other users."/>
-
+                    android:layout_height="200dp"
+                    android:scrollbars="vertical"
+                    android:text="The Privacy Policy content will be loaded programmatically."
+                    android:textSize="14sp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <Button
-            android:id="@+id/acceptButton"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Accept &amp; Continue"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/rounded_button"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/declineButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Decline"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/rounded_button"
+                android:layout_marginEnd="8dp"
+                android:padding="12dp"/>
+
+            <Button
+                android:id="@+id/acceptButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Accept &amp; Continue"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/rounded_button"
+                android:layout_marginStart="8dp"
+                android:padding="12dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

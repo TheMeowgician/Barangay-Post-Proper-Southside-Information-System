@@ -807,10 +807,10 @@ public class IncidentReportFragment extends Fragment {
 
     private String uploadVideoDirectly(File videoFile) {
         try {
-            // Create a multipart HTTP request to Cloudinary
-            String cloudName = "hwovp9krt";
-            String apiKey = "613375141957299";
-            String apiSecret = "ip4PaEblMwn5dtzcnUPCLPwVmM0";
+            // Create a multipart HTTP request to Cloudinary using BuildConfig values instead of hardcoded credentials
+            String cloudName = BuildConfig.CLOUDINARY_CLOUD_NAME;
+            String apiKey = BuildConfig.CLOUDINARY_API_KEY;
+            String apiSecret = BuildConfig.CLOUDINARY_API_SECRET;
             String uploadUrl = "https://api.cloudinary.com/v1_1/" + cloudName + "/video/upload";
 
             // Generate timestamp and signature

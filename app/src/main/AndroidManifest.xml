@@ -7,14 +7,22 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <!-- Define permissions with brief descriptions to help security scanners -->
+    <!-- Internet permission for API access -->
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Camera permission for document scanning and ID uploads -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+    <!-- Storage permissions for saving and uploading documents -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
+        android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <application
-        android:usesCleartextTraffic="true"
+        android:name=".BarangayApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
