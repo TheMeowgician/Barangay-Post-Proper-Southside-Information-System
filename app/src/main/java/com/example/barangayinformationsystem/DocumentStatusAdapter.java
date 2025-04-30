@@ -55,6 +55,32 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
 
         holder.transactionNumber.setText("TXN-" + request.getId());
         holder.documentType.setText(request.getDocumentType());
+        
+        // Set the document price based on document type
+        String documentType = request.getDocumentType();
+        String priceText = "Price: ";
+        
+        switch(documentType.toLowerCase()) {
+            case "barangay clearance":
+            case "barangay certification":
+            case "certificate of indigency":
+            case "first time job certificate":
+                priceText += "Php 50.00";
+                break;
+            case "cedula":
+                priceText += "Depends on income";
+                break;
+            default:
+                priceText += "Please inquire at barangay office";
+                break;
+        }
+        
+        // Add note about exemptions
+        if (!documentType.equalsIgnoreCase("cedula")) {
+            priceText += " (Senior/PWD: Free)";
+        }
+        
+        holder.documentPrice.setText(priceText);
 
         // Update status text based on pickup status
         if (request.isComplete()) {
@@ -143,10 +169,11 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView transactionNumber;
         TextView documentType;
+        TextView documentPrice;  // Added this for the price
         TextView statusText;
         TextView pickupInstructions;
         TextView rejectionReason;
-        TextView pickupStatus;      // Added this field
+        TextView pickupStatus;
         View statusIndicator;
         Button cancelButton;
 
@@ -154,12 +181,13 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
             super(itemView);
             transactionNumber = itemView.findViewById(R.id.transaction_number);
             documentType = itemView.findViewById(R.id.document_type);
+            documentPrice = itemView.findViewById(R.id.document_price);  // Added this line
             statusText = itemView.findViewById(R.id.status_text);
             statusIndicator = itemView.findViewById(R.id.status_indicator);
             cancelButton = itemView.findViewById(R.id.cancel_request_button);
             pickupInstructions = itemView.findViewById(R.id.pickup_instructions);
             rejectionReason = itemView.findViewById(R.id.rejection_reason);
-            pickupStatus = itemView.findViewById(R.id.pickup_status);  // Added this line
+            pickupStatus = itemView.findViewById(R.id.pickup_status);
         }
     }
 }

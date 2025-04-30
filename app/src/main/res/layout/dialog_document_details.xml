@@ -145,6 +145,19 @@
                     android:textColor="@android:color/holo_red_dark"
                     android:fontFamily="@font/poppins"/>
             </LinearLayout>
+            
+            <!-- Adding a close button that matches the app's style -->
+            <Button
+                android:id="@+id/close_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Close"
+                android:textColor="#FFFFFF"
+                android:textAllCaps="false"
+                android:fontFamily="@font/poppins_medium"
+                android:background="@drawable/custom_button_log_in"
+                android:padding="12dp"
+                android:layout_marginTop="8dp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </ScrollView>

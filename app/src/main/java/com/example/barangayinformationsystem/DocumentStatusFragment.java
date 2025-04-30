@@ -23,8 +23,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,6 +62,35 @@ public class DocumentStatusFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
+    /**
+     * Format a date string from "yyyy-MM-dd HH:mm:ss" to "MMM dd, yyyy h:mm a"
+     * Example: "2023-09-25 14:30:00" to "Sep 25, 2023 2:30 PM"
+     * @param dateString The date string to format
+     * @return Formatted date string
+     */
+    private String formatDateTime(String dateString) {
+        if (dateString == null || dateString.isEmpty()) {
+            return "";
+        }
+
+        try {
+            // Parse the database datetime format
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+            inputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Manila"));
+
+            Date date = inputFormat.parse(dateString);
+
+            // Format to user-friendly format with Manila time (PHT)
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy h:mm a", Locale.US);
+            outputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Manila"));
+
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return dateString; // Return original if parsing fails
+        }
+    }
+
     private void showDetailsDialog(DocumentRequest request) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         View dialogView = LayoutInflater.from(getContext())
@@ -71,15 +105,16 @@ public class DocumentStatusFragment extends Fragment {
         TextView dateRequestedText = dialogView.findViewById(R.id.date_requested_text);
         TextView documentTypeText = dialogView.findViewById(R.id.document_type_text);
         TextView statusText = dialogView.findViewById(R.id.status_text);
+        Button closeButton = dialogView.findViewById(R.id.close_button); // Add reference to the close button
 
         // Set values with better formatting
         documentTypeText.setText(request.getDocumentType());
         nameText.setText("Name: " + request.getName());
         addressText.setText("Address: " + request.getAddress());
-        birthdayText.setText("Birthday: " + request.getBirthday());
+        birthdayText.setText("Birthday: " + formatDateTime(request.getBirthday()));
         purposeText.setText("Purpose: " + request.getPurpose());
         quantityText.setText("Quantity: " + String.valueOf(request.getQuantity()));
-        dateRequestedText.setText("Date Requested: " + request.getDateRequested());
+        dateRequestedText.setText("Date Requested: " + formatDateTime(request.getDateRequested()));
 
         // Set status with color
         String status = "Status: " + request.getStatus();
@@ -103,8 +138,10 @@ public class DocumentStatusFragment extends Fragment {
         }
 
         AlertDialog dialog = builder.setView(dialogView)
-                .setPositiveButton("Close", null)
                 .create();
+
+        // Set up the close button's click listener
+        closeButton.setOnClickListener(v -> dialog.dismiss());
 
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         dialog.show();
@@ -220,6 +257,7 @@ public class DocumentStatusFragment extends Fragment {
 
         dialog.show();
     }
+
     private void showFinalConfirmationDialog(DocumentRequest request, String reason) {
         new AlertDialog.Builder(getContext())
                 .setTitle("Confirm Cancellation")
@@ -230,6 +268,7 @@ public class DocumentStatusFragment extends Fragment {
                 .setNegativeButton("No", null)
                 .show();
     }
+
     private void cancelRequest(DocumentRequest request, String reason) {
         ApiService apiService = RetrofitClient.getApiService();
         Call<DocumentRequestResponse> call = apiService.cancelRequest(request.getId(), reason);
