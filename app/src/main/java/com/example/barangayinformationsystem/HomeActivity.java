@@ -267,21 +267,32 @@ public class HomeActivity extends AppCompatActivity {
         if (homeDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             homeDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            Dialog dialog = new Dialog(this);
-            dialog.setContentView(R.layout.dialog_exit_confirmation);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            // Check which fragment is currently active
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
+            
+            if (currentFragment instanceof HomeFragment) {
+                // If HomeFragment is active, show exit confirmation dialog
+                Dialog dialog = new Dialog(this);
+                dialog.setContentView(R.layout.dialog_exit_confirmation);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-            Button noButton = dialog.findViewById(R.id.noButton);
-            Button yesButton = dialog.findViewById(R.id.yesButton);
+                Button noButton = dialog.findViewById(R.id.noButton);
+                Button yesButton = dialog.findViewById(R.id.yesButton);
 
-            noButton.setOnClickListener(v -> dialog.dismiss());
+                noButton.setOnClickListener(v -> dialog.dismiss());
 
-            yesButton.setOnClickListener(v -> {
-                dialog.dismiss();
-                finish();
-            });
+                yesButton.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    finish();
+                });
 
-            dialog.show();
+                dialog.show();
+            } else {
+                // If any other fragment is active, navigate back to HomeFragment
+                replaceFragment(new HomeFragment());
+                // Update navigation drawer selection to highlight Home
+                navigationView.setCheckedItem(R.id.navHome);
+            }
         }
     }
 }
