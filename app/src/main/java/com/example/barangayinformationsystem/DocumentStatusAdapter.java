@@ -190,4 +190,15 @@ public class DocumentStatusAdapter extends RecyclerView.Adapter<DocumentStatusAd
             pickupStatus = itemView.findViewById(R.id.pickup_status);
         }
     }
+
+    public void updateRequest(DocumentRequest updatedRequest) {
+        for (int i = 0; i < requests.size(); i++) {
+            if (requests.get(i).getId() == updatedRequest.getId()) {
+                requests.set(i, updatedRequest);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
 }
