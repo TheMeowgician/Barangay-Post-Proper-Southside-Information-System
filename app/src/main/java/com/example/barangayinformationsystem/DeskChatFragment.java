@@ -1,6 +1,5 @@
 package com.example.barangayinformationsystem;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,7 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -24,53 +23,72 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DeskChatFragment extends Fragment {
-    private static final String TAG = "DeskChatFragment"; // Tag for logging
+/**
+ * DeskChatFragment - Handles the chat interface for user inquiries
+ * with automatic FAQ responses and option for live admin support
+ */
+public class DeskChatFragment extends Fragment implements FaqAdapter.OnFaqQuestionClickListener {
+    private static final String TAG = "DeskChatFragment";
+    private static final int MESSAGE_CHECK_INTERVAL = 3000; // 3 seconds
 
     private RecyclerView chatRecyclerView;
+    private RecyclerView faqRecyclerView;
     private EditText messageInput;
     private ImageButton sendButton;
     private ImageButton backButton;
+    private View faqPanel;
+    private TextView tvTalkToAdmin;
     private ChatAdapter chatAdapter;
+    private FaqAdapter faqAdapter;
     private List<ChatMessage> chatMessages;
+    private List<FAQQuestion> faqQuestions;
     private int userId;
     private long lastMessageTimestamp = 0;
     private Handler messageCheckHandler;
-    private static final int MESSAGE_CHECK_INTERVAL = 3000; // 3 seconds
+    
+    // Counter to generate unique negative IDs for auto-responses
+    private AtomicInteger autoResponseIdCounter = new AtomicInteger(-1);
+    
+    // Flag to track if user has switched to live chat
+    private boolean liveChatMode = false;
 
-    // ** FIX: Set to track displayed message IDs **
+    // Set to track displayed message IDs
     private Set<Integer> displayedMessageIds;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_desk_chat, container, false);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
         userId = prefs.getInt("user_id", -1);
         if (userId == -1) {
-            // Handle user not logged in scenario
             Toast.makeText(getContext(), "User not logged in.", Toast.LENGTH_LONG).show();
-            // Redirect to login or handle appropriately
-            return view; // Or redirect
+            return view;
         }
 
         initializeViews(view);
         setupRecyclerView();
+        setupFaqRecyclerView();
         setupClickListeners();
-        loadMessages(); // Load initial messages
-        startMessageChecking(); // Start polling
+        loadMessages();
+        startMessageChecking();
+        
+        // Hide FAQ panel initially - user needs to press More FAQs to see it
+        faqPanel.setVisibility(View.GONE);
+        
+        // Show welcome message with instructions immediately
+        showWelcomeMessage();
 
         return view;
     }
@@ -80,17 +98,26 @@ public class DeskChatFragment extends Fragment {
         messageInput = view.findViewById(R.id.messageInput);
         sendButton = view.findViewById(R.id.sendButton);
         backButton = view.findViewById(R.id.backButton);
+        faqPanel = view.findViewById(R.id.faqPanel);
+        faqRecyclerView = faqPanel.findViewById(R.id.rvFaqQuestions);
+        tvTalkToAdmin = faqPanel.findViewById(R.id.tvTalkToAdmin);
+        
+        // Disable input field by default - user needs to explicitly enable it
+        messageInput.setEnabled(false);
+        messageInput.setHint("Press \"Type your question\" button to enable typing");
+        sendButton.setEnabled(false);
+        sendButton.setAlpha(0.5f);  // Visual indication that it's disabled
+        
         chatMessages = new ArrayList<>();
-        // ** FIX: Initialize the Set **
+        faqQuestions = FAQQuestion.getCommonQuestions();
         displayedMessageIds = new HashSet<>();
         messageCheckHandler = new Handler(Looper.getMainLooper());
     }
 
     private void setupClickListeners() {
         backButton.setOnClickListener(v -> {
-            // Navigate back or finish activity
             if (getActivity() != null) {
-                getActivity().onBackPressed(); // More standard way to go back
+                getActivity().onBackPressed();
             }
         });
 
@@ -98,12 +125,53 @@ public class DeskChatFragment extends Fragment {
             String message = messageInput.getText().toString().trim();
             if (!message.isEmpty()) {
                 sendMessage(message);
+                
+                // Hide FAQ panel when user sends a message
+                if (!liveChatMode) {
+                    liveChatMode = true;
+                    faqPanel.setVisibility(View.GONE);
+                }
             } else {
                 Toast.makeText(getContext(), "Message cannot be empty", Toast.LENGTH_SHORT).show();
             }
         });
+        
+        tvTalkToAdmin.setOnClickListener(v -> {
+            liveChatMode = true;
+            showLiveChatTransitionMessage();
+            faqPanel.setVisibility(View.GONE);
+        });
     }
-
+    
+    private void showWelcomeMessage() {
+        String welcomeMessage = "Welcome to the Barangay Post Proper Southside Information System! " +
+                "Press the \"More FAQs\" button below to see common questions, or type your own message to chat with a barangay representative.";
+        
+        long currentTime = System.currentTimeMillis();
+        int newMessageId = autoResponseIdCounter.getAndDecrement();
+        
+        ChatMessage autoMessage = new ChatMessage(welcomeMessage, currentTime, true);
+        autoMessage.setId(newMessageId);
+        
+        chatMessages.add(autoMessage);
+        chatAdapter.notifyItemInserted(chatMessages.size() - 1);
+        chatRecyclerView.smoothScrollToPosition(chatMessages.size() - 1);
+    }
+    
+    private void showLiveChatTransitionMessage() {
+        String transitionMessage = "You are now chatting with a barangay representative. " +
+                "Please note that responses may take a few minutes. Thank you for your patience.";
+        
+        long currentTime = System.currentTimeMillis();
+        int newMessageId = autoResponseIdCounter.getAndDecrement();
+        
+        ChatMessage autoMessage = new ChatMessage(transitionMessage, currentTime, true);
+        autoMessage.setId(newMessageId);
+        
+        chatMessages.add(autoMessage);
+        chatAdapter.notifyItemInserted(chatMessages.size() - 1);
+        chatRecyclerView.smoothScrollToPosition(chatMessages.size() - 1);
+    }
 
     private void loadMessages() {
         Log.d(TAG, "Loading initial messages for user: " + userId);
@@ -114,44 +182,59 @@ public class DeskChatFragment extends Fragment {
             @Override
             public void onResponse(Call<List<ChatMessage>> call, Response<List<ChatMessage>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.d(TAG, "Successfully loaded " + response.body().size() + " initial messages.");
+                    // Clear existing messages and displayedMessageIds
                     chatMessages.clear();
-                    // ** FIX: Clear and populate displayed IDs **
                     displayedMessageIds.clear();
+                    
+                    // Add messages from the server first
                     List<ChatMessage> initialMessages = response.body();
                     chatMessages.addAll(initialMessages);
                     for (ChatMessage msg : initialMessages) {
                         displayedMessageIds.add(msg.getId());
                     }
-
-                    chatAdapter.notifyDataSetChanged();
-                    if (!chatMessages.isEmpty()) {
-                        chatRecyclerView.scrollToPosition(chatMessages.size() - 1);
-                        // Update last message timestamp based on the latest initial message
-                        lastMessageTimestamp = chatMessages.get(chatMessages.size() - 1).getTimestamp();
-                        Log.d(TAG, "Initial load - Last timestamp updated to: " + lastMessageTimestamp);
+                    
+                    // Now add welcome message at the end of the existing messages
+                    if (!initialMessages.isEmpty()) {
+                        // Update timestamp for latest message from server
+                        long latestTimestamp = 0;
+                        for (ChatMessage msg : initialMessages) {
+                            if (msg.getTimestamp() > latestTimestamp) {
+                                latestTimestamp = msg.getTimestamp();
+                            }
+                        }
+                        lastMessageTimestamp = latestTimestamp;
+                        
+                        // After adding all server messages, add the welcome message
+                        showWelcomeMessage();
                     } else {
-                        lastMessageTimestamp = 0; // Reset if no messages
-                        Log.d(TAG, "Initial load - No messages found, timestamp reset.");
+                        // No messages from server, reset timestamp
+                        lastMessageTimestamp = 0;
+                        // Add welcome message for empty conversation
+                        showWelcomeMessage();
                     }
+                    
+                    chatAdapter.notifyDataSetChanged();
+                    chatRecyclerView.scrollToPosition(chatMessages.size() - 1);
                 } else {
-                    Log.e(TAG, "Failed to load messages. Code: " + response.code() + ", Message: " + response.message());
-                    Toast.makeText(getContext(), "Failed to load messages (Code: " + response.code() + ")", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to load messages. Code: " + response.code());
+                    Toast.makeText(getContext(), "Failed to load messages", Toast.LENGTH_SHORT).show();
+                    // Show welcome message even if server request fails
+                    showWelcomeMessage();
                 }
             }
 
             @Override
             public void onFailure(Call<List<ChatMessage>> call, Throwable t) {
-                Log.e(TAG, "Failed to load messages (Network/API Error): " + t.getMessage(), t);
-                Toast.makeText(getContext(), "Failed to load messages: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to load messages: " + t.getMessage(), t);
+                Toast.makeText(getContext(), "Failed to load messages", Toast.LENGTH_SHORT).show();
+                // Show welcome message even if server request fails
+                showWelcomeMessage();
             }
         });
     }
 
     private void sendMessage(String messageText) {
-        Log.d(TAG, "Sending message: " + messageText + " from user: " + userId);
         ApiService apiService = RetrofitClient.getApiService();
-        // Pass message and sender_id (backend should ideally ignore sender_id and use authenticated user)
         Call<MessageResponse> call = apiService.sendMessage(messageText, userId);
 
         call.enqueue(new Callback<MessageResponse>() {
@@ -159,52 +242,41 @@ public class DeskChatFragment extends Fragment {
             public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if ("success".equals(response.body().getStatus())) {
-                        Log.d(TAG, "Message sent successfully.");
                         messageInput.setText("");
-                        // Don't call loadMessages() here, let the polling handle updates
-                        // loadMessages(); // Reload messages to show the new one - REMOVED
-                        // Instead, trigger an immediate poll check
                         checkForNewMessages();
                     } else {
-                        String errorMsg = response.body().getMessage() != null ? response.body().getMessage() : "Unknown error";
-                        Log.e(TAG, "Failed to send message (API Error): " + errorMsg);
-                        Toast.makeText(getContext(), "Send failed: " + errorMsg, Toast.LENGTH_SHORT).show();
+                        String errorMsg = response.body().getMessage() != null ? 
+                                response.body().getMessage() : "Unknown error";
+                        Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Log.e(TAG, "Failed to send message (HTTP Error). Code: " + response.code() + ", Message: " + response.message());
-                    Toast.makeText(getContext(), "Send failed (Code: " + response.code() + ")", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<MessageResponse> call, Throwable t) {
-                Log.e(TAG, "Failed to send message (Network/API Error): " + t.getMessage(), t);
-                Toast.makeText(getContext(), "Failed to send message: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
     private void startMessageChecking() {
-        Log.d(TAG, "Starting message polling every " + MESSAGE_CHECK_INTERVAL + "ms");
-        messageCheckHandler.removeCallbacksAndMessages(null); // Remove existing callbacks first
+        messageCheckHandler.removeCallbacksAndMessages(null);
         messageCheckHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 checkForNewMessages();
-                // Schedule the next check
                 messageCheckHandler.postDelayed(this, MESSAGE_CHECK_INTERVAL);
             }
-        }, MESSAGE_CHECK_INTERVAL); // Start after initial interval
+        }, MESSAGE_CHECK_INTERVAL);
     }
 
     private void checkForNewMessages() {
-        // Ensure userId is valid before making the call
         if (userId <= 0) {
-            Log.w(TAG, "User ID invalid, skipping message check.");
             return;
         }
-        Log.d(TAG, "Checking for new messages for user " + userId + " since timestamp " + lastMessageTimestamp);
+        
         ApiService apiService = RetrofitClient.getApiService();
         Call<MessageCheckResponse> call = apiService.checkNewMessages(userId, lastMessageTimestamp);
 
@@ -216,77 +288,112 @@ public class DeskChatFragment extends Fragment {
                     if (checkResponse.hasNewMessages()) {
                         List<ChatMessage> receivedMessages = checkResponse.getNewMessages();
                         if (receivedMessages != null && !receivedMessages.isEmpty()) {
-                            Log.d(TAG, "Received " + receivedMessages.size() + " potential new messages.");
-
-                            // ** FIX: Filter out messages already displayed **
+                            // Filter out messages already displayed
                             List<ChatMessage> messagesToAdd = new ArrayList<>();
-                            long latestReceivedTimestamp = lastMessageTimestamp; // Keep track of latest timestamp from THIS batch
+                            long latestReceivedTimestamp = lastMessageTimestamp;
 
                             for (ChatMessage msg : receivedMessages) {
                                 if (!displayedMessageIds.contains(msg.getId())) {
                                     messagesToAdd.add(msg);
-                                    displayedMessageIds.add(msg.getId()); // Add ID to set
-                                    Log.d(TAG, "Adding new message ID: " + msg.getId());
-                                } else {
-                                    Log.d(TAG, "Skipping already displayed message ID: " + msg.getId());
+                                    displayedMessageIds.add(msg.getId());
                                 }
-                                // Update latest timestamp from received messages regardless of display status
                                 if (msg.getTimestamp() > latestReceivedTimestamp) {
                                     latestReceivedTimestamp = msg.getTimestamp();
                                 }
                             }
 
-                            // Update the global last timestamp based on the latest message received in this poll
+                            // Update the timestamp if newer messages were received
                             if (latestReceivedTimestamp > lastMessageTimestamp) {
-                                Log.d(TAG, "Updating lastMessageTimestamp from " + lastMessageTimestamp + " to " + latestReceivedTimestamp);
                                 lastMessageTimestamp = latestReceivedTimestamp;
                             }
 
-                            // Add only the truly new messages to the list and notify adapter
+                            // Add only the new messages to the list
                             if (!messagesToAdd.isEmpty()) {
-                                Log.d(TAG, "Appending " + messagesToAdd.size() + " new unique messages to UI.");
                                 int startPosition = chatMessages.size();
                                 chatMessages.addAll(messagesToAdd);
-                                // Use notifyItemRangeInserted for better performance/animation
                                 chatAdapter.notifyItemRangeInserted(startPosition, messagesToAdd.size());
                                 chatRecyclerView.scrollToPosition(chatMessages.size() - 1);
-                            } else {
-                                Log.d(TAG, "Polling received messages, but they were already displayed.");
+                                
+                                // If we received a message from an admin, switch to live chat mode
+                                for (ChatMessage msg : messagesToAdd) {
+                                    if (msg.isAdmin() && !msg.isAutoResponse()) {
+                                        liveChatMode = true;
+                                        faqPanel.setVisibility(View.GONE);
+                                        break;
+                                    }
+                                }
                             }
-
-                        } else {
-                            Log.d(TAG, "API reported new messages, but the list was empty or null.");
-                            // Update timestamp even if list is empty/null but hasNewMessages was true?
-                            // This case shouldn't ideally happen based on backend logic.
                         }
-                    } else {
-                        Log.d(TAG, "No new messages found.");
                     }
-                } else {
-                    // Log non-successful responses during polling, but maybe don't show Toast
-                    Log.w(TAG, "Check messages API call failed or returned empty body. Code: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<MessageCheckResponse> call, Throwable t) {
-                // Silent fail for background checks, but log it
-                Log.e(TAG, "Check messages network call failed: " + t.getMessage());
+                // Silent fail for background checks
+                Log.e(TAG, "Check messages failed: " + t.getMessage());
             }
         });
     }
 
     @Override
-    public void onDestroyView() { // Changed from onDestroy to onDestroyView for Fragments
+    public void onDestroyView() {
         super.onDestroyView();
-        Log.d(TAG, "Fragment view destroyed. Stopping message polling.");
-        messageCheckHandler.removeCallbacksAndMessages(null); // Stop handler when view is destroyed
+        messageCheckHandler.removeCallbacksAndMessages(null);
+    }
+    
+    @Override
+    public void onQuestionClick(FAQQuestion question) {
+        // Hide FAQ panel immediately to reveal the chat content
+        faqPanel.setVisibility(View.GONE);
+        
+        // Get current time for both messages to ensure proper ordering
+        long currentTime = System.currentTimeMillis();
+        
+        // Add the question as a user message immediately
+        int questionMessageId = autoResponseIdCounter.getAndDecrement();
+        ChatMessage userQuestion = new ChatMessage(question.getQuestion(), currentTime, false);
+        userQuestion.setId(questionMessageId);
+        chatMessages.add(userQuestion);  // Add user's question
+        
+        // Create and add auto-response immediately after the question
+        int answerMessageId = autoResponseIdCounter.getAndDecrement();
+        // Use a slightly later timestamp for the answer to ensure proper ordering
+        ChatMessage autoAnswer = new ChatMessage(question.getAnswer(), currentTime + 1, true);
+        autoAnswer.setId(answerMessageId);
+        chatMessages.add(autoAnswer);
+        
+        // Notify adapter of both insertions and scroll to the bottom
+        chatAdapter.notifyDataSetChanged();
+        chatRecyclerView.post(() -> {
+            chatRecyclerView.smoothScrollToPosition(chatMessages.size() - 1);
+        });
+        
+        // If user selected "I need to speak with a barangay official", switch to live chat mode
+        if (question.getId() == 10) {
+            liveChatMode = true;
+        }
+    }
+    
+    private void showFaqPanel() {
+        if (!liveChatMode) {
+            faqPanel.setVisibility(View.VISIBLE);
+            faqPanel.bringToFront();
+        }
+    }
+    
+    private void setupFaqRecyclerView() {
+        faqAdapter = new FaqAdapter(faqQuestions, this);
+        faqRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        faqRecyclerView.setAdapter(faqAdapter);
     }
 
-    // --- ChatAdapter Class with Fixed Timezone ---
-    private static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
+    // --- ChatAdapter Class with Additional View Type for Auto-responses ---
+    private class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private static final int VIEW_TYPE_USER = 1;
         private static final int VIEW_TYPE_ADMIN = 2;
+        private static final int VIEW_TYPE_AUTO = 3;  // Auto-response messages
+        
         private final List<ChatMessage> messages;
         private final int userId;
 
@@ -296,31 +403,91 @@ public class DeskChatFragment extends Fragment {
         }
 
         @NonNull @Override
-        public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
             if (viewType == VIEW_TYPE_USER) {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_message_user, parent, false);
-            } else {
+                return new UserMessageViewHolder(view);
+            } else if (viewType == VIEW_TYPE_ADMIN) {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_message_admin, parent, false);
+                return new AdminMessageViewHolder(view);
+            } else {
+                // Auto-response view type
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_message_auto, parent, false);
+                return new AutoResponseViewHolder(view);
             }
-            return new ChatViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
             ChatMessage message = messages.get(position);
+            
+            if (holder instanceof UserMessageViewHolder) {
+                bindUserMessage((UserMessageViewHolder) holder, message);
+            } else if (holder instanceof AdminMessageViewHolder) {
+                bindAdminMessage((AdminMessageViewHolder) holder, message);
+            } else if (holder instanceof AutoResponseViewHolder) {
+                bindAutoResponseMessage((AutoResponseViewHolder) holder, message);
+            }
+        }
+        
+        private void bindUserMessage(UserMessageViewHolder holder, ChatMessage message) {
+            holder.messageText.setText(message.getMessage());
+            formatTimestamp(holder.timestampText, message.getTimestamp());
+        }
+        
+        private void bindAdminMessage(AdminMessageViewHolder holder, ChatMessage message) {
             holder.messageText.setText(message.getMessage());
             if (holder.senderNameText != null) {
-                if (message.isAdmin()) {
-                    holder.senderNameText.setVisibility(View.VISIBLE);
-                    holder.senderNameText.setText(message.getSenderName() != null ? message.getSenderName() : "Admin");
-                } else {
-                    holder.senderNameText.setVisibility(View.GONE);
-                }
+                holder.senderNameText.setVisibility(View.VISIBLE);
+                holder.senderNameText.setText(message.getSenderName() != null ? message.getSenderName() : "Admin");
             }
-
+            formatTimestamp(holder.timestampText, message.getTimestamp());
+        }
+        
+        private void bindAutoResponseMessage(AutoResponseViewHolder holder, ChatMessage message) {
+            holder.messageText.setText(message.getMessage());
+            formatTimestamp(holder.timestampText, message.getTimestamp());
+            
+            // Setup the "More FAQs" button to show the FAQ panel again
+            holder.btnMoreQuestions.setOnClickListener(v -> {
+                // Reset live chat mode to allow showing FAQ panel again
+                liveChatMode = false;
+                
+                // Show the FAQ panel
+                showFaqPanel();
+            });
+            
+            // Setup the "Type your question instead" button to enable the input field
+            holder.btnTypeQuestion.setOnClickListener(v -> {
+                // Enable the message input field and send button
+                messageInput.setEnabled(true);
+                messageInput.setHint("Type your question here");
+                messageInput.requestFocus();
+                sendButton.setEnabled(true);
+                sendButton.setAlpha(1.0f);
+                
+                // Switch to live chat mode and hide FAQ panel
+                liveChatMode = true;
+                faqPanel.setVisibility(View.GONE);
+                
+                // Show a transition message
+                String typeMessage = "You can now type your question in the text box below.";
+                long currentTime = System.currentTimeMillis();
+                int newMessageId = autoResponseIdCounter.getAndDecrement();
+                
+                ChatMessage typeNotification = new ChatMessage(typeMessage, currentTime, true);
+                typeNotification.setId(newMessageId);
+                
+                chatMessages.add(typeNotification);
+                chatAdapter.notifyItemInserted(chatMessages.size() - 1);
+                chatRecyclerView.smoothScrollToPosition(chatMessages.size() - 1);
+            });
+        }
+        
+        private void formatTimestamp(TextView timestampView, long timestamp) {
             // Get the raw timestamp (in milliseconds since epoch)
-            long timestampMillis = message.getTimestamp();
+            long timestampMillis = timestamp;
 
             // Create a Calendar instance for Philippines timezone
             Calendar philCalendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Manila"));
@@ -345,32 +512,68 @@ public class DeskChatFragment extends Fragment {
                     philCalendar.get(Calendar.DAY_OF_MONTH) == currentPhilCalendar.get(Calendar.DAY_OF_MONTH));
 
             if (isSameDay) {
-                holder.timestampText.setText(formattedTime);
+                timestampView.setText(formattedTime);
             } else {
                 String formattedDate = dateFormat.format(philCalendar.getTime());
-                holder.timestampText.setText(formattedDate + " " + formattedTime);
+                timestampView.setText(formattedDate + " " + formattedTime);
             }
         }
 
-        @Override public int getItemCount() {
+        @Override
+        public int getItemCount() {
             return messages.size();
         }
 
-        @Override public int getItemViewType(int position) {
+        @Override
+        public int getItemViewType(int position) {
             ChatMessage message = messages.get(position);
-            return message.isAdmin() ? VIEW_TYPE_ADMIN : VIEW_TYPE_USER;
+            if (message.isAdmin()) {
+                if (message.isAutoResponse()) {
+                    return VIEW_TYPE_AUTO;  // Auto-response messages
+                }
+                return VIEW_TYPE_ADMIN;     // Admin messages
+            }
+            return VIEW_TYPE_USER;          // User messages
         }
 
-        static class ChatViewHolder extends RecyclerView.ViewHolder {
+        class UserMessageViewHolder extends RecyclerView.ViewHolder {
+            TextView messageText;
+            TextView timestampText;
+
+            UserMessageViewHolder(@NonNull View itemView) {
+                super(itemView);
+                messageText = itemView.findViewById(R.id.messageText);
+                timestampText = itemView.findViewById(R.id.timestampText);
+            }
+        }
+
+        class AdminMessageViewHolder extends RecyclerView.ViewHolder {
             TextView messageText;
             TextView timestampText;
             TextView senderNameText;
 
-            ChatViewHolder(@NonNull View itemView) {
+            AdminMessageViewHolder(@NonNull View itemView) {
                 super(itemView);
                 messageText = itemView.findViewById(R.id.messageText);
                 timestampText = itemView.findViewById(R.id.timestampText);
-                senderNameText = itemView.findViewById(R.id.senderNameText); /* Might be null in user layout */
+                senderNameText = itemView.findViewById(R.id.senderNameText);
+            }
+        }
+        
+        class AutoResponseViewHolder extends RecyclerView.ViewHolder {
+            TextView messageText;
+            TextView timestampText;
+            TextView senderNameText;
+            Button btnMoreQuestions;
+            Button btnTypeQuestion;
+
+            AutoResponseViewHolder(@NonNull View itemView) {
+                super(itemView);
+                messageText = itemView.findViewById(R.id.messageText);
+                timestampText = itemView.findViewById(R.id.timestampText);
+                senderNameText = itemView.findViewById(R.id.senderNameText);
+                btnMoreQuestions = itemView.findViewById(R.id.btnMoreQuestions);
+                btnTypeQuestion = itemView.findViewById(R.id.btnTypeQuestion);
             }
         }
     }
@@ -379,9 +582,7 @@ public class DeskChatFragment extends Fragment {
     private void setupRecyclerView() {
         chatAdapter = new ChatAdapter(chatMessages, userId);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        // layoutManager.setStackFromEnd(true); // Keep messages stacked from bottom
         chatRecyclerView.setLayoutManager(layoutManager);
         chatRecyclerView.setAdapter(chatAdapter);
-        Log.d(TAG, "RecyclerView setup complete.");
     }
 }

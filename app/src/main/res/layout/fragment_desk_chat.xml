@@ -46,10 +46,19 @@
         android:id="@+id/chatRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/messageInputLayout"
+        android:layout_above="@id/faqPanel"
         android:layout_below="@id/toolbar"
         android:padding="8dp"
         android:clipToPadding="false"/>
+
+    <!-- FAQ Panel -->
+    <include
+        android:id="@+id/faqPanel"
+        layout="@layout/layout_faq_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/messageInputLayout"
+        android:visibility="visible" />
 
     <!-- Message Input Layout -->
     <RelativeLayout
