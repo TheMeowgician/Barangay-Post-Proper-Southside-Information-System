@@ -291,32 +291,53 @@ public class RegistrationActivity extends AppCompatActivity {
 
     public void openDialog(View view) {
         Calendar calendar = Calendar.getInstance();
+        
+        // Calculate the date 18 years ago to set as maximum allowed date
+        Calendar maxDateCalendar = Calendar.getInstance();
+        maxDateCalendar.add(Calendar.YEAR, -18);
+        
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 this,
                 (datePicker, year, month, day) -> {
-                    // Format and set the birth date
-                    String formattedDate = String.format("%d-%02d-%02d", year, month + 1, day);
-                    birthDateTextInputEditText.setText(formattedDate);
-
-                    // Calculate age
+                    // Double-check if selected date makes user at least 18 years old
                     Calendar birthCalendar = Calendar.getInstance();
                     birthCalendar.set(year, month, day);
                     Calendar currentCalendar = Calendar.getInstance();
-
+                    
                     int age = currentCalendar.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR);
-
+                    
                     // Adjust age if birthday hasn't occurred this year
-                    if (currentCalendar.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
+                    if (currentCalendar.get(Calendar.MONTH) < birthCalendar.get(Calendar.MONTH) || 
+                        (currentCalendar.get(Calendar.MONTH) == birthCalendar.get(Calendar.MONTH) && 
+                         currentCalendar.get(Calendar.DAY_OF_MONTH) < birthCalendar.get(Calendar.DAY_OF_MONTH))) {
                         age--;
                     }
-
-                    // Set the calculated age
-                    ageTextInputEditText.setText(String.valueOf(age));
+                    
+                    // Only set the date if age is at least 18, otherwise show error
+                    if (age >= 18) {
+                        // Format and set the birth date
+                        String formattedDate = String.format("%d-%02d-%02d", year, month + 1, day);
+                        birthDateTextInputEditText.setText(formattedDate);
+                        
+                        // Set the calculated age
+                        ageTextInputEditText.setText(String.valueOf(age));
+                    } else {
+                        Toast.makeText(RegistrationActivity.this, 
+                                "You must be at least 18 years old to register", 
+                                Toast.LENGTH_LONG).show();
+                        // Clear any previously set date if the new one is invalid
+                        birthDateTextInputEditText.setText("");
+                        ageTextInputEditText.setText("");
+                    }
                 },
-                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.YEAR) - 18, // Start with 18 years ago as default
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
+        
+        // Set the maximum date to 18 years ago
+        datePickerDialog.getDatePicker().setMaxDate(maxDateCalendar.getTimeInMillis());
+        
         datePickerDialog.show();
     }
 
@@ -417,6 +438,22 @@ public class RegistrationActivity extends AppCompatActivity {
             birthdateTextInputLayout.setError("Birth date is required");
             missingFields.add("Birth Date");
             isValid = false;
+        } else {
+            // Ensure age is at least 18, regardless of whether ageTextInputEditText is empty
+            // This is a fallback in case the DatePicker restriction is bypassed
+            int age = 0;
+            try {
+                age = isEmpty(ageTextInputEditText) ? 0 : 
+                      Integer.parseInt(ageTextInputEditText.getText().toString().trim());
+            } catch (NumberFormatException e) {
+                age = 0;
+            }
+            
+            if (age < 18) {
+                birthdateTextInputLayout.setError("You must be at least 18 years old to register");
+                Toast.makeText(this, "You must be at least 18 years old to register", Toast.LENGTH_LONG).show();
+                isValid = false;
+            }
         }
 
         if (genderRadioGroup.getCheckedRadioButtonId() == -1) {
