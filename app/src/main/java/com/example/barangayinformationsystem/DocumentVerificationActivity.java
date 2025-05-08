@@ -1,5 +1,7 @@
 package com.example.barangayinformationsystem;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -150,86 +153,115 @@ public class DocumentVerificationActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     progressDialog.dismiss();
                     try {
+                        Log.d(TAG, "Server response: " + responseData);
                         JSONObject json = new JSONObject(responseData);
                         boolean success = json.getBoolean("success");
 
                         if (success) {
                             // Document verified successfully
                             JSONObject docInfo = json.getJSONObject("document_info");
-                            showVerificationResult(docInfo);
+                            showVerificationResult(docInfo, signature);
                         } else {
                             // Invalid document
                             String message = json.getString("message");
                             showError("Invalid Document", message);
                         }
                     } catch (JSONException e) {
-                        showError("Error", "Failed to parse verification response");
+                        Log.e(TAG, "JSON parsing error: " + e.getMessage() + "\nResponse: " + responseData);
+                        showError("Error", "Failed to parse verification response. Please try again.");
                     }
                 });
             }
         });
     }
 
-    private void showVerificationResult(JSONObject docInfo) throws JSONException {
-        // Create custom dialog to show document details
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_document_verified, null);
-        builder.setView(dialogView);
-
-        TextView tvDocType = dialogView.findViewById(R.id.tv_document_type);
-        TextView tvName = dialogView.findViewById(R.id.tv_name);
-        TextView tvAddress = dialogView.findViewById(R.id.tv_address);
-        TextView tvPurpose = dialogView.findViewById(R.id.tv_purpose);
-        TextView tvIssued = dialogView.findViewById(R.id.tv_issued_date);
-        TextView tvSignature = dialogView.findViewById(R.id.tv_signature);
-        ImageView ivVerified = dialogView.findViewById(R.id.iv_verified_badge);
-
-        tvDocType.setText(docInfo.getString("document_type"));
-        tvName.setText(docInfo.getString("requester_name"));
-        tvAddress.setText(docInfo.getString("address"));
-        tvPurpose.setText(docInfo.getString("purpose"));
-        tvIssued.setText("Issued on: " + docInfo.getString("issued_date").substring(0, 10));
-
-        // Show partial signature (first 20 chars + "...")
-        String signature = docInfo.getString("signature");
-        String displaySignature = signature.length() > 20
-                ? signature.substring(0, 20) + "..."
-                : signature;
-        tvSignature.setText(displaySignature);
-
-        // Set an onClick listener on the signature to show the full signature
-        tvSignature.setOnClickListener(v -> {
-            AlertDialog.Builder fullSigBuilder = new AlertDialog.Builder(this);
-            fullSigBuilder.setTitle("Digital Signature");
-
-            // Create ScrollView to make long signatures scrollable
-            ScrollView scrollView = new ScrollView(this);
-            TextView fullSigTextView = new TextView(this);
-            fullSigTextView.setPadding(30, 30, 30, 30);
-            fullSigTextView.setText(signature);
-            scrollView.addView(fullSigTextView);
-
-            fullSigBuilder.setView(scrollView);
-            fullSigBuilder.setPositiveButton("Copy", (dialog, which) -> {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("Document Signature", signature);
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(this, "Signature copied to clipboard", Toast.LENGTH_SHORT).show();
+    private void showVerificationResult(JSONObject docInfo, String signature) {
+        try {
+            // Create custom dialog to show document details
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.dialog_document_verified, null);
+            builder.setView(dialogView);
+    
+            TextView tvDocType = dialogView.findViewById(R.id.tv_document_type);
+            TextView tvName = dialogView.findViewById(R.id.tv_name);
+            TextView tvAddress = dialogView.findViewById(R.id.tv_address);
+            TextView tvPurpose = dialogView.findViewById(R.id.tv_purpose);
+            TextView tvIssued = dialogView.findViewById(R.id.tv_issued_date);
+            TextView tvSignature = dialogView.findViewById(R.id.tv_signature);
+            ImageView ivVerified = dialogView.findViewById(R.id.iv_verified_badge);
+    
+            // Extract document info with safer methods to handle missing fields
+            String documentType = docInfo.optString("document_type", "Unknown");
+            String requesterName = docInfo.optString("requester_name", "Unknown");
+            String address = docInfo.optString("address", "Unknown");
+            String purpose = docInfo.optString("purpose", "Unknown");
+            String issuedDate = docInfo.optString("issued_date", "Unknown");
+            String expiresOn = docInfo.optString("expires_on", "Unknown");
+            boolean isExpired = docInfo.optBoolean("is_expired", false);
+            String verificationMethod = docInfo.optString("verification_method", "Unknown");
+    
+            tvDocType.setText(documentType);
+            tvName.setText(requesterName);
+            tvAddress.setText(address);
+            tvPurpose.setText(purpose);
+            
+            // Format and set issued date
+            if (!issuedDate.equals("Unknown") && issuedDate.length() > 10) {
+                tvIssued.setText("Issued on: " + issuedDate.substring(0, 10));
+            } else {
+                tvIssued.setText("Issued on: " + issuedDate);
+            }
+    
+            // Show partial signature (first 20 chars + "...")
+            String displaySignature = signature.length() > 20
+                    ? signature.substring(0, 20) + "..."
+                    : signature;
+            tvSignature.setText(displaySignature);
+    
+            // Set an onClick listener on the signature to show the full signature
+            tvSignature.setOnClickListener(v -> {
+                AlertDialog.Builder fullSigBuilder = new AlertDialog.Builder(this);
+                fullSigBuilder.setTitle("Digital Signature");
+    
+                // Create ScrollView to make long signatures scrollable
+                ScrollView scrollView = new ScrollView(this);
+                TextView fullSigTextView = new TextView(this);
+                fullSigTextView.setPadding(30, 30, 30, 30);
+                fullSigTextView.setText(signature);
+                scrollView.addView(fullSigTextView);
+    
+                fullSigBuilder.setView(scrollView);
+                fullSigBuilder.setPositiveButton("Copy", (dialog, which) -> {
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("Document Signature", signature);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(this, "Signature copied to clipboard", Toast.LENGTH_SHORT).show();
+                });
+                fullSigBuilder.setNegativeButton("Close", null);
+                fullSigBuilder.show();
             });
-            fullSigBuilder.setNegativeButton("Close", null);
-            fullSigBuilder.show();
-        });
-
-        ivVerified.setVisibility(View.VISIBLE);
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.setCanceledOnTouchOutside(false);
-
-        Button btnOk = dialogView.findViewById(R.id.btn_ok);
-        btnOk.setOnClickListener(v -> alertDialog.dismiss());
-
-        alertDialog.show();
+    
+            ivVerified.setVisibility(View.VISIBLE);
+    
+            // Show expiration info if available
+            if (isExpired) {
+                showError("Warning", "This document has expired on " + expiresOn.substring(0, 10) + 
+                         "\n\nThe document was authentic but is no longer valid.");
+            }
+    
+            AlertDialog alertDialog = builder.create();
+            alertDialog.setCanceledOnTouchOutside(false);
+    
+            Button btnOk = dialogView.findViewById(R.id.btn_ok);
+            btnOk.setOnClickListener(v -> alertDialog.dismiss());
+    
+            alertDialog.show();
+    
+        } catch (Exception e) {
+            Log.e(TAG, "Error displaying verification result: " + e.getMessage());
+            showError("Display Error", "Could not display document information: " + e.getMessage());
+        }
     }
 
     private void showError(String title, String message) {
