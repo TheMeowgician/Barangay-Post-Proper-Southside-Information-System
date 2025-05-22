@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This selector ensures the box stroke color only turns red when there's an error -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Normal focused state - purple accent color when focused -->
+    <item android:color="@color/primary_color" android:state_focused="true" android:state_enabled="true" />
+    
+    <!-- Default state - black when not focused -->
+    <item android:color="@color/black" android:state_enabled="true" />
+    
+    <!-- Disabled state -->
+    <item android:color="@android:color/darker_gray" android:state_enabled="false" />
+</selector>

@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -15,6 +17,7 @@ import com.example.barangayinformationsystem.PasswordHasher;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import retrofit2.Call;
@@ -57,9 +60,7 @@ public class LogInActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-    private void initializeComponents() {
+    }    private void initializeComponents() {
         signUpTextView = findViewById(R.id.signUpTextView);
         logInButton = findViewById(R.id.logInButton);
         backImageButton = findViewById(R.id.backImageButton);
@@ -68,38 +69,49 @@ public class LogInActivity extends AppCompatActivity {
 
         removeTextInputLayoutAnimation();
         addUnderlineToTextView();
+        setupTextChangeListeners();
 
         backImageButton.setOnClickListener(v -> {
             Intent intent = new Intent(LogInActivity.this, ChooseActivity.class);
             startActivity(intent);
             finish();
-        });
-
-        logInButton.setOnClickListener(new View.OnClickListener() {
+        });        logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Clear previous error states
+                clearErrorStates();
+                
                 String username = usernameTextInputLayout.getEditText().getText().toString();
                 String password = passwordTextInputLayout.getEditText().getText().toString();
 
-                if (username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LogInActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                } else {
+                boolean hasError = false;
+                  if (username.isEmpty()) {
+                    usernameTextInputLayout.setError("Username is required");
+                    setErrorStrokeColor(usernameTextInputLayout);
+                    hasError = true;
+                }
+                
+                if (password.isEmpty()) {
+                    passwordTextInputLayout.setError("Password is required");
+                    setErrorStrokeColor(passwordTextInputLayout);
+                    hasError = true;
+                }
+                
+                if (!hasError) {
                     loginUser(username, password);
                 }
             }
         });
-    }
-
-    private void loginUser(String username, String password) {
+    }    private void loginUser(String username, String password) {
         logInButton.setEnabled(false);
-        logInButton.setText("Logging in...");
-
-        // Hash the password before sending
+        logInButton.setText("Logging in...");          // Clear any previous error states
+        clearErrorStates();// Hash the password before sending
         String hashedPassword = PasswordHasher.hashPassword(password);
         if (hashedPassword == null) {
             logInButton.setEnabled(true);
             logInButton.setText("Log In");
-            Toast.makeText(LogInActivity.this, "Error processing password. Please try again.", Toast.LENGTH_SHORT).show();
+            passwordTextInputLayout.setError("Error processing password. Please try again.");
+            setErrorStrokeColor(passwordTextInputLayout);
             return;
         }
 
@@ -144,9 +156,19 @@ public class LogInActivity extends AppCompatActivity {
                             Toast.makeText(LogInActivity.this, "Your account has been rejected.", Toast.LENGTH_LONG).show();
                         }
                     } else {
-                        Toast.makeText(LogInActivity.this, loginResponse.getMessage() != null ?
-                                        loginResponse.getMessage() : "Invalid username or password",
-                                Toast.LENGTH_SHORT).show();
+                        // Show appropriate error based on the message
+                        String errorMessage = loginResponse.getMessage() != null ? 
+                                loginResponse.getMessage() : "Invalid username or password";                        // Set error message under the specific field
+                        if ("Username not found".equals(errorMessage)) {
+                            usernameTextInputLayout.setError(errorMessage);
+                            setErrorStrokeColor(usernameTextInputLayout);
+                        } else if ("Invalid password".equals(errorMessage)) {
+                            passwordTextInputLayout.setError(errorMessage);
+                            setErrorStrokeColor(passwordTextInputLayout);
+                        } else {
+                            // General error if we can't determine which field is wrong
+                            Toast.makeText(LogInActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        }
                     }
                 } else {
                     Toast.makeText(LogInActivity.this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
@@ -179,19 +201,83 @@ public class LogInActivity extends AppCompatActivity {
 
     private void addUnderlineToTextView() {
         signUpTextView.setPaintFlags(signUpTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-    }
-
-    private void removeTextInputLayoutAnimation() {
+    }    private void removeTextInputLayoutAnimation() {
         usernameTextInputLayout.setHintAnimationEnabled(false);
         usernameTextInputLayout.setHintEnabled(false);
 
         passwordTextInputLayout.setHintAnimationEnabled(false);
         passwordTextInputLayout.setHintEnabled(false);
     }
-    @Override
+    
+    private void setupTextChangeListeners() {
+        // Add text watchers to clear errors when user starts typing
+        TextInputEditText usernameEditText = findViewById(R.id.usernameTextInputEditText);
+        TextInputEditText passwordEditText = findViewById(R.id.passwordTextInputEditText);
+        
+        usernameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Clear error when user types
+                usernameTextInputLayout.setError(null);
+                // This will reset to the default selector behavior
+                usernameTextInputLayout.refreshDrawableState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+        
+        passwordEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Clear error when user types
+                passwordTextInputLayout.setError(null);
+                // This will reset to the default selector behavior
+                passwordTextInputLayout.refreshDrawableState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }    @Override
     public void onBackPressed() {
         Intent intent = new Intent(LogInActivity.this, ChooseActivity.class);
         startActivity(intent);
         finish();
+    }
+      /**
+     * Helper method to clear all error states from input fields
+     */
+    private void clearErrorStates() {
+        usernameTextInputLayout.setError(null);
+        passwordTextInputLayout.setError(null);
+        usernameTextInputLayout.refreshDrawableState();
+        passwordTextInputLayout.refreshDrawableState();
+    }
+    
+    /**
+     * Helper method to set the error stroke color for TextInputLayout
+     * This directly sets the box stroke color to show red only when there's an error
+     */
+    private void setErrorStrokeColor(TextInputLayout textInputLayout) {
+        // Using reflection to access the boxStrokeErrorColor field
+        try {
+            java.lang.reflect.Field boxStrokeColorField = TextInputLayout.class.getDeclaredField("boxStrokeErrorColor");
+            boxStrokeColorField.setAccessible(true);
+            
+            // Create a ColorStateList with error color
+            android.content.res.ColorStateList colorStateList = 
+                android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.error));
+            
+            boxStrokeColorField.set(textInputLayout, colorStateList);
+            
+            // Force the view to refresh
+            textInputLayout.invalidate();
+        } catch (Exception e) {
+            // Fallback method if reflection fails
+            textInputLayout.setBoxStrokeColor(getResources().getColor(R.color.error));
+        }
     }
 }

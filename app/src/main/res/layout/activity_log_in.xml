@@ -53,9 +53,7 @@
                     android:layout_height="wrap_content"
                     android:text="Username"
                     android:textSize="18dp"
-                    android:fontFamily="@font/poppins_light"/>
-
-                <com.google.android.material.textfield.TextInputLayout
+                    android:fontFamily="@font/poppins_light"/>                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/usernameTextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -64,7 +62,9 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusTopStart="13dp"
-                    app:boxStrokeColor="@color/black"
+                    app:boxStrokeColor="@color/text_input_box_stroke_selector"
+                    app:errorEnabled="true"
+                    app:errorTextColor="@color/error"
                     app:endIconMode="clear_text"
                     app:hintAnimationEnabled="false">
 
@@ -91,9 +91,7 @@
                 android:layout_height="wrap_content"
                 android:text="Password"
                 android:textSize="18dp"
-                android:fontFamily="@font/poppins_light"/>
-
-                <com.google.android.material.textfield.TextInputLayout
+                android:fontFamily="@font/poppins_light"/>                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/passwordTextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -102,7 +100,9 @@
                     app:boxCornerRadiusBottomStart="13dp"
                     app:boxCornerRadiusTopEnd="13dp"
                     app:boxCornerRadiusTopStart="13dp"
-                    app:boxStrokeColor="@color/black"
+                    app:boxStrokeColor="@color/text_input_box_stroke_selector"
+                    app:errorEnabled="true"
+                    app:errorTextColor="@color/error"
                     app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
