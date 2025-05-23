@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Notification"
+            android:text="Notifications"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:fontFamily="@font/poppins_medium" />
@@ -68,24 +68,15 @@
 
     </RelativeLayout>
 
-    <ScrollView
-        android:id="@+id/notification_activity_body_scroll_view"
+    <!-- RecyclerView with no margins/padding for full width -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notification_activity_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/notification_activity_recent_notification_relative_layout">
-
-        <RelativeLayout
-            android:id="@+id/notification_activity_body_relative_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/notification_activity_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-        </RelativeLayout>
-
-    </ScrollView>
+        android:layout_below="@+id/notification_activity_recent_notification_relative_layout"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 
 </RelativeLayout>

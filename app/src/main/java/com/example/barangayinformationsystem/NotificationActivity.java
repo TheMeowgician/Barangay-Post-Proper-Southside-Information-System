@@ -50,16 +50,8 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
-        notification_activity_recent_textview = findViewById(R.id.notification_activity_recent_textview);
-        notification_activity_header_back_button = findViewById(R.id.notification_activity_header_back_button);
-
-        notificationRecyclerView = findViewById(R.id.notification_activity_recycler_view);
-        notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Initialize the list and adapter
-        notificationItems = new ArrayList<>();
-        notificationAdapter = new NotificationAdapter(this, notificationItems);
-        notificationRecyclerView.setAdapter(notificationAdapter);
+        initializeViews();
+        setupRecyclerView();
 
         // Initialize the API service
         apiService = RetrofitClient.getApiService();
@@ -87,6 +79,35 @@ public class NotificationActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Please log in to view notifications", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void initializeViews() {
+        notification_activity_recent_textview = findViewById(R.id.notification_activity_recent_textview);
+        notification_activity_header_back_button = findViewById(R.id.notification_activity_header_back_button);
+        notificationRecyclerView = findViewById(R.id.notification_activity_recycler_view);
+    }
+
+    private void setupRecyclerView() {
+        // Initialize the list and adapter
+        notificationItems = new ArrayList<>();
+        notificationAdapter = new NotificationAdapter(this, notificationItems);
+
+        // Setup LinearLayoutManager
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        notificationRecyclerView.setLayoutManager(layoutManager);
+        notificationRecyclerView.setAdapter(notificationAdapter);
+
+        // Remove any default item decorations to eliminate gaps
+        while (notificationRecyclerView.getItemDecorationCount() > 0) {
+            notificationRecyclerView.removeItemDecorationAt(0);
+        }
+
+        // Disable nested scrolling for better performance
+        notificationRecyclerView.setNestedScrollingEnabled(false);
+
+        // Remove any padding from RecyclerView
+        notificationRecyclerView.setPadding(0, 0, 0, 0);
+        notificationRecyclerView.setClipToPadding(false);
     }
 
     public void goBack(View view) {

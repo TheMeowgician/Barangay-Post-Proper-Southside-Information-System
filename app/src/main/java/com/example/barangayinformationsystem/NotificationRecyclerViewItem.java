@@ -8,11 +8,21 @@ public class NotificationRecyclerViewItem {
     private String nameOfUser;
     private String caption;
     private int image;
+    private long timestamp; // Optional: for real timestamps
 
     public NotificationRecyclerViewItem(String nameOfUser, String caption, int image) {
         this.nameOfUser = nameOfUser;
         this.caption = caption;
         this.image = image;
+        this.timestamp = System.currentTimeMillis(); // Set current time as default
+    }
+
+    // Constructor with timestamp
+    public NotificationRecyclerViewItem(String nameOfUser, String caption, int image, long timestamp) {
+        this.nameOfUser = nameOfUser;
+        this.caption = caption;
+        this.image = image;
+        this.timestamp = timestamp;
     }
 
     public String getNameOfUser() {
@@ -25,6 +35,14 @@ public class NotificationRecyclerViewItem {
 
     public int getImage() {
         return image;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -51,6 +69,7 @@ public class NotificationRecyclerViewItem {
             json.put("nameOfUser", nameOfUser);
             json.put("caption", caption);
             json.put("image", image);
+            json.put("timestamp", timestamp);
             return json;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -65,7 +84,8 @@ public class NotificationRecyclerViewItem {
             String name = json.getString("nameOfUser");
             String caption = json.getString("caption");
             int image = json.getInt("image");
-            return new NotificationRecyclerViewItem(name, caption, image);
+            long timestamp = json.optLong("timestamp", System.currentTimeMillis()); // Default to current time if not present
+            return new NotificationRecyclerViewItem(name, caption, image, timestamp);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;

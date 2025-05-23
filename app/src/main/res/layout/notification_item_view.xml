@@ -1,61 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#E9D8F8">
+    android:layout_marginBottom="1dp"
+    android:background="#E9D8F8"
+    android:padding="16dp">
 
-    <RelativeLayout
-        android:id="@+id/notification_recycler_view_item_image_view_relative_layout"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginRight="10dp">
+    <!-- Notification Icon -->
+    <ImageView
+        android:id="@+id/notification_recycler_view_item_image_view"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="12dp"
+        android:contentDescription="Notification Icon"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/notification_pps_logo" />
 
-        <ImageView
-            android:id="@+id/notification_recycler_view_item_image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/notification_name_of_user_and_caption_relative_layout"
+    <!-- Timestamp -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/notification_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="28dp"
-        android:layout_toEndOf="@+id/notification_recycler_view_item_image_view_relative_layout">
+        android:textColor="#06070F"
+        android:textSize="12sp"
+        android:alpha="0.7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="2 hours ago" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/notification_recycler_view_item_name_of_user_material_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingRight="20dp"
-            android:textColor="@color/black"
-            android:fontFamily="@font/poppins_semibold"
-            android:textSize="14sp"
-            />
+    <!-- Notification Title -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/notification_recycler_view_item_name_of_user_material_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#06070F"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/notification_timestamp"
+        app:layout_constraintStart_toEndOf="@id/notification_recycler_view_item_image_view"
+        app:layout_constraintTop_toTopOf="@id/notification_recycler_view_item_image_view"
+        tools:text="Post Proper Southside" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/notification_recycler_view_item_caption_of_user_material_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingRight="20dp"
-            android:textColor="@color/black"
-            android:fontFamily="@font/poppins"
-            android:textSize="10sp"
-            android:layout_below="@+id/notification_recycler_view_item_name_of_user_material_text_view"/>
+    <!-- Notification Message -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/notification_recycler_view_item_caption_of_user_material_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:lineSpacingExtra="2dp"
+        android:maxLines="3"
+        android:textColor="#06070F"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/notification_recycler_view_item_image_view"
+        app:layout_constraintTop_toBottomOf="@id/notification_recycler_view_item_name_of_user_material_text_view"
+        tools:text="Your Barangay Clearance request has been approved. You can now pick it up at the barangay hall." />
 
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#A0A0A0"
-        android:layout_below="@+id/notification_recycler_view_item_image_view_relative_layout">
-
-    </LinearLayout>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

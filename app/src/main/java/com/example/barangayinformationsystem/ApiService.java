@@ -175,4 +175,17 @@ public interface ApiService {
             @Query("last_message_timestamp") long lastMessageTimestamp // Keep timestamp param (milliseconds)
     );
 
+    /**
+     * Get user notifications
+     */
+    @GET("android/notifications")
+    Call<NotificationListResponse> getUserNotifications(@Query("user_id") int userId);
+
+    /**
+     * Mark notification as read
+     */
+    @FormUrlEncoded
+    @POST("android/notifications/mark-read")
+    Call<ApiResponse> markNotificationAsRead(@Field("notification_id") int notificationId);
+
 }
