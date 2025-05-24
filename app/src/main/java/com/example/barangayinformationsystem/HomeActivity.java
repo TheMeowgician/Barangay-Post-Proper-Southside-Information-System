@@ -455,8 +455,7 @@ public class HomeActivity extends AppCompatActivity {    private static final St
             }
         });
     }
-    
-    /**
+      /**
      * Check for document status changes and update counter
      */
     private void checkForDocumentStatusChanges() {
@@ -472,13 +471,23 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                         int newStatusChangeCount = 0;
                         
                         for (DocumentRequest request : requests) {
-                            String statusKey = "doc_" + request.getId() + "_" + request.getStatus();
-                            boolean statusChanged = statusTracker.hasStatusChanged(request.getId(), request.getStatus());
+                            String currentStatus = request.getStatus();
+                            String trackedStatus = statusTracker.getTrackedStatus(request.getId());
                             
-                            if (statusChanged && !knownDocumentStatuses.contains(statusKey)) {
-                                knownDocumentStatuses.add(statusKey);
-                                newStatusChangeCount++;
-                                Log.d(TAG, "Document #" + request.getId() + " status changed to: " + request.getStatus());
+                            // If this is a new request or status has changed
+                            if (trackedStatus == null || !trackedStatus.equals(currentStatus)) {
+                                // Only count notifications for meaningful status changes
+                                if (shouldCreateNotificationForStatus(currentStatus, trackedStatus)) {
+                                    String statusKey = "doc_" + request.getId() + "_" + currentStatus;
+                                    if (!knownDocumentStatuses.contains(statusKey)) {
+                                        knownDocumentStatuses.add(statusKey);
+                                        newStatusChangeCount++;
+                                        Log.d(TAG, "Document #" + request.getId() + " status changed to: " + currentStatus);
+                                    }
+                                }
+                                
+                                // Update tracked status
+                                statusTracker.updateStatus(request.getId(), currentStatus);
                             }
                         }
                         
@@ -486,6 +495,7 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                             unreadNotificationCount += newStatusChangeCount;
                             updateNotificationCounter();
                             saveKnownNotifications();
+                            statusTracker.saveTrackedStatuses(HomeActivity.this);
                             Log.d(TAG, "Found " + newStatusChangeCount + " document status changes");
                         }
                     }
@@ -497,6 +507,29 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                 Log.e(TAG, "Error checking document requests: " + t.getMessage());
             }
         });
+    }
+    
+    /**
+     * Helper method to determine if we should create notification for this status change
+     */
+    private boolean shouldCreateNotificationForStatus(String currentStatus, String previousStatus) {
+        // Don't create notifications for initial "pending" status unless there was a previous status
+        if (previousStatus == null && "pending".equalsIgnoreCase(currentStatus)) {
+            return false;
+        }
+        
+        // Don't create notification if status hasn't actually changed
+        if (previousStatus != null && previousStatus.equalsIgnoreCase(currentStatus)) {
+            return false;
+        }
+        
+        // Create notifications for meaningful status changes
+        return "approved".equalsIgnoreCase(currentStatus) || 
+               "rejected".equalsIgnoreCase(currentStatus) || 
+               "cancelled".equalsIgnoreCase(currentStatus) ||
+               "overdue".equalsIgnoreCase(currentStatus) ||
+               // Also notify when moving from pending to other statuses
+               ("pending".equalsIgnoreCase(previousStatus) && !"pending".equalsIgnoreCase(currentStatus));
     }
     
     /**

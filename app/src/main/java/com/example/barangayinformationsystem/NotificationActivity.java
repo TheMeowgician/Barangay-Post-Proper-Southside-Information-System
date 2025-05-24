@@ -508,10 +508,10 @@ public class NotificationActivity extends AppCompatActivity {    private static 
 
         switch (status) {
             case "APPROVED":
-                notificationMessage = "Your document request (" + request.getDocumentType() + ") has been APPROVED. Please visit the barangay office to pick it up.";
+                notificationMessage = "Your document request ID #" + request.getId() + " (" + request.getDocumentType() + ") has been APPROVED. Please visit the barangay office to pick it up.";
                 break;
             case "REJECTED":
-                notificationMessage = "Your document request (" + request.getDocumentType() + ") has been REJECTED.";
+                notificationMessage = "Your document request ID #" + request.getId() + " (" + request.getDocumentType() + ") has been REJECTED.";
                 if (request.getRejectionReason() != null && !request.getRejectionReason().isEmpty()) {
                     notificationMessage += " Reason: " + request.getRejectionReason();
                 } else {
@@ -519,13 +519,13 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 }
                 break;
             case "CANCELLED":
-                notificationMessage = "Your document request (" + request.getDocumentType() + ") has been CANCELLED.";
+                notificationMessage = "Your document request ID #" + request.getId() + " (" + request.getDocumentType() + ") has been CANCELLED.";
                 break;
             case "OVERDUE":
-                notificationMessage = "Your document request (" + request.getDocumentType() + ") is now OVERDUE. Please contact the barangay office immediately.";
+                notificationMessage = "Your document request ID #" + request.getId() + " (" + request.getDocumentType() + ") is now OVERDUE. Please contact the barangay office immediately.";
                 break;
             default:
-                notificationMessage = "Your document request (" + request.getDocumentType() + ") status has changed to " + status;
+                notificationMessage = "Your document request ID #" + request.getId() + " (" + request.getDocumentType() + ") status has changed to " + status;
                 break;
         }
 
@@ -543,7 +543,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         notificationAdapter.notifyItemInserted(0);
 
         // Save notifications after adding new one
-        saveNotifications();        // Show toast for immediate feedback
+        saveNotifications();
+        
+        // Show toast for immediate feedback
         Toast.makeText(this, "Document status updated: " + status, Toast.LENGTH_SHORT).show();
     }
     
@@ -705,16 +707,17 @@ public class NotificationActivity extends AppCompatActivity {    private static 
             }
         });
     }
-    
-    // Helper method to check if notification already exists for this request
+      // Helper method to check if notification already exists for this request
     private boolean hasExistingNotificationForRequest(DocumentRequest request) {
         String documentType = request.getDocumentType();
         String status = request.getStatus().toUpperCase();
+        String documentId = "ID #" + request.getId();
         
         for (NotificationRecyclerViewItem notification : notificationItems) {
             if (notification.getNameOfUser().equals("Document Request Update")) {
                 String caption = notification.getCaption();
-                if (caption.contains(documentType) && caption.contains(status)) {
+                // Check for document type, status, AND document ID to ensure uniqueness
+                if (caption.contains(documentType) && caption.contains(status) && caption.contains(documentId)) {
                     return true;
                 }
             }
@@ -883,15 +886,15 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 if (notification.getNameOfUser().equals("Document Request Update")) {
                     // Extract request info from the notification
                     String caption = notification.getCaption();
-                    
-                    // Try to find if this notification corresponds to a current request
+                      // Try to find if this notification corresponds to a current request
                     boolean foundMatchingRequest = false;
                     for (DocumentRequest request : currentRequests) {
                         String documentType = request.getDocumentType();
                         String status = request.getStatus().toUpperCase();
+                        String documentId = "ID #" + request.getId();
                         
-                        // Check if the notification matches this request
-                        if (caption.contains(documentType) && caption.contains(status)) {
+                        // Check if the notification matches this request (type, status, AND ID)
+                        if (caption.contains(documentType) && caption.contains(status) && caption.contains(documentId)) {
                             foundMatchingRequest = true;
                             break;
                         }

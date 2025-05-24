@@ -45,15 +45,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return new ViewHolder(view);
     }    @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        NotificationRecyclerViewItem item = notificationItems.get(position);
-
-        holder.titleTextView.setText(item.getNameOfUser());
+        NotificationRecyclerViewItem item = notificationItems.get(position);        holder.titleTextView.setText(item.getNameOfUser());
         holder.messageTextView.setText(item.getCaption());
         holder.iconImageView.setImageResource(item.getImage());
 
-        // Set timestamp - for now we'll use a generated timestamp since NotificationRecyclerViewItem doesn't have a timestamp field
-        // You can enhance NotificationRecyclerViewItem to include timestamp if needed
-        String timeAgo = generateTimeStamp(position);
+        // Use the actual timestamp from the notification item
+        String timeAgo = getTimeAgoFromTimestamp(item.getTimestamp());
         holder.timestampTextView.setText(timeAgo);
 
         // Set click listener for notification item
@@ -74,24 +71,33 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @Override
     public int getItemCount() {
         return notificationItems != null ? notificationItems.size() : 0;
-    }
+    }    // Method to calculate time ago from timestamp in milliseconds
+    private String getTimeAgoFromTimestamp(long timestamp) {
+        try {
+            Date notificationDate = new Date(timestamp);
+            Date now = new Date();
+            long diff = now.getTime() - notificationDate.getTime();
+            long minutes = diff / (60 * 1000);
+            long hours = diff / (60 * 60 * 1000);
+            long days = diff / (24 * 60 * 60 * 1000);
 
-    private String generateTimeStamp(int position) {
-        // Generate different timestamps based on position for demo purposes
-        // In a real app, you would get this from your notification data
-        switch (position % 5) {
-            case 0:
-                return "2 hours ago";
-            case 1:
-                return "12 hours ago";
-            case 2:
-                return "21 hours ago";
-            case 3:
-                return "2 days ago";
-            case 4:
-                return "1 week ago";
-            default:
+            if (minutes < 1) {
                 return "Just now";
+            } else if (minutes < 60) {
+                return minutes + " minute" + (minutes == 1 ? "" : "s") + " ago";
+            } else if (hours < 24) {
+                return hours + " hour" + (hours == 1 ? "" : "s") + " ago";
+            } else if (days < 7) {
+                return days + " day" + (days == 1 ? "" : "s") + " ago";
+            } else if (days < 30) {
+                long weeks = days / 7;
+                return weeks + " week" + (weeks == 1 ? "" : "s") + " ago";
+            } else {
+                SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd", Locale.getDefault());
+                return displayFormat.format(notificationDate);
+            }
+        } catch (Exception e) {
+            return "Just now";
         }
     }
 
