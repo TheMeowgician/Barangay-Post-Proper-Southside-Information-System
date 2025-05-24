@@ -68,6 +68,14 @@ public class DocumentStatusTracker {
                 }
             }
         }
+    }    // Get the tracked status for a document
+    public String getTrackedStatus(int documentId) {
+        return documentStatusMap.get(documentId);
+    }
+
+    // Update the status for a document
+    public void updateStatus(int documentId, String newStatus) {
+        documentStatusMap.put(documentId, newStatus);
     }
 
     // Clear all tracked statuses

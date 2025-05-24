@@ -21,6 +21,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -499,9 +500,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 Log.e(TAG, "Error fetching document requests: " + t.getMessage());
             }
         });
-    }
-
-    // Add a notification for document status change
+    }    // Add a notification for document status change
     private void addDocumentStatusNotification(DocumentRequest request) {
         String status = request.getStatus().toUpperCase();
         String notificationMessage = "";
@@ -522,6 +521,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
             case "CANCELLED":
                 notificationMessage = "Your document request (" + request.getDocumentType() + ") has been CANCELLED.";
                 break;
+            case "OVERDUE":
+                notificationMessage = "Your document request (" + request.getDocumentType() + ") is now OVERDUE. Please contact the barangay office immediately.";
+                break;
             default:
                 notificationMessage = "Your document request (" + request.getDocumentType() + ") status has changed to " + status;
                 break;
@@ -541,24 +543,36 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         notificationAdapter.notifyItemInserted(0);
 
         // Save notifications after adding new one
-        saveNotifications();
-
-        // Show toast for immediate feedback
+        saveNotifications();        // Show toast for immediate feedback
         Toast.makeText(this, "Document status updated: " + status, Toast.LENGTH_SHORT).show();
     }
-
+    
     public void addRecentNotification(View view) {
+        // Use a counter to track completed async calls
+        final int[] completedCalls = {0};
+        final boolean[] foundNewNotifications = {false};
+        
         // Check for document updates first
-        fetchDocumentRequests(true);
+        fetchDocumentRequestsForRecent(new DocumentUpdateCallback() {
+            @Override
+            public void onDocumentUpdateComplete(boolean foundUpdates) {
+                foundNewNotifications[0] = foundNewNotifications[0] || foundUpdates;
+                completedCalls[0]++;
+                checkAllCallsComplete(completedCalls, foundNewNotifications);
+            }
+        });
 
-        // Then proceed with announcements as before
+        // Then proceed with announcements
         Call<List<AnnouncementResponse>> call = apiService.getAnnouncements();
         call.enqueue(new Callback<List<AnnouncementResponse>>() {
             @Override
             public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
+                boolean addedAnnouncements = false;
+                
                 if (response.isSuccessful() && response.body() != null) {
                     List<AnnouncementResponse> announcements = response.body();
-                    boolean added = false;                    for (AnnouncementResponse announcement : announcements) {
+
+                    for (AnnouncementResponse announcement : announcements) {
                         // Check if this announcement was deleted by the user
                         String announcementTitle = announcement.getAnnouncementTitle();
                         Log.d(TAG, "Recent fetch - checking announcement: " + announcementTitle);
@@ -588,74 +602,147 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                         // Avoid duplicates: Check if the new announcement already exists
                         if (!isDuplicate) {
                             notificationItems.add(0, newNotification); // Add to the top
-                            added = true;
+                            addedAnnouncements = true;
                         }
                     }
 
-                    if (added) {
+                    if (addedAnnouncements) {
                         notificationAdapter.notifyDataSetChanged(); // Notify the adapter
                         saveNotifications(); // Save after adding
-                        Toast.makeText(NotificationActivity.this, "Recent notifications added!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(NotificationActivity.this, "No new notifications found", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(NotificationActivity.this, "No new notifications found", Toast.LENGTH_SHORT).show();
                 }
+                
+                foundNewNotifications[0] = foundNewNotifications[0] || addedAnnouncements;
+                completedCalls[0]++;
+                checkAllCallsComplete(completedCalls, foundNewNotifications);
             }
 
             @Override
             public void onFailure(Call<List<AnnouncementResponse>> call, Throwable t) {
                 Log.e(TAG, "Error: " + t.getMessage());
-                Toast.makeText(NotificationActivity.this, "An error occurred while fetching recent notifications", Toast.LENGTH_SHORT).show();
+                completedCalls[0]++;
+                checkAllCallsComplete(completedCalls, foundNewNotifications);
             }
         });
     }
 
-    private void filterDeletedDocumentRequestNotifications(List<DocumentRequest> currentRequests) {
-        // Create a set of current request IDs for quick lookup
-        Set<Integer> currentRequestIds = new HashSet<>();
-        for (DocumentRequest request : currentRequests) {
-            currentRequestIds.add(request.getId());
+    private void checkAllCallsComplete(int[] completedCalls, boolean[] foundNewNotifications) {
+        if (completedCalls[0] >= 2) { // Both document and announcement calls completed
+            if (foundNewNotifications[0]) {
+                Toast.makeText(this, "Recent notifications added!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "No new notifications found", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
+    // Interface for callback when document update check is complete
+    private interface DocumentUpdateCallback {
+        void onDocumentUpdateComplete(boolean foundUpdates);
+    }
+    
+    // Enhanced method to fetch document requests specifically for "recent" button
+    private void fetchDocumentRequestsForRecent(final DocumentUpdateCallback callback) {
+        if (userId == -1) {
+            callback.onDocumentUpdateComplete(false);
+            return;
         }
 
-        // Identify notifications to remove (those for document requests that no longer exist)
-        List<NotificationRecyclerViewItem> notificationsToRemove = new ArrayList<>();
+        Call<DocumentRequestListResponse> call = apiService.getUserRequests(userId);
+        call.enqueue(new Callback<DocumentRequestListResponse>() {
+            @Override
+            public void onResponse(Call<DocumentRequestListResponse> call, Response<DocumentRequestListResponse> response) {
+                boolean foundUpdates = false;
+                
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<DocumentRequest> requests = response.body().getRequests();
+                    if (requests != null) {
+                        Log.d(TAG, "Fetched " + requests.size() + " document requests for recent check");
 
-        for (NotificationRecyclerViewItem notification : notificationItems) {
-            // Check if this is a document request notification
-            if (notification.getNameOfUser().equals("Document Request Update")) {
-                String caption = notification.getCaption();
-
-                // Try to extract the document type from the notification
-                int startIndex = caption.indexOf("(") + 1;
-                int endIndex = caption.indexOf(")");
-
-                if (startIndex > 0 && endIndex > startIndex) {
-                    String documentType = caption.substring(startIndex, endIndex);
-                    boolean found = false;
-
-                    // Check if any current request matches this document type
-                    for (DocumentRequest request : currentRequests) {
-                        if (request.getDocumentType().equals(documentType)) {
-                            found = true;
-                            break;
+                        // Check each request for status changes
+                        for (DocumentRequest request : requests) {
+                            String currentStatus = request.getStatus();
+                            String trackedStatus = statusTracker.getTrackedStatus(request.getId());
+                            
+                            Log.d(TAG, "Request ID: " + request.getId() + 
+                                  ", Current: " + currentStatus + 
+                                  ", Tracked: " + trackedStatus);
+                            
+                            // If this is a new request or status has changed
+                            if (trackedStatus == null || !trackedStatus.equals(currentStatus)) {
+                                // Only show notifications for meaningful status changes
+                                if (shouldCreateNotificationForStatus(currentStatus, trackedStatus)) {
+                                    Log.d(TAG, "Status change detected for request " + request.getId() + 
+                                          ": " + trackedStatus + " -> " + currentStatus);
+                                    
+                                    // Check if notification for this status already exists
+                                    if (!hasExistingNotificationForRequest(request)) {
+                                        addDocumentStatusNotification(request);
+                                        foundUpdates = true;
+                                    }
+                                }
+                                
+                                // Update tracked status
+                                statusTracker.updateStatus(request.getId(), currentStatus);
+                            }
                         }
-                    }
-
-                    // If no matching request found, mark for removal
-                    if (!found) {
-                        notificationsToRemove.add(notification);
+                        
+                        // Filter out notifications for deleted requests
+                        filterDeletedDocumentRequestNotifications(requests);
+                        
+                        // Save tracked statuses
+                        statusTracker.saveTrackedStatuses(NotificationActivity.this);
                     }
                 }
+                
+                callback.onDocumentUpdateComplete(foundUpdates);
             }
-        }        // Remove the identified notifications
-        if (!notificationsToRemove.isEmpty()) {
-            notificationItems.removeAll(notificationsToRemove);
-            notificationAdapter.notifyDataSetChanged();
-            saveNotifications(); // Save after removing
+
+            @Override
+            public void onFailure(Call<DocumentRequestListResponse> call, Throwable t) {
+                Log.e(TAG, "Error fetching document requests for recent: " + t.getMessage());
+                callback.onDocumentUpdateComplete(false);
+            }
+        });
+    }
+    
+    // Helper method to check if notification already exists for this request
+    private boolean hasExistingNotificationForRequest(DocumentRequest request) {
+        String documentType = request.getDocumentType();
+        String status = request.getStatus().toUpperCase();
+        
+        for (NotificationRecyclerViewItem notification : notificationItems) {
+            if (notification.getNameOfUser().equals("Document Request Update")) {
+                String caption = notification.getCaption();
+                if (caption.contains(documentType) && caption.contains(status)) {
+                    return true;
+                }
+            }
         }
-    }    /**
+        return false;
+    }
+      // Helper method to determine if we should create notification for this status change
+    private boolean shouldCreateNotificationForStatus(String currentStatus, String previousStatus) {
+        // Don't create notifications for initial "pending" status unless there was a previous status
+        if (previousStatus == null && "pending".equalsIgnoreCase(currentStatus)) {
+            return false;
+        }
+        
+        // Don't create notification if status hasn't actually changed
+        if (previousStatus != null && previousStatus.equalsIgnoreCase(currentStatus)) {
+            return false;
+        }
+        
+        // Create notifications for meaningful status changes
+        return "approved".equalsIgnoreCase(currentStatus) || 
+               "rejected".equalsIgnoreCase(currentStatus) || 
+               "cancelled".equalsIgnoreCase(currentStatus) ||
+               "overdue".equalsIgnoreCase(currentStatus) ||
+               // Also notify when moving from pending to other statuses
+               ("pending".equalsIgnoreCase(previousStatus) && !"pending".equalsIgnoreCase(currentStatus));
+    }
+
+    /**
      * Extract announcement ID from notification message
      * This method now extracts the announcement title and creates a consistent identifier
      */
@@ -772,5 +859,61 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         editor.apply();
         Log.d(TAG, "Saved cache times - Announcements: " + lastAnnouncementCheckTime + 
                    ", Documents: " + lastDocumentCheckTime);
+    }
+
+    /**
+     * Filter out notifications for document requests that have been deleted by user
+     */
+    private void filterDeletedDocumentRequestNotifications(List<DocumentRequest> currentRequests) {
+        try {
+            // Create a set of current request IDs for quick lookup
+            Set<Integer> currentRequestIds = new HashSet<>();
+            for (DocumentRequest request : currentRequests) {
+                currentRequestIds.add(request.getId());
+            }
+            
+            // Remove notifications for document requests that no longer exist
+            Iterator<NotificationRecyclerViewItem> iterator = notificationItems.iterator();
+            boolean removedAny = false;
+            
+            while (iterator.hasNext()) {
+                NotificationRecyclerViewItem notification = iterator.next();
+                
+                // Check if this is a document request notification
+                if (notification.getNameOfUser().equals("Document Request Update")) {
+                    // Extract request info from the notification
+                    String caption = notification.getCaption();
+                    
+                    // Try to find if this notification corresponds to a current request
+                    boolean foundMatchingRequest = false;
+                    for (DocumentRequest request : currentRequests) {
+                        String documentType = request.getDocumentType();
+                        String status = request.getStatus().toUpperCase();
+                        
+                        // Check if the notification matches this request
+                        if (caption.contains(documentType) && caption.contains(status)) {
+                            foundMatchingRequest = true;
+                            break;
+                        }
+                    }
+                    
+                    // If no matching request found, this notification should be removed
+                    if (!foundMatchingRequest) {
+                        Log.d(TAG, "Removing orphaned document notification: " + caption);
+                        iterator.remove();
+                        removedAny = true;
+                    }
+                }
+            }
+            
+            // Update the adapter if we removed any notifications
+            if (removedAny) {
+                notificationAdapter.notifyDataSetChanged();
+                saveNotifications();
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error filtering deleted document request notifications", e);
+        }
     }
 }
