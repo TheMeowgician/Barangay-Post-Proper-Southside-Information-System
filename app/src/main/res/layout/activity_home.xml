@@ -42,17 +42,37 @@
                     android:orientation="horizontal"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="28dp">
-
-                    <ImageButton
-                        android:id="@+id/notificationImageButton"
+                    android:layout_marginRight="28dp">                    <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:background="?android:selectableItemBackground"
-                        android:onClick="openNotificationActivity"
-                        android:src="@drawable/black_notification_icon" />
+                        android:layout_centerVertical="true">
+
+                        <ImageButton
+                            android:id="@+id/notificationImageButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?android:selectableItemBackground"
+                            android:onClick="openNotificationActivity"
+                            android:src="@drawable/black_notification_icon" />
+
+                        <TextView
+                            android:id="@+id/notificationCounterTextView"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignEnd="@id/notificationImageButton"
+                            android:layout_alignTop="@id/notificationImageButton"
+                            android:layout_marginTop="-5dp"
+                            android:layout_marginEnd="-5dp"
+                            android:background="@drawable/notification_badge_background"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                    </RelativeLayout>
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/profileMiniIconCircleImageView"

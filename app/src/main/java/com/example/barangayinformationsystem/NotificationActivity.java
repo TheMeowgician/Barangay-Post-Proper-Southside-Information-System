@@ -1,5 +1,6 @@
 package com.example.barangayinformationsystem;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,11 +28,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class NotificationActivity extends AppCompatActivity {
-
-    private static final String TAG = "NotificationActivity";
+public class NotificationActivity extends AppCompatActivity {    private static final String TAG = "NotificationActivity";
     private static final String PREF_KEY_SAVED_NOTIFICATIONS = "saved_notifications";
-    private static final int MAX_NOTIFICATIONS = 50; // Maximum notifications to keep
+    private static final String PREF_KEY_DELETED_ANNOUNCEMENTS = "deleted_announcements";
+    private static final String PREF_KEY_DELETED_DOCUMENT_REQUESTS = "deleted_document_requests";    private static final int MAX_NOTIFICATIONS = 50; // Maximum notifications to keep
+    private static final int POLLING_INTERVAL = 20000; // Reduced from 5000 to 20000 (20 seconds)
+    private static final int BACKGROUND_POLLING_INTERVAL = 60000; // Poll every 60 seconds when in background
+    private static final long MIN_CACHE_DURATION = 15000; // Minimum 15 seconds between API calls
+    
+    // Cache-related constants for SharedPreferences
+    private static final String PREF_KEY_LAST_ANNOUNCEMENT_CHECK = "last_announcement_check_time";
+    private static final String PREF_KEY_LAST_DOCUMENT_CHECK = "last_document_check_time";
 
     private RecyclerView notificationRecyclerView;
     private MaterialTextView notification_activity_recent_textview;
@@ -42,27 +49,37 @@ public class NotificationActivity extends AppCompatActivity {
     private DocumentStatusTracker statusTracker;
     private int userId;
 
-    private final Handler handler = new Handler();
-    private final int POLLING_INTERVAL = 5000; // Poll every 5 seconds
+    // Sets to track deleted notifications to prevent re-adding them
+    private Set<String> deletedAnnouncementIds;
+    private Set<String> deletedDocumentRequestIds;    private final Handler handler = new Handler();
+    
+    // Caching variables to reduce API calls
+    private long lastAnnouncementCheckTime = 0;
+    private long lastDocumentCheckTime = 0;
+    private boolean isAppInForeground = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification);
-
-        initializeViews();
+        setContentView(R.layout.activity_notification);        initializeViews();
         setupRecyclerView();
+
+        // Initialize deleted notification tracking
+        deletedAnnouncementIds = new HashSet<>();
+        deletedDocumentRequestIds = new HashSet<>();
+        loadDeletedNotificationIds();
 
         // Initialize the API service
         apiService = RetrofitClient.getApiService();
 
         // Initialize status tracker
         statusTracker = DocumentStatusTracker.getInstance();
-        statusTracker.loadTrackedStatuses(this);
-
-        // Get user ID from SharedPreferences
+        statusTracker.loadTrackedStatuses(this);        // Get user ID from SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         userId = prefs.getInt("user_id", -1);
+        
+        // Load cache timestamps
+        loadLastCheckTimes();
 
         if (userId != -1) {
             // Load saved notifications first
@@ -85,12 +102,23 @@ public class NotificationActivity extends AppCompatActivity {
         notification_activity_recent_textview = findViewById(R.id.notification_activity_recent_textview);
         notification_activity_header_back_button = findViewById(R.id.notification_activity_header_back_button);
         notificationRecyclerView = findViewById(R.id.notification_activity_recycler_view);
-    }
-
-    private void setupRecyclerView() {
+    }    private void setupRecyclerView() {
         // Initialize the list and adapter
         notificationItems = new ArrayList<>();
         notificationAdapter = new NotificationAdapter(this, notificationItems);
+
+        // Set up the interaction listener
+        notificationAdapter.setOnNotificationInteractionListener(new NotificationAdapter.OnNotificationInteractionListener() {
+            @Override
+            public void onNotificationClick(NotificationRecyclerViewItem item, int position) {
+                handleNotificationClick(item, position);
+            }
+
+            @Override
+            public void onNotificationDelete(NotificationRecyclerViewItem item, int position) {
+                handleNotificationDelete(item, position);
+            }
+        });
 
         // Setup LinearLayoutManager
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -108,40 +136,147 @@ public class NotificationActivity extends AppCompatActivity {
         // Remove any padding from RecyclerView
         notificationRecyclerView.setPadding(0, 0, 0, 0);
         notificationRecyclerView.setClipToPadding(false);
-    }
-
-    public void goBack(View view) {
+    }    public void goBack(View view) {
         finish();
+    }    private void handleNotificationClick(NotificationRecyclerViewItem item, int position) {
+        // Handle navigation based on notification type
+        String title = item.getNameOfUser();
+        String message = item.getCaption();
+        
+        try {
+            if (message.toLowerCase().contains("announcement") || message.toLowerCase().contains("posted")) {
+                // Navigate back to home to show announcements
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            } else if (message.toLowerCase().contains("request") || 
+                      message.toLowerCase().contains("approved") || 
+                      message.toLowerCase().contains("denied") ||
+                      message.toLowerCase().contains("pending") ||
+                      message.toLowerCase().contains("cancelled")) {
+                // Navigate to document status fragment
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.putExtra("navigate_to", "document_status");
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            } else {
+                // Default behavior - show a toast with the notification content
+                Toast.makeText(this, "Notification: " + message, Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error handling notification click", e);
+            Toast.makeText(this, "Error opening notification", Toast.LENGTH_SHORT).show();
+        }
+    }    private void handleNotificationDelete(NotificationRecyclerViewItem item, int position) {
+        try {
+            // Track the deleted notification to prevent re-adding
+            String message = item.getCaption();
+            if (message.toLowerCase().contains("announcement") || message.toLowerCase().contains("posted")) {
+                // Extract announcement identifier from the message (you can enhance this logic)
+                String announcementId = extractAnnouncementId(message);
+                if (announcementId != null) {
+                    deletedAnnouncementIds.add(announcementId);
+                    Log.d(TAG, "Added announcement to deleted list: " + announcementId);
+                    Log.d(TAG, "Total deleted announcements: " + deletedAnnouncementIds.size());
+                }
+            } else if (message.toLowerCase().contains("request")) {
+                // Extract document request identifier from the message
+                String requestId = extractDocumentRequestId(message);
+                if (requestId != null) {
+                    deletedDocumentRequestIds.add(requestId);
+                    Log.d(TAG, "Added document request to deleted list: " + requestId);
+                }
+            }
+
+            // Remove the notification from the adapter
+            notificationAdapter.removeNotification(position);
+            
+            // Update the notification counter in HomeActivity
+            updateNotificationCounter();
+            
+            // Save the updated notifications list and deleted IDs
+            saveNotifications();
+            saveDeletedNotificationIds();
+            
+            Toast.makeText(this, "Notification deleted", Toast.LENGTH_SHORT).show();
+            
+            Log.d(TAG, "Notification deleted at position: " + position);
+        } catch (Exception e) {
+            Log.e(TAG, "Error deleting notification", e);
+            Toast.makeText(this, "Error deleting notification", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void startPolling() {
+    private void updateNotificationCounter() {
+        // Update the notification counter to reflect current number of notifications
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("notification_count", notificationItems.size());
+        editor.apply();
+    }    private void startPolling() {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                fetchNewAnnouncements(); // Fetch new announcements
-                fetchDocumentRequests(true); // Fetch document requests and notify on changes
-                handler.postDelayed(this, POLLING_INTERVAL); // Re-run after interval
+                long currentTime = System.currentTimeMillis();
+                
+                // Check if enough time has passed since last announcement check
+                if (currentTime - lastAnnouncementCheckTime >= MIN_CACHE_DURATION) {
+                    fetchNewAnnouncements();
+                    lastAnnouncementCheckTime = currentTime;
+                    Log.d(TAG, "Fetched announcements due to cache expiry");
+                } else {
+                    Log.d(TAG, "Skipped announcement fetch due to cache (time remaining: " + 
+                          (MIN_CACHE_DURATION - (currentTime - lastAnnouncementCheckTime)) + "ms)");
+                }
+                
+                // Check if enough time has passed since last document check
+                if (currentTime - lastDocumentCheckTime >= MIN_CACHE_DURATION) {
+                    fetchDocumentRequests(true);
+                    lastDocumentCheckTime = currentTime;
+                    Log.d(TAG, "Fetched document requests due to cache expiry");
+                } else {
+                    Log.d(TAG, "Skipped document fetch due to cache (time remaining: " + 
+                          (MIN_CACHE_DURATION - (currentTime - lastDocumentCheckTime)) + "ms)");
+                }
+                
+                // Use different polling intervals based on app state
+                int pollingInterval = isAppInForeground ? POLLING_INTERVAL : BACKGROUND_POLLING_INTERVAL;
+                handler.postDelayed(this, pollingInterval);
+                
+                Log.d(TAG, "Next poll in " + pollingInterval + "ms (foreground: " + isAppInForeground + ")");
             }
         }, POLLING_INTERVAL);
-    }
-
-    @Override
+    }@Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacksAndMessages(null); // Stop all scheduled tasks
         // Save tracked statuses when activity is destroyed
         statusTracker.saveTrackedStatuses(this);
-        // Save notifications
-        saveNotifications();
+        // Save notifications and deleted IDs        saveNotifications();
+        saveDeletedNotificationIds();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isAppInForeground = true;
+        // Load cache times when resuming
+        loadLastCheckTimes();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        isAppInForeground = false;
         // Save tracked statuses when activity is paused
         statusTracker.saveTrackedStatuses(this);
-        // Save notifications
+        // Save notifications and deleted IDs
         saveNotifications();
+        saveDeletedNotificationIds();
+        // Save cache times
+        saveLastCheckTimes();
     }
 
     /**
@@ -199,18 +334,25 @@ public class NotificationActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(TAG, "Error loading notifications: " + e.getMessage());
         }
-    }
-
-    private void fetchNewAnnouncements() {
+    }    private void fetchNewAnnouncements() {
         Call<List<AnnouncementResponse>> call = apiService.getAnnouncements();
         call.enqueue(new Callback<List<AnnouncementResponse>>() {
             @Override
             public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<AnnouncementResponse> announcements = response.body();
+                    List<AnnouncementResponse> announcements = response.body();                    for (AnnouncementResponse announcement : announcements) {
+                        // Check if this announcement was deleted by the user
+                        // Use the announcement title as the identifier to match deletion tracking
+                        String announcementTitle = announcement.getAnnouncementTitle();
+                        Log.d(TAG, "Checking announcement: " + announcementTitle);
+                        Log.d(TAG, "Deleted announcements set: " + deletedAnnouncementIds.toString());
+                        
+                        if (deletedAnnouncementIds.contains(announcementTitle)) {
+                            Log.d(TAG, "Skipping deleted announcement: " + announcementTitle);
+                            continue; // Skip deleted announcements
+                        }
 
-                    for (AnnouncementResponse announcement : announcements) {
-                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcement.getAnnouncementTitle();
+                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcementTitle;
 
                         NotificationRecyclerViewItem newNotification = new NotificationRecyclerViewItem(
                                 "Post Proper Southside",
@@ -218,8 +360,16 @@ public class NotificationActivity extends AppCompatActivity {
                                 R.drawable.notification_pps_logo
                         );
 
-                        // Avoid duplicates
-                        if (!notificationItems.contains(newNotification)) {
+                        // Avoid duplicates by checking both the list and content
+                        boolean isDuplicate = false;
+                        for (NotificationRecyclerViewItem existingItem : notificationItems) {
+                            if (existingItem.getCaption().equals(updatedTitle)) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+
+                        if (!isDuplicate) {
                             notificationItems.add(0, newNotification); // Add new to top
                             notificationAdapter.notifyItemInserted(0); // Notify adapter
                             saveNotifications(); // Save after adding
@@ -233,18 +383,23 @@ public class NotificationActivity extends AppCompatActivity {
                 Log.e(TAG, "Error fetching announcements: " + t.getMessage());
             }
         });
-    }
-
-    private void fetchAnnouncements() {
+    }    private void fetchAnnouncements() {
         Call<List<AnnouncementResponse>> call = apiService.getAnnouncements();
         call.enqueue(new Callback<List<AnnouncementResponse>>() {
             @Override
             public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<AnnouncementResponse> announcements = response.body();
-                    for (AnnouncementResponse announcement : announcements) {
+                    List<AnnouncementResponse> announcements = response.body();                    for (AnnouncementResponse announcement : announcements) {
+                        // Check if this announcement was deleted by the user
+                        String announcementTitle = announcement.getAnnouncementTitle();
+                        Log.d(TAG, "Initial fetch - checking announcement: " + announcementTitle);
+                        if (deletedAnnouncementIds.contains(announcementTitle)) {
+                            Log.d(TAG, "Initial fetch - skipping deleted announcement: " + announcementTitle);
+                            continue; // Skip deleted announcements
+                        }
+
                         // Prepend the text to the announcement title
-                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcement.getAnnouncementTitle();
+                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcementTitle;
 
                         NotificationRecyclerViewItem newNotification = new NotificationRecyclerViewItem(
                                 "Post Proper Southside",
@@ -252,8 +407,17 @@ public class NotificationActivity extends AppCompatActivity {
                                 R.drawable.notification_pps_logo
                         );
 
+                        // Check for duplicates by content, not just object equality
+                        boolean isDuplicate = false;
+                        for (NotificationRecyclerViewItem existingItem : notificationItems) {
+                            if (existingItem.getCaption().equals(updatedTitle)) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+
                         // Only add if not already in the list
-                        if (!notificationItems.contains(newNotification)) {
+                        if (!isDuplicate) {
                             notificationItems.add(newNotification);
                         }
                     }
@@ -394,11 +558,17 @@ public class NotificationActivity extends AppCompatActivity {
             public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<AnnouncementResponse> announcements = response.body();
-                    boolean added = false;
+                    boolean added = false;                    for (AnnouncementResponse announcement : announcements) {
+                        // Check if this announcement was deleted by the user
+                        String announcementTitle = announcement.getAnnouncementTitle();
+                        Log.d(TAG, "Recent fetch - checking announcement: " + announcementTitle);
+                        if (deletedAnnouncementIds.contains(announcementTitle)) {
+                            Log.d(TAG, "Recent fetch - skipping deleted announcement: " + announcementTitle);
+                            continue; // Skip deleted announcements
+                        }
 
-                    for (AnnouncementResponse announcement : announcements) {
                         // Prepend the text to the announcement title
-                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcement.getAnnouncementTitle();
+                        String updatedTitle = "Post Proper Southside posted a new announcement.\n" + announcementTitle;
 
                         NotificationRecyclerViewItem newNotification = new NotificationRecyclerViewItem(
                                 "Post Proper Southside",
@@ -406,8 +576,17 @@ public class NotificationActivity extends AppCompatActivity {
                                 R.drawable.notification_pps_logo
                         );
 
+                        // Check for duplicates by content, not just object equality
+                        boolean isDuplicate = false;
+                        for (NotificationRecyclerViewItem existingItem : notificationItems) {
+                            if (existingItem.getCaption().equals(updatedTitle)) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+
                         // Avoid duplicates: Check if the new announcement already exists
-                        if (!notificationItems.contains(newNotification)) {
+                        if (!isDuplicate) {
                             notificationItems.add(0, newNotification); // Add to the top
                             added = true;
                         }
@@ -470,13 +649,128 @@ public class NotificationActivity extends AppCompatActivity {
                     }
                 }
             }
-        }
-
-        // Remove the identified notifications
+        }        // Remove the identified notifications
         if (!notificationsToRemove.isEmpty()) {
             notificationItems.removeAll(notificationsToRemove);
             notificationAdapter.notifyDataSetChanged();
             saveNotifications(); // Save after removing
         }
+    }    /**
+     * Extract announcement ID from notification message
+     * This method now extracts the announcement title and creates a consistent identifier
+     */
+    private String extractAnnouncementId(String message) {
+        try {
+            // Extract the announcement title from the message
+            if (message.contains("announcement.\n")) {
+                String[] parts = message.split("announcement.\n");
+                if (parts.length > 1) {
+                    String title = parts[1].trim();
+                    // Create a consistent identifier based on the title
+                    // This will match the title used when creating notifications
+                    return title;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            Log.e(TAG, "Error extracting announcement ID", e);
+            return null;
+        }
+    }
+
+    /**
+     * Extract document request ID from notification message
+     */
+    private String extractDocumentRequestId(String message) {
+        try {
+            // Extract document type and use it as identifier
+            // This can be enhanced to use actual request IDs
+            return message.hashCode() + ""; // Use message hash as ID for now
+        } catch (Exception e) {
+            Log.e(TAG, "Error extracting document request ID", e);
+            return null;
+        }
+    }
+
+    /**
+     * Save deleted notification IDs to SharedPreferences
+     */
+    private void saveDeletedNotificationIds() {
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            // Save deleted announcement IDs
+            JSONArray deletedAnnouncementsArray = new JSONArray();
+            for (String id : deletedAnnouncementIds) {
+                deletedAnnouncementsArray.put(id);
+            }
+            editor.putString(PREF_KEY_DELETED_ANNOUNCEMENTS, deletedAnnouncementsArray.toString());
+
+            // Save deleted document request IDs
+            JSONArray deletedDocRequestsArray = new JSONArray();
+            for (String id : deletedDocumentRequestIds) {
+                deletedDocRequestsArray.put(id);
+            }
+            editor.putString(PREF_KEY_DELETED_DOCUMENT_REQUESTS, deletedDocRequestsArray.toString());
+            
+            editor.apply();
+            Log.d(TAG, "Saved " + deletedAnnouncementIds.size() + " deleted announcement IDs: " + deletedAnnouncementIds.toString());
+            Log.d(TAG, "Saved " + deletedDocumentRequestIds.size() + " deleted document request IDs");
+        } catch (Exception e) {
+            Log.e(TAG, "Error saving deleted notification IDs", e);
+        }
+    }    /**
+     * Load deleted notification IDs from SharedPreferences
+     */
+    private void loadDeletedNotificationIds() {
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+            // Load deleted announcement IDs
+            String deletedAnnouncementsJson = prefs.getString(PREF_KEY_DELETED_ANNOUNCEMENTS, "[]");
+            JSONArray deletedAnnouncementsArray = new JSONArray(deletedAnnouncementsJson);
+            for (int i = 0; i < deletedAnnouncementsArray.length(); i++) {
+                String deletedId = deletedAnnouncementsArray.getString(i);
+                deletedAnnouncementIds.add(deletedId);
+                Log.d(TAG, "Loaded deleted announcement ID: " + deletedId);
+            }
+
+            // Load deleted document request IDs
+            String deletedDocRequestsJson = prefs.getString(PREF_KEY_DELETED_DOCUMENT_REQUESTS, "[]");
+            JSONArray deletedDocRequestsArray = new JSONArray(deletedDocRequestsJson);
+            for (int i = 0; i < deletedDocRequestsArray.length(); i++) {
+                deletedDocumentRequestIds.add(deletedDocRequestsArray.getString(i));
+            }
+
+            Log.d(TAG, "Loaded " + deletedAnnouncementIds.size() + " deleted announcement IDs and " 
+                    + deletedDocumentRequestIds.size() + " deleted document request IDs");
+            Log.d(TAG, "Deleted announcement IDs: " + deletedAnnouncementIds.toString());        } catch (Exception e) {
+            Log.e(TAG, "Error loading deleted notification IDs", e);
+        }
+    }
+
+    /**
+     * Load cache timestamps from SharedPreferences
+     */
+    private void loadLastCheckTimes() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        lastAnnouncementCheckTime = prefs.getLong(PREF_KEY_LAST_ANNOUNCEMENT_CHECK, 0);
+        lastDocumentCheckTime = prefs.getLong(PREF_KEY_LAST_DOCUMENT_CHECK, 0);
+        Log.d(TAG, "Loaded cache times - Announcements: " + lastAnnouncementCheckTime + 
+                   ", Documents: " + lastDocumentCheckTime);
+    }
+
+    /**
+     * Save cache timestamps to SharedPreferences
+     */
+    private void saveLastCheckTimes() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(PREF_KEY_LAST_ANNOUNCEMENT_CHECK, lastAnnouncementCheckTime);
+        editor.putLong(PREF_KEY_LAST_DOCUMENT_CHECK, lastDocumentCheckTime);
+        editor.apply();
+        Log.d(TAG, "Saved cache times - Announcements: " + lastAnnouncementCheckTime + 
+                   ", Documents: " + lastDocumentCheckTime);
     }
 }

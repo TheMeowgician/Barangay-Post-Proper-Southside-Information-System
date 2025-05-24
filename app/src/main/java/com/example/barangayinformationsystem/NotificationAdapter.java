@@ -21,10 +21,21 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     private Context context;
     private List<NotificationRecyclerViewItem> notificationItems;
+    private OnNotificationInteractionListener listener;
+
+    // Interface for handling notification interactions
+    public interface OnNotificationInteractionListener {
+        void onNotificationClick(NotificationRecyclerViewItem item, int position);
+        void onNotificationDelete(NotificationRecyclerViewItem item, int position);
+    }
 
     public NotificationAdapter(Context context, List<NotificationRecyclerViewItem> notificationItems) {
         this.context = context;
         this.notificationItems = notificationItems;
+    }
+
+    public void setOnNotificationInteractionListener(OnNotificationInteractionListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -32,9 +43,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.notification_item_view, parent, false);
         return new ViewHolder(view);
-    }
-
-    @Override
+    }    @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         NotificationRecyclerViewItem item = notificationItems.get(position);
 
@@ -47,9 +56,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         String timeAgo = generateTimeStamp(position);
         holder.timestampTextView.setText(timeAgo);
 
-        // Add click listener for potential future functionality
+        // Set click listener for notification item
         holder.itemView.setOnClickListener(v -> {
-            // Handle notification click if needed
+            if (listener != null) {
+                listener.onNotificationClick(item, position);
+            }
+        });
+
+        // Set click listener for delete button
+        holder.deleteButton.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onNotificationDelete(item, position);
+            }
         });
     }
 
@@ -124,13 +142,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         } catch (Exception e) {
             return "Just now";
         }
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    }    public static class ViewHolder extends RecyclerView.ViewHolder {
         MaterialTextView titleTextView;
         MaterialTextView messageTextView;
         MaterialTextView timestampTextView;
         ImageView iconImageView;
+        ImageView deleteButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -138,6 +155,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             messageTextView = itemView.findViewById(R.id.notification_recycler_view_item_caption_of_user_material_text_view);
             timestampTextView = itemView.findViewById(R.id.notification_timestamp);
             iconImageView = itemView.findViewById(R.id.notification_recycler_view_item_image_view);
+            deleteButton = itemView.findViewById(R.id.notification_delete_button);
+        }
+    }
+
+    // Method to remove notification from list
+    public void removeNotification(int position) {
+        if (position >= 0 && position < notificationItems.size()) {
+            notificationItems.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, notificationItems.size());
         }
     }
 }

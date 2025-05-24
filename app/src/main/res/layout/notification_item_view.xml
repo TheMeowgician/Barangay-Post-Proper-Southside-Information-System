@@ -18,7 +18,19 @@
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/notification_pps_logo" />
+        tools:src="@drawable/notification_pps_logo" />    <!-- Delete Button -->
+    <ImageView
+        android:id="@+id/notification_delete_button"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Delete notification"
+        android:padding="4dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:tint="#666666"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Timestamp -->
     <com.google.android.material.textview.MaterialTextView
@@ -28,11 +40,9 @@
         android:textColor="#06070F"
         android:textSize="12sp"
         android:alpha="0.7"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/notification_delete_button"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="2 hours ago" />
-
-    <!-- Notification Title -->
+        tools:text="2 hours ago" />    <!-- Notification Title -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/notification_recycler_view_item_name_of_user_material_text_view"
         android:layout_width="0dp"
@@ -44,7 +54,7 @@
         android:textColor="#06070F"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/notification_timestamp"
+        app:layout_constraintEnd_toStartOf="@id/notification_delete_button"
         app:layout_constraintStart_toEndOf="@id/notification_recycler_view_item_image_view"
         app:layout_constraintTop_toTopOf="@id/notification_recycler_view_item_image_view"
         tools:text="Post Proper Southside" />
