@@ -58,18 +58,13 @@
 
                         <TextView
                             android:id="@+id/notificationCounterTextView"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
                             android:layout_alignEnd="@id/notificationImageButton"
                             android:layout_alignTop="@id/notificationImageButton"
-                            android:layout_marginTop="-5dp"
-                            android:layout_marginEnd="-5dp"
+                            android:layout_marginTop="-3dp"
+                            android:layout_marginEnd="-3dp"
                             android:background="@drawable/notification_badge_background"
-                            android:gravity="center"
-                            android:text="0"
-                            android:textColor="@android:color/white"
-                            android:textSize="10sp"
-                            android:textStyle="bold"
                             android:visibility="gone" />
 
                     </RelativeLayout>

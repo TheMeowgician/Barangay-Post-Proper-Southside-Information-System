@@ -135,6 +135,9 @@ public class LogInActivity extends AppCompatActivity {
                             editor.putInt("user_id", loginResponse.getId());
                             editor.apply();
 
+                            // Initialize first login timestamp for this user
+                            initializeFirstLoginTimestamp(loginResponse.getId());
+
                             Intent homeIntent = new Intent(LogInActivity.this, HomeActivity.class);
                             homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             SuccessDialog.showSuccess(LogInActivity.this, "You have successfully logged in", homeIntent);
@@ -145,6 +148,9 @@ public class LogInActivity extends AppCompatActivity {
                             SharedPreferences.Editor editor = prefs.edit();
                             editor.putInt("user_id", loginResponse.getId());
                             editor.apply();
+
+                            // Initialize first login timestamp for this user
+                            initializeFirstLoginTimestamp(loginResponse.getId());
 
                             Intent pendingIntent = new Intent(LogInActivity.this, PendingStatusActivity.class);
                             pendingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -278,6 +284,28 @@ public class LogInActivity extends AppCompatActivity {
         } catch (Exception e) {
             // Fallback method if reflection fails
             textInputLayout.setBoxStrokeColor(getResources().getColor(R.color.error));
+        }
+    }
+
+    /**
+     * Initialize first login timestamp for this user
+     */
+    private void initializeFirstLoginTimestamp(int userId) {
+        String firstLoginKey = "first_login_timestamp_" + userId;
+        
+        // Check if this is the first time this user is logging in on this device
+        long firstLoginTimestamp = prefs.getLong(firstLoginKey, 0);
+        
+        if (firstLoginTimestamp == 0) {
+            // This is the first login for this user on this device
+            firstLoginTimestamp = System.currentTimeMillis();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putLong(firstLoginKey, firstLoginTimestamp);
+            editor.apply();
+            
+            android.util.Log.d("LogInActivity", "First login detected for user " + userId + " at timestamp: " + firstLoginTimestamp);
+        } else {
+            android.util.Log.d("LogInActivity", "Existing user " + userId + " first logged in at timestamp: " + firstLoginTimestamp);
         }
     }
 }

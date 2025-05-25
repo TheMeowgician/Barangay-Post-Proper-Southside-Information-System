@@ -33,7 +33,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     private static final String PREF_KEY_SAVED_NOTIFICATIONS = "saved_notifications";
     private static final String PREF_KEY_DELETED_ANNOUNCEMENTS = "deleted_announcements";
     private static final String PREF_KEY_DELETED_DOCUMENT_REQUESTS = "deleted_document_requests";
-    private static final String PREF_KEY_DELETED_INCIDENT_REPORTS = "deleted_incident_reports";    private static final int MAX_NOTIFICATIONS = 50; // Maximum notifications to keep
+    private static final String PREF_KEY_DELETED_INCIDENT_REPORTS = "deleted_incident_reports";
+    private static final String PREF_KEY_DELETED_DATABASE_NOTIFICATIONS = "deleted_database_notifications";
+    private static final String PREF_KEY_FIRST_LOGIN_TIMESTAMP = "first_login_timestamp_";    private static final int MAX_NOTIFICATIONS = 50; // Maximum notifications to keep
     private static final int POLLING_INTERVAL = 20000; // Reduced from 5000 to 20000 (20 seconds)
     private static final int BACKGROUND_POLLING_INTERVAL = 60000; // Poll every 60 seconds when in background
     private static final long MIN_CACHE_DURATION = 15000; // Minimum 15 seconds between API calls
@@ -56,13 +58,17 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     // Sets to track deleted notifications to prevent re-adding them
     private Set<String> deletedAnnouncementIds;
     private Set<String> deletedDocumentRequestIds;
-    private Set<String> deletedIncidentReportIds;    private final Handler handler = new Handler();
+    private Set<String> deletedIncidentReportIds;
+    private Set<String> deletedDatabaseNotificationIds;    private final Handler handler = new Handler();
     
     // Caching variables to reduce API calls
     private long lastAnnouncementCheckTime = 0;
     private long lastDocumentCheckTime = 0;
     private long lastIncidentCheckTime = 0;
     private boolean isAppInForeground = true;
+    
+    // First login timestamp to filter out old notifications
+    private long firstLoginTimestamp = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +80,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         deletedAnnouncementIds = new HashSet<>();
         deletedDocumentRequestIds = new HashSet<>();
         deletedIncidentReportIds = new HashSet<>();
+        deletedDatabaseNotificationIds = new HashSet<>();
         loadDeletedNotificationIds();
 
         // Initialize the API service
@@ -87,6 +94,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         incidentStatusTracker.loadTrackedStatuses(this);        // Get user ID from SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         userId = prefs.getInt("user_id", -1);
+        
+        // Initialize first login timestamp for this user
+        initializeFirstLoginTimestamp();
         
         // Load cache timestamps
         loadLastCheckTimes();
@@ -155,7 +165,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     }    public void goBack(View view) {
         finish();
     }    private void handleNotificationClick(NotificationRecyclerViewItem item, int position) {
-        // Handle navigation based on notification type
+                                                                                                                                                                                                                                              // Handle navigation based on notification type
         String title = item.getNameOfUser();
         String message = item.getCaption();
         
@@ -196,29 +206,38 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     }    private void handleNotificationDelete(NotificationRecyclerViewItem item, int position) {
         try {
             // Track the deleted notification to prevent re-adding
+            // Use nameOfUser to properly identify notification source instead of message content
+            String nameOfUser = item.getNameOfUser();
             String message = item.getCaption();
-            if (message.toLowerCase().contains("announcement") || message.toLowerCase().contains("posted")) {
-                // Extract announcement identifier from the message (you can enhance this logic)
+            
+            if (nameOfUser.equals("Post Proper Southside")) {
+                // This is an announcement notification
                 String announcementId = extractAnnouncementId(message);
                 if (announcementId != null) {
                     deletedAnnouncementIds.add(announcementId);
                     Log.d(TAG, "Added announcement to deleted list: " + announcementId);
                     Log.d(TAG, "Total deleted announcements: " + deletedAnnouncementIds.size());
                 }
-            } else if (message.toLowerCase().contains("request")) {
-                // Extract document request identifier from the message
+            } else if (nameOfUser.equals("Document Request Update")) {
+                // This is an app-generated document request notification
                 String requestId = extractDocumentRequestId(message);
                 if (requestId != null) {
                     deletedDocumentRequestIds.add(requestId);
                     Log.d(TAG, "Added document request to deleted list: " + requestId);
                 }
-            } else if (message.toLowerCase().contains("incident")) {
-                // Extract incident report identifier from the message
+            } else if (nameOfUser.equals("Incident Report Update")) {
+                // This is an app-generated incident report notification
                 String incidentId = extractIncidentReportId(message);
                 if (incidentId != null) {
                     deletedIncidentReportIds.add(incidentId);
                     Log.d(TAG, "Added incident report to deleted list: " + incidentId);
                 }
+            } else {
+                // Handle database notifications (anything else) - create a unique identifier
+                String databaseNotificationId = item.getUniqueId();
+                deletedDatabaseNotificationIds.add(databaseNotificationId);
+                Log.d(TAG, "Added database notification to deleted list: " + databaseNotificationId);
+                Log.d(TAG, "Database notification nameOfUser: " + nameOfUser + ", message: " + message);
             }
 
             // Remove the notification from the adapter
@@ -387,9 +406,17 @@ public class NotificationActivity extends AppCompatActivity {    private static 
             public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<AnnouncementResponse> announcements = response.body();                    for (AnnouncementResponse announcement : announcements) {
+                        String announcementTitle = announcement.getAnnouncementTitle();
+                        String createdAt = announcement.getCreatedAt();
+                        
+                        // Check if this announcement should be shown based on first login timestamp
+                        if (!shouldShowNotification(createdAt)) {
+                            Log.d(TAG, "Skipping old announcement (before first login): " + announcementTitle);
+                            continue; // Skip announcements created before first login
+                        }
+                        
                         // Check if this announcement was deleted by the user
                         // Use the announcement title as the identifier to match deletion tracking
-                        String announcementTitle = announcement.getAnnouncementTitle();
                         Log.d(TAG, "Checking announcement: " + announcementTitle);
                         Log.d(TAG, "Deleted announcements set: " + deletedAnnouncementIds.toString());
                         
@@ -436,8 +463,16 @@ public class NotificationActivity extends AppCompatActivity {    private static 
             public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<AnnouncementResponse> announcements = response.body();                    for (AnnouncementResponse announcement : announcements) {
-                        // Check if this announcement was deleted by the user
                         String announcementTitle = announcement.getAnnouncementTitle();
+                        String createdAt = announcement.getCreatedAt();
+                        
+                        // Check if this announcement should be shown based on first login timestamp
+                        if (!shouldShowNotification(createdAt)) {
+                            Log.d(TAG, "Skipping old announcement (before first login): " + announcementTitle);
+                            continue; // Skip announcements created before first login
+                        }
+                        
+                        // Check if this announcement was deleted by the user
                         Log.d(TAG, "Initial fetch - checking announcement: " + announcementTitle);
                         if (deletedAnnouncementIds.contains(announcementTitle)) {
                             Log.d(TAG, "Initial fetch - skipping deleted announcement: " + announcementTitle);
@@ -620,8 +655,16 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                     List<AnnouncementResponse> announcements = response.body();
 
                     for (AnnouncementResponse announcement : announcements) {
-                        // Check if this announcement was deleted by the user
                         String announcementTitle = announcement.getAnnouncementTitle();
+                        String createdAt = announcement.getCreatedAt();
+                        
+                        // Check if this announcement should be shown based on first login timestamp
+                        if (!shouldShowNotification(createdAt)) {
+                            Log.d(TAG, "Recent fetch - skipping old announcement (before first login): " + announcementTitle);
+                            continue; // Skip announcements created before first login
+                        }
+                        
+                        // Check if this announcement was deleted by the user
                         Log.d(TAG, "Recent fetch - checking announcement: " + announcementTitle);
                         if (deletedAnnouncementIds.contains(announcementTitle)) {
                             Log.d(TAG, "Recent fetch - skipping deleted announcement: " + announcementTitle);
@@ -855,11 +898,19 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 deletedIncidentReportsArray.put(id);
             }
             editor.putString(PREF_KEY_DELETED_INCIDENT_REPORTS, deletedIncidentReportsArray.toString());
+
+            // Save deleted database notification IDs
+            JSONArray deletedDatabaseNotificationsArray = new JSONArray();
+            for (String id : deletedDatabaseNotificationIds) {
+                deletedDatabaseNotificationsArray.put(id);
+            }
+            editor.putString(PREF_KEY_DELETED_DATABASE_NOTIFICATIONS, deletedDatabaseNotificationsArray.toString());
             
             editor.apply();
             Log.d(TAG, "Saved " + deletedAnnouncementIds.size() + " deleted announcement IDs: " + deletedAnnouncementIds.toString());
             Log.d(TAG, "Saved " + deletedDocumentRequestIds.size() + " deleted document request IDs");
             Log.d(TAG, "Saved " + deletedIncidentReportIds.size() + " deleted incident report IDs");
+            Log.d(TAG, "Saved " + deletedDatabaseNotificationIds.size() + " deleted database notification IDs");
         } catch (Exception e) {
             Log.e(TAG, "Error saving deleted notification IDs", e);
         }
@@ -893,11 +944,88 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 deletedIncidentReportIds.add(deletedIncidentReportsArray.getString(i));
             }
 
+            // Load deleted database notification IDs
+            String deletedDatabaseNotificationsJson = prefs.getString(PREF_KEY_DELETED_DATABASE_NOTIFICATIONS, "[]");
+            JSONArray deletedDatabaseNotificationsArray = new JSONArray(deletedDatabaseNotificationsJson);
+            for (int i = 0; i < deletedDatabaseNotificationsArray.length(); i++) {
+                deletedDatabaseNotificationIds.add(deletedDatabaseNotificationsArray.getString(i));
+            }
+
             Log.d(TAG, "Loaded " + deletedAnnouncementIds.size() + " deleted announcement IDs and " 
                     + deletedDocumentRequestIds.size() + " deleted document request IDs and "
-                    + deletedIncidentReportIds.size() + " deleted incident report IDs");
+                    + deletedIncidentReportIds.size() + " deleted incident report IDs and "
+                    + deletedDatabaseNotificationIds.size() + " deleted database notification IDs");
             Log.d(TAG, "Deleted announcement IDs: " + deletedAnnouncementIds.toString());        } catch (Exception e) {
             Log.e(TAG, "Error loading deleted notification IDs", e);
+        }
+    }
+
+    /**
+     * Initialize first login timestamp for this user
+     */
+    private void initializeFirstLoginTimestamp() {
+        if (userId == -1) return;
+        
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String firstLoginKey = PREF_KEY_FIRST_LOGIN_TIMESTAMP + userId;
+        
+        // Check if this is the first time this user is logging in on this device
+        firstLoginTimestamp = prefs.getLong(firstLoginKey, 0);
+        
+        if (firstLoginTimestamp == 0) {
+            // This is the first login for this user on this device
+            firstLoginTimestamp = System.currentTimeMillis();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putLong(firstLoginKey, firstLoginTimestamp);
+            editor.apply();
+            
+            Log.d(TAG, "First login detected for user " + userId + " at timestamp: " + firstLoginTimestamp);
+        } else {
+            Log.d(TAG, "Existing user " + userId + " first logged in at timestamp: " + firstLoginTimestamp);
+        }
+    }
+
+    /**
+     * Check if a notification should be shown based on its creation timestamp
+     */
+    private boolean shouldShowNotification(String createdAtString) {
+        if (firstLoginTimestamp == 0) {
+            return true; // If no first login timestamp, show all notifications
+        }
+        
+        try {
+            // Parse the created_at timestamp from the API
+            // Common formats: "2024-01-15 10:30:00", "2024-01-15T10:30:00Z", etc.
+            java.text.SimpleDateFormat[] formats = {
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()),
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.getDefault()),
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault()),
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+            };
+            
+            java.util.Date notificationDate = null;
+            for (java.text.SimpleDateFormat format : formats) {
+                try {
+                    notificationDate = format.parse(createdAtString);
+                    break;
+                } catch (java.text.ParseException e) {
+                    // Try next format
+                }
+            }
+            
+            if (notificationDate != null) {
+                long notificationTimestamp = notificationDate.getTime();
+                boolean shouldShow = notificationTimestamp >= firstLoginTimestamp;
+                Log.d(TAG, "Notification created at: " + createdAtString + " (" + notificationTimestamp + 
+                           "), First login: " + firstLoginTimestamp + ", Should show: " + shouldShow);
+                return shouldShow;
+            } else {
+                Log.w(TAG, "Could not parse notification timestamp: " + createdAtString + ", showing by default");
+                return true; // If we can't parse the timestamp, show the notification
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking notification timestamp: " + e.getMessage());
+            return true; // If there's an error, show the notification
         }
     }
 
@@ -1129,6 +1257,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         }
     }
 
+
+
     /**
      * Fetch notifications from the database (the primary source of notifications)
      */
@@ -1148,9 +1278,27 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                             // Convert database notification to NotificationRecyclerViewItem
                             String title = dbNotification.getTitle();
                             String message = dbNotification.getMessage();
+                            String createdAt = dbNotification.getCreatedAt();
                             
-                            // Create a unique identifier for this database notification
-                            String notificationId = "db_" + dbNotification.getId();
+                            // Check if this notification should be shown based on first login timestamp
+                            if (!shouldShowNotification(createdAt)) {
+                                Log.d(TAG, "Skipping old database notification (before first login): " + title + " - " + message);
+                                continue; // Skip notifications created before first login
+                            }
+                            
+                            // Create a temporary notification item to get unique ID
+                            NotificationRecyclerViewItem tempNotification = new NotificationRecyclerViewItem(
+                                title,
+                                message,
+                                R.drawable.notification_pps_logo
+                            );
+                            String notificationId = tempNotification.getUniqueId();
+                            
+                            // Check if this notification was deleted by the user
+                            if (deletedDatabaseNotificationIds.contains(notificationId)) {
+                                Log.d(TAG, "Skipping deleted database notification: " + title + " - " + message);
+                                continue; // Skip deleted database notifications
+                            }
                             
                             // Check if this notification already exists in our list
                             boolean alreadyExists = false;

@@ -45,6 +45,8 @@ public class HomeActivity extends AppCompatActivity {    private static final St
     private static final int BACKGROUND_POLLING_INTERVAL = 60000; // Poll every 60 seconds when in background
     private static final String PREF_KEY_DELETED_ANNOUNCEMENTS = "deleted_announcements";
     private static final String PREF_KEY_DELETED_DOCUMENT_REQUESTS = "deleted_document_requests";
+    private static final String PREF_KEY_DELETED_DATABASE_NOTIFICATIONS = "deleted_database_notifications";
+    private static final String PREF_KEY_FIRST_LOGIN_TIMESTAMP = "first_login_timestamp_";
     private static final String PREF_KEY_LAST_ANNOUNCEMENT_CHECK = "last_announcement_check";
     private static final String PREF_KEY_LAST_DOCUMENT_CHECK = "last_document_check";
     private static final String PREF_KEY_LAST_INCIDENT_CHECK = "last_incident_check";
@@ -73,7 +75,11 @@ public class HomeActivity extends AppCompatActivity {    private static final St
     
     // Sets to track deleted notifications to prevent counting them
     private Set<String> deletedAnnouncementIds = new HashSet<>();
-    private Set<String> deletedDocumentRequestIds = new HashSet<>();@Override
+    private Set<String> deletedDocumentRequestIds = new HashSet<>();
+    private Set<String> deletedDatabaseNotificationIds = new HashSet<>();
+    
+    // First login timestamp to filter out old notifications
+    private long firstLoginTimestamp = 0;@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
@@ -373,6 +379,9 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         userId = prefs.getInt("user_id", -1);
         
         if (userId != -1) {
+            // Initialize first login timestamp for this user
+            initializeFirstLoginTimestamp();
+            
             // Load deleted notification IDs
             loadDeletedNotificationIds();
             
@@ -440,8 +449,16 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                     int newAnnouncementCount = 0;
                     
                     for (AnnouncementResponse announcement : announcements) {
-                        // Check if this announcement was deleted by the user
                         String announcementTitle = announcement.getAnnouncementTitle();
+                        String createdAt = announcement.getCreatedAt();
+                        
+                        // Check if this announcement should be shown based on first login timestamp
+                        if (!shouldShowNotification(createdAt)) {
+                            Log.d(TAG, "HomeActivity: Skipping old announcement (before first login): " + announcementTitle);
+                            continue; // Skip announcements created before first login
+                        }
+                        
+                        // Check if this announcement was deleted by the user
                         if (deletedAnnouncementIds.contains(announcementTitle)) {
                             Log.d(TAG, "HomeActivity: Skipping deleted announcement: " + announcementTitle);
                             continue; // Skip deleted announcements
@@ -611,6 +628,28 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                         for (NotificationResponse dbNotification : dbNotifications) {
                             // Only count unread notifications
                             if (!dbNotification.isRead()) {
+                                String createdAt = dbNotification.getCreatedAt();
+                                
+                                // Check if this notification should be shown based on first login timestamp
+                                if (!shouldShowNotification(createdAt)) {
+                                    Log.d(TAG, "HomeActivity: Skipping old database notification (before first login): " + dbNotification.getTitle());
+                                    continue; // Skip notifications created before first login
+                                }
+                                
+                                // Create a temporary notification item to get unique ID
+                                NotificationRecyclerViewItem tempNotification = new NotificationRecyclerViewItem(
+                                    dbNotification.getTitle(),
+                                    dbNotification.getMessage(),
+                                    R.drawable.notification_pps_logo
+                                );
+                                String notificationId = tempNotification.getUniqueId();
+                                
+                                // Check if this notification was deleted by the user
+                                if (deletedDatabaseNotificationIds.contains(notificationId)) {
+                                    Log.d(TAG, "Skipping deleted database notification: " + dbNotification.getTitle());
+                                    continue; // Skip deleted database notifications
+                                }
+                                
                                 String notificationKey = "db_notification_" + dbNotification.getId();
                                 if (!knownIncidentStatuses.contains(notificationKey)) {
                                     knownIncidentStatuses.add(notificationKey);
@@ -644,8 +683,8 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         runOnUiThread(() -> {
             if (unreadNotificationCount > 0) {
                 notificationCounterTextView.setVisibility(View.VISIBLE);
-                String countText = unreadNotificationCount > 99 ? "99+" : String.valueOf(unreadNotificationCount);
-                notificationCounterTextView.setText(countText);
+                // Just show a red dot - no text needed
+                notificationCounterTextView.setText("");
             } else {
                 notificationCounterTextView.setVisibility(View.GONE);
             }
@@ -709,6 +748,74 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         editor.apply();
     }
       /**
+     * Initialize first login timestamp for this user
+     */
+    private void initializeFirstLoginTimestamp() {
+        if (userId == -1) return;
+        
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String firstLoginKey = PREF_KEY_FIRST_LOGIN_TIMESTAMP + userId;
+        
+        // Check if this is the first time this user is logging in on this device
+        firstLoginTimestamp = prefs.getLong(firstLoginKey, 0);
+        
+        if (firstLoginTimestamp == 0) {
+            // This is the first login for this user on this device
+            firstLoginTimestamp = System.currentTimeMillis();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putLong(firstLoginKey, firstLoginTimestamp);
+            editor.apply();
+            
+            Log.d(TAG, "HomeActivity: First login detected for user " + userId + " at timestamp: " + firstLoginTimestamp);
+        } else {
+            Log.d(TAG, "HomeActivity: Existing user " + userId + " first logged in at timestamp: " + firstLoginTimestamp);
+        }
+    }
+
+    /**
+     * Check if a notification should be shown based on its creation timestamp
+     */
+    private boolean shouldShowNotification(String createdAtString) {
+        if (firstLoginTimestamp == 0) {
+            return true; // If no first login timestamp, show all notifications
+        }
+        
+        try {
+            // Parse the created_at timestamp from the API
+            java.text.SimpleDateFormat[] formats = {
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()),
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.getDefault()),
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault()),
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+            };
+            
+            java.util.Date notificationDate = null;
+            for (java.text.SimpleDateFormat format : formats) {
+                try {
+                    notificationDate = format.parse(createdAtString);
+                    break;
+                } catch (java.text.ParseException e) {
+                    // Try next format
+                }
+            }
+            
+            if (notificationDate != null) {
+                long notificationTimestamp = notificationDate.getTime();
+                boolean shouldShow = notificationTimestamp >= firstLoginTimestamp;
+                Log.d(TAG, "HomeActivity: Notification created at: " + createdAtString + " (" + notificationTimestamp + 
+                           "), First login: " + firstLoginTimestamp + ", Should show: " + shouldShow);
+                return shouldShow;
+            } else {
+                Log.w(TAG, "HomeActivity: Could not parse notification timestamp: " + createdAtString + ", showing by default");
+                return true; // If we can't parse the timestamp, show the notification
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "HomeActivity: Error checking notification timestamp: " + e.getMessage());
+            return true; // If there's an error, show the notification
+        }
+    }
+
+    /**
      * Load deleted notification IDs from SharedPreferences
      */
     private void loadDeletedNotificationIds() {
@@ -731,8 +838,16 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                 deletedDocumentRequestIds.add(deletedDocRequestsArray.getString(i));
             }
 
+            // Load deleted database notification IDs
+            String deletedDatabaseNotificationsJson = prefs.getString(PREF_KEY_DELETED_DATABASE_NOTIFICATIONS, "[]");
+            JSONArray deletedDatabaseNotificationsArray = new JSONArray(deletedDatabaseNotificationsJson);
+            for (int i = 0; i < deletedDatabaseNotificationsArray.length(); i++) {
+                deletedDatabaseNotificationIds.add(deletedDatabaseNotificationsArray.getString(i));
+            }
+
             Log.d(TAG, "HomeActivity: Loaded " + deletedAnnouncementIds.size() + " deleted announcement IDs and " 
-                    + deletedDocumentRequestIds.size() + " deleted document request IDs");
+                    + deletedDocumentRequestIds.size() + " deleted document request IDs and "
+                    + deletedDatabaseNotificationIds.size() + " deleted database notification IDs");
         } catch (Exception e) {
             Log.e(TAG, "HomeActivity: Error loading deleted notification IDs", e);
         }

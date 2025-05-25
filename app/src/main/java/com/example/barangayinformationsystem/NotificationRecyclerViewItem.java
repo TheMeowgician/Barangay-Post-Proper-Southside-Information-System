@@ -91,4 +91,10 @@ public class NotificationRecyclerViewItem {
             return null;
         }
     }
+
+    // Create a unique identifier for this notification
+    public String getUniqueId() {
+        String identifier = nameOfUser + "|" + caption;
+        return String.valueOf(identifier.hashCode());
+    }
 }

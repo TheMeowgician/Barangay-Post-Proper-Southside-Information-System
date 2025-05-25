@@ -18,12 +18,14 @@
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/notification_pps_logo" />    <!-- Delete Button -->
+        tools:src="@drawable/notification_pps_logo" />
+
+    <!-- Delete Button -->
     <ImageView
         android:id="@+id/notification_delete_button"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="4dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Delete notification"
         android:padding="4dp"
@@ -35,14 +37,23 @@
     <!-- Timestamp -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/notification_timestamp"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:ellipsize="end"
+        android:gravity="end"
+        android:maxLines="1"
         android:textColor="#06070F"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:alpha="0.7"
         app:layout_constraintEnd_toStartOf="@id/notification_delete_button"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="2 hours ago" />    <!-- Notification Title -->
+        app:layout_constraintStart_toEndOf="@id/notification_recycler_view_item_name_of_user_material_text_view"
+        app:layout_constraintTop_toTopOf="@id/notification_recycler_view_item_name_of_user_material_text_view"
+        app:layout_constraintBottom_toBottomOf="@id/notification_recycler_view_item_name_of_user_material_text_view"
+        tools:text="2 hours ago" />
+
+    <!-- Notification Title -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/notification_recycler_view_item_name_of_user_material_text_view"
         android:layout_width="0dp"
@@ -52,11 +63,14 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="#06070F"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/notification_delete_button"
+        app:layout_constraintEnd_toStartOf="@id/notification_timestamp"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/notification_recycler_view_item_image_view"
         app:layout_constraintTop_toTopOf="@id/notification_recycler_view_item_image_view"
+        app:layout_constraintWidth_percent="0.6"
         tools:text="Post Proper Southside" />
 
     <!-- Notification Message -->
@@ -65,16 +79,18 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="12dp"
         android:ellipsize="end"
-        android:lineSpacingExtra="2dp"
-        android:maxLines="3"
+        android:lineSpacingExtra="1dp"
+        android:maxLines="2"
         android:textColor="#06070F"
-        android:textSize="14sp"
+        android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/notification_recycler_view_item_image_view"
         app:layout_constraintTop_toBottomOf="@id/notification_recycler_view_item_name_of_user_material_text_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0"
         tools:text="Your Barangay Clearance request has been approved. You can now pick it up at the barangay hall." />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
