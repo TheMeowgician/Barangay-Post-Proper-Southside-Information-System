@@ -47,6 +47,7 @@ public class HomeActivity extends AppCompatActivity {    private static final St
     private static final String PREF_KEY_DELETED_DOCUMENT_REQUESTS = "deleted_document_requests";
     private static final String PREF_KEY_LAST_ANNOUNCEMENT_CHECK = "last_announcement_check";
     private static final String PREF_KEY_LAST_DOCUMENT_CHECK = "last_document_check";
+    private static final String PREF_KEY_LAST_INCIDENT_CHECK = "last_incident_check";
     private static final long MIN_CACHE_DURATION = 15000; // 15 seconds minimum between checks
 
     ImageButton menuImageButton, closeMenuImageButton;
@@ -62,10 +63,12 @@ public class HomeActivity extends AppCompatActivity {    private static final St
     private int unreadNotificationCount = 0;
     private Set<String> knownAnnouncements = new HashSet<>();
     private Set<String> knownDocumentStatuses = new HashSet<>();
+    private Set<String> knownIncidentStatuses = new HashSet<>();
     
     // Cache variables to reduce database queries
     private long lastAnnouncementCheckTime = 0;
     private long lastDocumentCheckTime = 0;
+    private long lastIncidentCheckTime = 0;
     private boolean isAppInForeground = true;
     
     // Sets to track deleted notifications to prevent counting them
@@ -79,13 +82,17 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         loadUserDetails();
         updateUserActivity();
 
-        // Handle navigation from document request
+        // Handle navigation from notifications
         if (getIntent().hasExtra("navigate_to")) {
             String navigateTo = getIntent().getStringExtra("navigate_to");
             if ("document_status".equals(navigateTo)) {
                 replaceFragment(new DocumentStatusFragment());
                 // Update navigation drawer selection if needed
                 navigationView.setCheckedItem(R.id.navDocumentStatus);
+            } else if ("incident_status".equals(navigateTo)) {
+                replaceFragment(new IncidentReportStatusFragment());
+                // Update navigation drawer selection if needed
+                navigationView.setCheckedItem(R.id.navIncidentReportStatus);
             } else {
                 // Default to home fragment
                 replaceFragment(new HomeFragment());
@@ -399,6 +406,14 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                     lastDocumentCheckTime = currentTime;
                 }
                 
+                if (currentTime - lastIncidentCheckTime >= MIN_CACHE_DURATION) {
+                    checkForIncidentStatusChanges();
+                    lastIncidentCheckTime = currentTime;
+                }
+                
+                // Always check database notifications (they are the primary source)
+                checkForDatabaseNotifications();
+                
                 notificationHandler.postDelayed(this, interval);
             }
         }, NOTIFICATION_POLLING_INTERVAL);
@@ -533,6 +548,96 @@ public class HomeActivity extends AppCompatActivity {    private static final St
     }
     
     /**
+     * Check for incident status changes and update counter
+     */
+    private void checkForIncidentStatusChanges() {
+        if (apiService == null || userId == -1) return;
+        
+        Call<IncidentReportListResponse> call = apiService.getUserIncidentReports(userId);
+        call.enqueue(new Callback<IncidentReportListResponse>() {
+            @Override
+            public void onResponse(Call<IncidentReportListResponse> call, Response<IncidentReportListResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<IncidentReport> reports = response.body().getReports();
+                    if (reports != null) {
+                        int newStatusChangeCount = 0;
+                        
+                        for (IncidentReport report : reports) {
+                            String currentStatus = report.getStatus();
+                            
+                            // Only count notifications for meaningful status changes (resolved)
+                            if ("resolved".equalsIgnoreCase(currentStatus)) {
+                                String statusKey = "incident_" + report.getId() + "_" + currentStatus;
+                                if (!knownIncidentStatuses.contains(statusKey)) {
+                                    knownIncidentStatuses.add(statusKey);
+                                    newStatusChangeCount++;
+                                    Log.d(TAG, "Incident #" + report.getId() + " status changed to: " + currentStatus);
+                                }
+                            }
+                        }
+                        
+                        if (newStatusChangeCount > 0) {
+                            unreadNotificationCount += newStatusChangeCount;
+                            updateNotificationCounter();
+                            saveKnownNotifications();
+                            Log.d(TAG, "Found " + newStatusChangeCount + " incident status changes");
+                        }
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<IncidentReportListResponse> call, Throwable t) {
+                Log.e(TAG, "Error checking incident reports: " + t.getMessage());
+            }
+        });
+    }
+    
+    /**
+     * Check for database notifications and update counter
+     */
+    private void checkForDatabaseNotifications() {
+        if (apiService == null || userId == -1) return;
+        
+        Call<NotificationListResponse> call = apiService.getUserNotifications(userId);
+        call.enqueue(new Callback<NotificationListResponse>() {
+            @Override
+            public void onResponse(Call<NotificationListResponse> call, Response<NotificationListResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<NotificationResponse> dbNotifications = response.body().getNotifications();
+                    if (dbNotifications != null) {
+                        int newDbNotificationCount = 0;
+                        
+                        for (NotificationResponse dbNotification : dbNotifications) {
+                            // Only count unread notifications
+                            if (!dbNotification.isRead()) {
+                                String notificationKey = "db_notification_" + dbNotification.getId();
+                                if (!knownIncidentStatuses.contains(notificationKey)) {
+                                    knownIncidentStatuses.add(notificationKey);
+                                    newDbNotificationCount++;
+                                    Log.d(TAG, "Found new database notification: " + dbNotification.getTitle());
+                                }
+                            }
+                        }
+                        
+                        if (newDbNotificationCount > 0) {
+                            unreadNotificationCount += newDbNotificationCount;
+                            updateNotificationCounter();
+                            saveKnownNotifications();
+                            Log.d(TAG, "Found " + newDbNotificationCount + " new database notifications");
+                        }
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<NotificationListResponse> call, Throwable t) {
+                Log.e(TAG, "Error checking database notifications: " + t.getMessage());
+            }
+        });
+    }
+    
+    /**
      * Update the notification counter badge
      */
     private void updateNotificationCounter() {
@@ -573,6 +678,10 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         Set<String> savedDocStatuses = prefs.getStringSet("known_document_statuses", new HashSet<>());
         knownDocumentStatuses.addAll(savedDocStatuses);
         
+        // Load known incident statuses
+        Set<String> savedIncidentStatuses = prefs.getStringSet("known_incident_statuses", new HashSet<>());
+        knownIncidentStatuses.addAll(savedIncidentStatuses);
+        
         // Update counter display
         updateNotificationCounter();
     }
@@ -586,6 +695,7 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         
         editor.putStringSet("known_announcements", knownAnnouncements);
         editor.putStringSet("known_document_statuses", knownDocumentStatuses);
+        editor.putStringSet("known_incident_statuses", knownIncidentStatuses);
         editor.putInt("unread_notification_count", unreadNotificationCount);
         editor.apply();
     }
@@ -635,7 +745,8 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         lastAnnouncementCheckTime = prefs.getLong(PREF_KEY_LAST_ANNOUNCEMENT_CHECK, 0);
         lastDocumentCheckTime = prefs.getLong(PREF_KEY_LAST_DOCUMENT_CHECK, 0);
-        Log.d(TAG, "Loaded last check times - Announcements: " + lastAnnouncementCheckTime + ", Documents: " + lastDocumentCheckTime);
+        lastIncidentCheckTime = prefs.getLong(PREF_KEY_LAST_INCIDENT_CHECK, 0);
+        Log.d(TAG, "Loaded last check times - Announcements: " + lastAnnouncementCheckTime + ", Documents: " + lastDocumentCheckTime + ", Incidents: " + lastIncidentCheckTime);
     }
     
     /**
@@ -646,6 +757,7 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(PREF_KEY_LAST_ANNOUNCEMENT_CHECK, lastAnnouncementCheckTime);
         editor.putLong(PREF_KEY_LAST_DOCUMENT_CHECK, lastDocumentCheckTime);
+        editor.putLong(PREF_KEY_LAST_INCIDENT_CHECK, lastIncidentCheckTime);
         editor.apply();
         Log.d(TAG, "Saved last check times");
     }

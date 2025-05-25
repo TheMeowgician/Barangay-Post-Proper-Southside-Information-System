@@ -32,7 +32,8 @@ import retrofit2.Response;
 public class NotificationActivity extends AppCompatActivity {    private static final String TAG = "NotificationActivity";
     private static final String PREF_KEY_SAVED_NOTIFICATIONS = "saved_notifications";
     private static final String PREF_KEY_DELETED_ANNOUNCEMENTS = "deleted_announcements";
-    private static final String PREF_KEY_DELETED_DOCUMENT_REQUESTS = "deleted_document_requests";    private static final int MAX_NOTIFICATIONS = 50; // Maximum notifications to keep
+    private static final String PREF_KEY_DELETED_DOCUMENT_REQUESTS = "deleted_document_requests";
+    private static final String PREF_KEY_DELETED_INCIDENT_REPORTS = "deleted_incident_reports";    private static final int MAX_NOTIFICATIONS = 50; // Maximum notifications to keep
     private static final int POLLING_INTERVAL = 20000; // Reduced from 5000 to 20000 (20 seconds)
     private static final int BACKGROUND_POLLING_INTERVAL = 60000; // Poll every 60 seconds when in background
     private static final long MIN_CACHE_DURATION = 15000; // Minimum 15 seconds between API calls
@@ -40,6 +41,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     // Cache-related constants for SharedPreferences
     private static final String PREF_KEY_LAST_ANNOUNCEMENT_CHECK = "last_announcement_check_time";
     private static final String PREF_KEY_LAST_DOCUMENT_CHECK = "last_document_check_time";
+    private static final String PREF_KEY_LAST_INCIDENT_CHECK = "last_incident_check_time";
 
     private RecyclerView notificationRecyclerView;
     private MaterialTextView notification_activity_recent_textview;
@@ -48,15 +50,18 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     private List<NotificationRecyclerViewItem> notificationItems;
     private ApiService apiService;
     private DocumentStatusTracker statusTracker;
+    private IncidentStatusTracker incidentStatusTracker;
     private int userId;
 
     // Sets to track deleted notifications to prevent re-adding them
     private Set<String> deletedAnnouncementIds;
-    private Set<String> deletedDocumentRequestIds;    private final Handler handler = new Handler();
+    private Set<String> deletedDocumentRequestIds;
+    private Set<String> deletedIncidentReportIds;    private final Handler handler = new Handler();
     
     // Caching variables to reduce API calls
     private long lastAnnouncementCheckTime = 0;
     private long lastDocumentCheckTime = 0;
+    private long lastIncidentCheckTime = 0;
     private boolean isAppInForeground = true;
 
     @Override
@@ -68,14 +73,18 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         // Initialize deleted notification tracking
         deletedAnnouncementIds = new HashSet<>();
         deletedDocumentRequestIds = new HashSet<>();
+        deletedIncidentReportIds = new HashSet<>();
         loadDeletedNotificationIds();
 
         // Initialize the API service
         apiService = RetrofitClient.getApiService();
 
-        // Initialize status tracker
+        // Initialize status trackers
         statusTracker = DocumentStatusTracker.getInstance();
-        statusTracker.loadTrackedStatuses(this);        // Get user ID from SharedPreferences
+        statusTracker.loadTrackedStatuses(this);
+        
+        incidentStatusTracker = IncidentStatusTracker.getInstance();
+        incidentStatusTracker.loadTrackedStatuses(this);        // Get user ID from SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         userId = prefs.getInt("user_id", -1);
         
@@ -86,11 +95,17 @@ public class NotificationActivity extends AppCompatActivity {    private static 
             // Load saved notifications first
             loadSavedNotifications();
 
+            // Fetch database notifications first (these are the real notifications)
+            fetchDatabaseNotifications();
+
             // Then fetch announcements
             fetchAnnouncements();
 
             // Check document requests with notification enabled
             fetchDocumentRequests(true);
+
+            // Check incident reports with notification enabled
+            fetchIncidentReports(true);
 
             // Start polling for updates
             startPolling();
@@ -162,6 +177,14 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
+            } else if (message.toLowerCase().contains("incident") || 
+                      message.toLowerCase().contains("resolved")) {
+                // Navigate to incident report status fragment
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.putExtra("navigate_to", "incident_status");
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
             } else {
                 // Default behavior - show a toast with the notification content
                 Toast.makeText(this, "Notification: " + message, Toast.LENGTH_LONG).show();
@@ -188,6 +211,13 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 if (requestId != null) {
                     deletedDocumentRequestIds.add(requestId);
                     Log.d(TAG, "Added document request to deleted list: " + requestId);
+                }
+            } else if (message.toLowerCase().contains("incident")) {
+                // Extract incident report identifier from the message
+                String incidentId = extractIncidentReportId(message);
+                if (incidentId != null) {
+                    deletedIncidentReportIds.add(incidentId);
+                    Log.d(TAG, "Added incident report to deleted list: " + incidentId);
                 }
             }
 
@@ -242,6 +272,19 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                           (MIN_CACHE_DURATION - (currentTime - lastDocumentCheckTime)) + "ms)");
                 }
                 
+                // Check if enough time has passed since last incident check
+                if (currentTime - lastIncidentCheckTime >= MIN_CACHE_DURATION) {
+                    fetchIncidentReports(true);
+                    lastIncidentCheckTime = currentTime;
+                    Log.d(TAG, "Fetched incident reports due to cache expiry");
+                } else {
+                    Log.d(TAG, "Skipped incident fetch due to cache (time remaining: " + 
+                          (MIN_CACHE_DURATION - (currentTime - lastIncidentCheckTime)) + "ms)");
+                }
+                
+                // Always fetch database notifications (they are the primary source)
+                fetchDatabaseNotifications();
+                
                 // Use different polling intervals based on app state
                 int pollingInterval = isAppInForeground ? POLLING_INTERVAL : BACKGROUND_POLLING_INTERVAL;
                 handler.postDelayed(this, pollingInterval);
@@ -255,6 +298,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         handler.removeCallbacksAndMessages(null); // Stop all scheduled tasks
         // Save tracked statuses when activity is destroyed
         statusTracker.saveTrackedStatuses(this);
+        incidentStatusTracker.saveTrackedStatuses(this);
         // Save notifications and deleted IDs        saveNotifications();
         saveDeletedNotificationIds();
     }
@@ -273,6 +317,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         isAppInForeground = false;
         // Save tracked statuses when activity is paused
         statusTracker.saveTrackedStatuses(this);
+        incidentStatusTracker.saveTrackedStatuses(this);
         // Save notifications and deleted IDs
         saveNotifications();
         saveDeletedNotificationIds();
@@ -803,10 +848,18 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 deletedDocRequestsArray.put(id);
             }
             editor.putString(PREF_KEY_DELETED_DOCUMENT_REQUESTS, deletedDocRequestsArray.toString());
+
+            // Save deleted incident report IDs
+            JSONArray deletedIncidentReportsArray = new JSONArray();
+            for (String id : deletedIncidentReportIds) {
+                deletedIncidentReportsArray.put(id);
+            }
+            editor.putString(PREF_KEY_DELETED_INCIDENT_REPORTS, deletedIncidentReportsArray.toString());
             
             editor.apply();
             Log.d(TAG, "Saved " + deletedAnnouncementIds.size() + " deleted announcement IDs: " + deletedAnnouncementIds.toString());
             Log.d(TAG, "Saved " + deletedDocumentRequestIds.size() + " deleted document request IDs");
+            Log.d(TAG, "Saved " + deletedIncidentReportIds.size() + " deleted incident report IDs");
         } catch (Exception e) {
             Log.e(TAG, "Error saving deleted notification IDs", e);
         }
@@ -833,8 +886,16 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 deletedDocumentRequestIds.add(deletedDocRequestsArray.getString(i));
             }
 
+            // Load deleted incident report IDs
+            String deletedIncidentReportsJson = prefs.getString(PREF_KEY_DELETED_INCIDENT_REPORTS, "[]");
+            JSONArray deletedIncidentReportsArray = new JSONArray(deletedIncidentReportsJson);
+            for (int i = 0; i < deletedIncidentReportsArray.length(); i++) {
+                deletedIncidentReportIds.add(deletedIncidentReportsArray.getString(i));
+            }
+
             Log.d(TAG, "Loaded " + deletedAnnouncementIds.size() + " deleted announcement IDs and " 
-                    + deletedDocumentRequestIds.size() + " deleted document request IDs");
+                    + deletedDocumentRequestIds.size() + " deleted document request IDs and "
+                    + deletedIncidentReportIds.size() + " deleted incident report IDs");
             Log.d(TAG, "Deleted announcement IDs: " + deletedAnnouncementIds.toString());        } catch (Exception e) {
             Log.e(TAG, "Error loading deleted notification IDs", e);
         }
@@ -847,8 +908,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         lastAnnouncementCheckTime = prefs.getLong(PREF_KEY_LAST_ANNOUNCEMENT_CHECK, 0);
         lastDocumentCheckTime = prefs.getLong(PREF_KEY_LAST_DOCUMENT_CHECK, 0);
+        lastIncidentCheckTime = prefs.getLong(PREF_KEY_LAST_INCIDENT_CHECK, 0);
         Log.d(TAG, "Loaded cache times - Announcements: " + lastAnnouncementCheckTime + 
-                   ", Documents: " + lastDocumentCheckTime);
+                   ", Documents: " + lastDocumentCheckTime + ", Incidents: " + lastIncidentCheckTime);
     }
 
     /**
@@ -859,9 +921,10 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(PREF_KEY_LAST_ANNOUNCEMENT_CHECK, lastAnnouncementCheckTime);
         editor.putLong(PREF_KEY_LAST_DOCUMENT_CHECK, lastDocumentCheckTime);
+        editor.putLong(PREF_KEY_LAST_INCIDENT_CHECK, lastIncidentCheckTime);
         editor.apply();
         Log.d(TAG, "Saved cache times - Announcements: " + lastAnnouncementCheckTime + 
-                   ", Documents: " + lastDocumentCheckTime);
+                   ", Documents: " + lastDocumentCheckTime + ", Incidents: " + lastIncidentCheckTime);
     }
 
     /**
@@ -918,5 +981,217 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         } catch (Exception e) {
             Log.e(TAG, "Error filtering deleted document request notifications", e);
         }
+    }
+
+    /**
+     * Fetch incident reports and check for status changes
+     */
+    private void fetchIncidentReports(final boolean notifyChanges) {
+        if (userId == -1) return;
+
+        Call<IncidentReportListResponse> call = apiService.getUserIncidentReports(userId);
+        call.enqueue(new Callback<IncidentReportListResponse>() {
+            @Override
+            public void onResponse(Call<IncidentReportListResponse> call, Response<IncidentReportListResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<IncidentReport> reports = response.body().getReports();
+                    if (reports != null) {
+                        Log.d(TAG, "Fetched " + reports.size() + " incident reports");
+
+                        // Check for status changes
+                        if (!reports.isEmpty()) {
+                            for (IncidentReport report : reports) {
+                                Log.d(TAG, "Incident #" + report.getId() + " status: " + report.getStatus());
+
+                                // If this is the first view or if we want to notify about changes
+                                if (notifyChanges) {
+                                    boolean statusChanged = incidentStatusTracker.hasIncidentStatusChanged(report.getId(), report.getStatus());
+                                    Log.d(TAG, "Status changed for incident #" + report.getId() + ": " + statusChanged);
+
+                                    if (statusChanged) {
+                                        addIncidentStatusNotification(report);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "No incident reports found");
+                    }
+                } else {
+                    Log.e(TAG, "Failed to fetch incident reports: " + (response.body() != null ? response.body().getMessage() : "Unknown error"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<IncidentReportListResponse> call, Throwable t) {
+                Log.e(TAG, "Error fetching incident reports: " + t.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Add a notification for incident status change
+     */
+    private void addIncidentStatusNotification(IncidentReport report) {
+        String status = report.getStatus();
+        String title = report.getTitle();
+        
+        // Check if notification should be created
+        if (!shouldCreateNotificationForIncidentStatus(status, incidentStatusTracker.getTrackedIncidentStatus(report.getId()))) {
+            return;
+        }
+        
+        // Check for existing notification
+        if (hasExistingNotificationForIncident(report)) {
+            return;
+        }
+
+        String notificationMessage = String.format(
+            "Your incident report '%s' (ID #%d) has been %s.",
+            title,
+            report.getId(),
+            status.toLowerCase()
+        );
+
+        NotificationRecyclerViewItem newNotification = new NotificationRecyclerViewItem(
+            "Incident Report Update",
+            notificationMessage,
+            R.drawable.notification_pps_logo
+        );
+
+        Log.d(TAG, "Adding incident notification: " + notificationMessage);
+
+        // Add to the top of the list
+        notificationItems.add(0, newNotification);
+        notificationAdapter.notifyItemInserted(0);
+
+        // Save notifications after adding new one
+        saveNotifications();
+        
+        // Update status tracker
+        incidentStatusTracker.updateIncidentStatus(report.getId(), status);
+        
+        // Show toast for immediate feedback
+        Toast.makeText(this, "Incident report status updated: " + status, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Helper method to check if notification already exists for this incident
+     */
+    private boolean hasExistingNotificationForIncident(IncidentReport report) {
+        String title = report.getTitle();
+        String status = report.getStatus().toUpperCase();
+        String incidentId = "ID #" + report.getId();
+        
+        for (NotificationRecyclerViewItem notification : notificationItems) {
+            if (notification.getNameOfUser().equals("Incident Report Update")) {
+                String caption = notification.getCaption();
+                // Check for incident title, status, AND incident ID to ensure uniqueness
+                if (caption.contains(title) && caption.contains(status) && caption.contains(incidentId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Helper method to determine if we should create notification for this incident status change
+     */
+    private boolean shouldCreateNotificationForIncidentStatus(String currentStatus, String previousStatus) {
+        // Don't create notifications for initial "pending" status unless there was a previous status
+        if (previousStatus == null && "pending".equalsIgnoreCase(currentStatus)) {
+            return false;
+        }
+        
+        // Don't create notification if status hasn't actually changed
+        if (previousStatus != null && previousStatus.equalsIgnoreCase(currentStatus)) {
+            return false;
+        }
+        
+        // Create notifications for meaningful status changes
+        return "resolved".equalsIgnoreCase(currentStatus) ||
+               // Also notify when moving from pending to other statuses
+               ("pending".equalsIgnoreCase(previousStatus) && !"pending".equalsIgnoreCase(currentStatus));
+    }
+
+    /**
+     * Extract incident report ID from notification message
+     */
+    private String extractIncidentReportId(String message) {
+        try {
+            // Extract incident title and use it as identifier
+            // This can be enhanced to use actual incident IDs
+            return message.hashCode() + ""; // Use message hash as ID for now
+        } catch (Exception e) {
+            Log.e(TAG, "Error extracting incident report ID", e);
+            return null;
+        }
+    }
+
+    /**
+     * Fetch notifications from the database (the primary source of notifications)
+     */
+    private void fetchDatabaseNotifications() {
+        if (userId == -1) return;
+
+        Call<NotificationListResponse> call = apiService.getUserNotifications(userId);
+        call.enqueue(new Callback<NotificationListResponse>() {
+            @Override
+            public void onResponse(Call<NotificationListResponse> call, Response<NotificationListResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<NotificationResponse> dbNotifications = response.body().getNotifications();
+                    if (dbNotifications != null && !dbNotifications.isEmpty()) {
+                        Log.d(TAG, "Fetched " + dbNotifications.size() + " database notifications");
+
+                        for (NotificationResponse dbNotification : dbNotifications) {
+                            // Convert database notification to NotificationRecyclerViewItem
+                            String title = dbNotification.getTitle();
+                            String message = dbNotification.getMessage();
+                            
+                            // Create a unique identifier for this database notification
+                            String notificationId = "db_" + dbNotification.getId();
+                            
+                            // Check if this notification already exists in our list
+                            boolean alreadyExists = false;
+                            for (NotificationRecyclerViewItem existingItem : notificationItems) {
+                                // Check if this is the same database notification
+                                if (existingItem.getCaption().equals(message) && 
+                                    existingItem.getNameOfUser().equals(title)) {
+                                    alreadyExists = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!alreadyExists) {
+                                NotificationRecyclerViewItem newNotification = new NotificationRecyclerViewItem(
+                                    title,
+                                    message,
+                                    R.drawable.notification_pps_logo
+                                );
+                                
+                                // Add to the top of the list (most recent first)
+                                notificationItems.add(0, newNotification);
+                                Log.d(TAG, "Added database notification: " + title + " - " + message);
+                            }
+                        }
+                        
+                        // Update the adapter and save notifications
+                        notificationAdapter.notifyDataSetChanged();
+                        saveNotifications();
+                    } else {
+                        Log.d(TAG, "No database notifications found");
+                    }
+                } else {
+                    Log.e(TAG, "Failed to fetch database notifications: " + 
+                          (response.body() != null ? response.body().getMessage() : "Unknown error"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NotificationListResponse> call, Throwable t) {
+                Log.e(TAG, "Error fetching database notifications: " + t.getMessage());
+            }
+        });
     }
 }
