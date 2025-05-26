@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -101,6 +102,7 @@ public class IncidentReportStatusFragment extends Fragment {
         TextView descriptionText = dialogView.findViewById(R.id.incident_description_text);
         TextView dateSubmittedText = dialogView.findViewById(R.id.date_submitted_text);
         TextView statusText = dialogView.findViewById(R.id.status_text);
+        Button closeButton = dialogView.findViewById(R.id.close_button); // Add reference to the close button
 
         // Set values
         titleText.setText(report.getTitle());
@@ -120,9 +122,12 @@ public class IncidentReportStatusFragment extends Fragment {
         }
 
         AlertDialog dialog = builder.setView(dialogView)
-                .setPositiveButton("Close", null)
                 .create();
 
+        // Set up the close button's click listener
+        closeButton.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         dialog.show();
     }
 }

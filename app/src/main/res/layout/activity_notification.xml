@@ -56,16 +56,6 @@
             android:textSize="14sp"
             app:fontFamily="@font/poppins" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/notification_activity_mark_all_as_read_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:text="Mark all as read"
-            android:textSize="14sp"
-            app:fontFamily="@font/poppins"/>
-
     </RelativeLayout>
 
     <!-- RecyclerView with no margins/padding for full width -->
