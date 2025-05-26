@@ -12,111 +12,144 @@
     <RelativeLayout
         android:id="@+id/emergency_hotline_main_relative_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:id="@+id/emergency_hotline_header_relative_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#3F0070"
-            android:padding="28dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/emergency_hotline_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
                 android:fontFamily="@font/poppins_bold"
                 android:text="Emergency Hotlines"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:gravity="center"
-                />
+                android:maxLines="2"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="18sp"
+                android:autoSizeMaxTextSize="24sp" />
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/emergency_hotlines_body_relative_layout"
+        <LinearLayout
+            android:id="@+id/emergency_hotlines_body_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="28dp"
+            android:orientation="vertical"
+            android:padding="16dp"
             android:layout_below="@+id/emergency_hotline_header_relative_layout">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/emergency_hotlines_barangay_pps_material_cardview"
                 android:layout_width="match_parent"
-                android:layout_height="260dp"
-                app:cardBackgroundColor="#3F0070">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#3F0070"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
                 <RelativeLayout
                     android:id="@+id/emergency_hotlines_barangay_pps_material_cardview_relative_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="20dp">
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:minHeight="200dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:alpha="0.5"
+                        android:id="@+id/barangay_logo_image"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="8dp"
+                        android:alpha="0.3"
+                        android:scaleType="centerInside"
                         android:src="@drawable/barangay_post_proper_southside_logo"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_barangay_pps_material_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_below="@+id/barangay_logo_image"
+                        android:layout_marginTop="8dp"
                         android:text="Barangay Post Proper Southside"
                         android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/poppins_semibold"/>
+                        android:textSize="16sp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_barangay_pps_telephone_number_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="16dp"
                         android:layout_below="@+id/emergency_hotlines_barangay_pps_material_textview"
-                        android:text="Telephone No: (02) 8986-2484\n                            (02) 8986-1681"
+                        android:text="Telephone No:\n(02) 8986-2484\n(02) 8986-1681"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:fontFamily="@font/poppins_light"/>
+                        android:fontFamily="@font/poppins_light"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="12sp"
+                        android:autoSizeMaxTextSize="14sp"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_barangay_pps_mobile_number_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="12dp"
                         android:layout_below="@+id/emergency_hotlines_barangay_pps_telephone_number_textview"
                         android:text="Mobile No: 0998-975-0368"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:fontFamily="@font/poppins_light"/>
+                        android:fontFamily="@font/poppins_light"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="12sp"
+                        android:autoSizeMaxTextSize="14sp"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_bantaybayan_and_barangay_enforcer_material_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="16dp"
                         android:text="Bantay Bayan and Barangay Enforcer"
                         android:textColor="@color/white"
                         android:textSize="14sp"
                         android:fontFamily="@font/poppins_semibold"
-                        android:layout_below="@+id/emergency_hotlines_barangay_pps_mobile_number_textview"/>
+                        android:gravity="center"
+                        android:layout_below="@+id/emergency_hotlines_barangay_pps_mobile_number_textview"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="12sp"
+                        android:autoSizeMaxTextSize="14sp"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_bantaybayan_and_barangay_enforcer_mobile_number_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="8dp"
                         android:layout_below="@+id/emergency_hotlines_bantaybayan_and_barangay_enforcer_material_textview"
                         android:text="Mobile No: 0906-445-1489"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:fontFamily="@font/poppins_light"/>
+                        android:fontFamily="@font/poppins_light"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="12sp"
+                        android:autoSizeMaxTextSize="14sp"/>
 
                 </RelativeLayout>
 
@@ -125,46 +158,58 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/emergency_hotlines_taguig_pnp_material_cardview"
                 android:layout_width="match_parent"
-                android:layout_height="260dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="#3F0070"
-                android:layout_marginTop="28dp"
-                android:layout_below="@+id/emergency_hotlines_barangay_pps_material_cardview">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
                 <RelativeLayout
                     android:id="@+id/emergency_hotlines_taguig_pnp_material_cardview_relative_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="20dp">
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:minHeight="150dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:alpha="0.5"
+                        android:id="@+id/pnp_logo_image"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="8dp"
+                        android:alpha="0.3"
+                        android:scaleType="centerInside"
                         android:src="@drawable/emergency_hotlines_taguig_pnp"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_taguig_pnp_material_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Taguig PNP (Philippine National Police)"
+                        android:layout_below="@+id/pnp_logo_image"
+                        android:layout_marginTop="8dp"
+                        android:text="Taguig PNP\n(Philippine National Police)"
                         android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/poppins_semibold"/>
+                        android:textSize="16sp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_taguig_pnp_mobile_number_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="16dp"
                         android:layout_below="@+id/emergency_hotlines_taguig_pnp_material_textview"
                         android:text="Mobile No: 0998-598-7932"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:fontFamily="@font/poppins_light"/>
+                        android:fontFamily="@font/poppins_light"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="12sp"
+                        android:autoSizeMaxTextSize="14sp"/>
 
                 </RelativeLayout>
 
@@ -173,52 +218,64 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/emergency_hotlines_taguig_command_center_material_cardview"
                 android:layout_width="match_parent"
-                android:layout_height="260dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="#3F0070"
-                android:layout_marginTop="28dp"
-                android:layout_below="@+id/emergency_hotlines_taguig_pnp_material_cardview">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
                 <RelativeLayout
                     android:id="@+id/emergency_hotlines_taguig_command_center_material_cardview_relative_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="20dp">
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:minHeight="150dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:alpha="0.5"
+                        android:id="@+id/command_center_logo_image"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="8dp"
+                        android:alpha="0.3"
+                        android:scaleType="centerInside"
                         android:src="@drawable/emergency_hotlines_city_of_taguig"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_taguig_command_center_material_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_below="@+id/command_center_logo_image"
+                        android:layout_marginTop="8dp"
                         android:text="Taguig Command Center"
                         android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/poppins_semibold"/>
+                        android:textSize="16sp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/emergency_hotlines_taguig_command_center_telephone_number_textview"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="16dp"
                         android:layout_below="@+id/emergency_hotlines_taguig_command_center_material_textview"
                         android:text="Telephone No: (02) 8640-0340"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:fontFamily="@font/poppins_light"/>
+                        android:fontFamily="@font/poppins_light"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="12sp"
+                        android:autoSizeMaxTextSize="14sp"/>
 
                 </RelativeLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </RelativeLayout>
 
