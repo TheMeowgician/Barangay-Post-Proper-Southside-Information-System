@@ -59,7 +59,7 @@ public class UserDetailsResponse {
         @SerializedName("houseNo")
         private String houseNoField;
         
-        @SerializedName("zone")
+        @SerializedName("adrZone")
         private String zoneField;
         
         @SerializedName("street")
@@ -188,9 +188,10 @@ public class UserDetailsResponse {
          */
         public String getFormattedAddress() {
             // If the server provided the full address, use it directly
-            if (address != null && !address.trim().isEmpty()) {
-                return address.trim();
-            }
+            // Force client-side construction to ensure latest parts are used
+            // if (address != null && !address.trim().isEmpty()) {
+            //    return address.trim();
+            // }
 
             StringBuilder addressBuilder = new StringBuilder();
             
@@ -208,7 +209,8 @@ public class UserDetailsResponse {
                 }
                 addressBuilder.append(street);
                 // Add "Street" keyword if not already in the address
-                if (!addressBuilder.toString().toLowerCase().contains("street")) {
+                // More robust check: add "Street" if the street part itself doesn't end with it or contain it.
+                if (!street.toLowerCase().contains("street")) {
                     addressBuilder.append(" Street");
                 }
             }
@@ -220,16 +222,12 @@ public class UserDetailsResponse {
                     addressBuilder.append(" ");
                 }
                 
-                // Check if zone already contains special suffixes like "Village"
-                if (zone.toLowerCase().contains("village")) {
-                    // Just add the zone as is without prefix
+                String lowerZone = zone.toLowerCase();
+                // Prefix with "Zone " unless it's already there or it's a village type
+                if (lowerZone.startsWith("zone ") || lowerZone.contains("village")) {
                     addressBuilder.append(zone);
-                } else if (zone.matches("\\d+")) {
-                    // If zone is just a number, add "Zone" prefix
-                    addressBuilder.append("Zone ").append(zone);
                 } else {
-                    // For other zones that aren't villages and not just numbers, don't add any prefix
-                    addressBuilder.append(zone);
+                    addressBuilder.append("Zone ").append(zone);
                 }
             }
             
