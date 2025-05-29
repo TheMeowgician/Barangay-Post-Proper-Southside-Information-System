@@ -51,6 +51,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     private static final String CHANNEL_ID = "barangay_notification_channel";
     private static final int NOTIFICATION_ID = 1;
 
+    private static final String PREF_KEY_SHOWN_SYSTEM_NOTIFICATION_IDS = "shown_system_notification_ids";
+
     private RecyclerView notificationRecyclerView;
     private MaterialTextView notification_activity_recent_textview;
     private AppCompatImageButton notification_activity_header_back_button;
@@ -452,7 +454,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                             notificationItems.add(0, newNotification); // Add new to top
                             notificationAdapter.notifyItemInserted(0); // Notify adapter
                             saveNotifications(); // Save after adding
-                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
+                            String notificationContentId = "announcement_" + announcement.getId(); // Assuming AnnouncementResponse has getId()
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), notificationContentId);
                         }
                     }
                 }
@@ -507,7 +510,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                         // Only add if not already in the list
                         if (!isDuplicate) {
                             notificationItems.add(newNotification);
-                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
+                            String notificationContentId = "announcement_" + announcement.getId(); // Assuming AnnouncementResponse has getId()
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), notificationContentId);
                         }
                     }
                     notificationAdapter.notifyDataSetChanged();
@@ -632,7 +636,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
 
         // Save notifications after adding new one
         saveNotifications();
-        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
+        String docNotificationContentId = "doc_" + request.getId() + "_" + request.getStatus().toUpperCase();
+        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), docNotificationContentId);
         
         // Show toast for immediate feedback
         Toast.makeText(this, "Document status updated: " + status, Toast.LENGTH_SHORT).show();
@@ -702,7 +707,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                         if (!isDuplicate) {
                             notificationItems.add(0, newNotification); // Add to the top
                             addedAnnouncements = true;
-                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
+                            String announcementContentId = "announcement_" + announcement.getId(); // Assuming AnnouncementResponse has getId()
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), announcementContentId);
                         }
                     }
 
@@ -1205,7 +1211,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
 
         // Save notifications after adding new one
         saveNotifications();
-        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
+        String incidentContentId = "incident_" + report.getId() + "_" + report.getStatus().toLowerCase();
+        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), incidentContentId);
         
         // Update status tracker
         incidentStatusTracker.updateIncidentStatus(report.getId(), status);
@@ -1332,7 +1339,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                                 // Add to the top of the list (most recent first)
                                 notificationItems.add(0, newNotification);
                                 Log.d(TAG, "Added database notification: " + title + " - " + message);
-                                showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
+                                String dbNotificationContentId = "db_notif_" + dbNotification.getId(); // Assuming NotificationResponse has getId()
+                                showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), dbNotificationContentId);
                             }
                         }
                         
@@ -1355,7 +1363,15 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         });
     }
 
-    private void showSystemNotification(String title, String message) {
+    private void showSystemNotification(String title, String message, String notificationContentId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Set<String> shownNotificationIds = prefs.getStringSet(PREF_KEY_SHOWN_SYSTEM_NOTIFICATION_IDS, new HashSet<>());
+
+        if (shownNotificationIds.contains(notificationContentId)) {
+            Log.d(TAG, "System notification for " + notificationContentId + " already shown. Skipping.");
+            return;
+        }
+
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -1371,5 +1387,10 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 .setAutoCancel(true);
 
         notificationManager.notify(NOTIFICATION_ID, builder.build());
+
+        // Add to set and save
+        shownNotificationIds.add(notificationContentId);
+        prefs.edit().putStringSet(PREF_KEY_SHOWN_SYSTEM_NOTIFICATION_IDS, shownNotificationIds).apply();
+        Log.d(TAG, "Shown system notification for " + notificationContentId + " and saved to prefs.");
     }
 }

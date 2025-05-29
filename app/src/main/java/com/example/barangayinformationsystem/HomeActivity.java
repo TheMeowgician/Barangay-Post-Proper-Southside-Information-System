@@ -1,7 +1,11 @@
 package com.example.barangayinformationsystem;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -9,13 +13,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +35,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,7 +46,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeActivity extends AppCompatActivity {    private static final String TAG = "HomeActivity";
+public class HomeActivity extends AppCompatActivity {
+    private static final String TAG = "HomeActivity";
     private static final int NOTIFICATION_POLLING_INTERVAL = 30000; // Poll every 30 seconds (reduced from 5)
     private static final int BACKGROUND_POLLING_INTERVAL = 60000; // Poll every 60 seconds when in background
     private static final String PREF_KEY_DELETED_ANNOUNCEMENTS = "deleted_announcements";
@@ -51,6 +58,11 @@ public class HomeActivity extends AppCompatActivity {    private static final St
     private static final String PREF_KEY_LAST_DOCUMENT_CHECK = "last_document_check";
     private static final String PREF_KEY_LAST_INCIDENT_CHECK = "last_incident_check";
     private static final long MIN_CACHE_DURATION = 15000; // 15 seconds minimum between checks
+
+    private static final String PREF_KEY_SHOWN_SYSTEM_NOTIFICATION_IDS = "shown_system_notification_ids"; // Same key as in NotificationActivity
+
+    private static final String CHANNEL_ID = "barangay_home_notification_channel"; // Different channel ID for HomeActivity
+    private static final int HOME_NOTIFICATION_ID = 2; // Different notification ID for HomeActivity
 
     ImageButton menuImageButton, closeMenuImageButton;
     DrawerLayout homeDrawerLayout;
@@ -79,7 +91,9 @@ public class HomeActivity extends AppCompatActivity {    private static final St
     private Set<String> deletedDatabaseNotificationIds = new HashSet<>();
     
     // First login timestamp to filter out old notifications
-    private long firstLoginTimestamp = 0;@Override
+    private long firstLoginTimestamp = 0;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
@@ -205,7 +219,9 @@ public class HomeActivity extends AppCompatActivity {    private static final St
             navHeaderImageView.setImageResource(R.drawable.default_profile_picture);
             profileMiniIconCircleImageView.setImageResource(R.drawable.default_profile_picture);
         }
-    }    @Override
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         isAppInForeground = true;
@@ -225,7 +241,9 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         if (userId != -1) {
             startNotificationPolling();
         }
-    }public void openNotificationActivity(View view) {
+    }
+
+    public void openNotificationActivity(View view) {
         // Reset notification counter when user opens notifications
         resetNotificationCounter();
         
@@ -276,7 +294,9 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         SuccessDialog.showSuccess(HomeActivity.this, "You have successfully logged out", loginIntent);
-    }    private void initializeComponents() {
+    }
+
+    private void initializeComponents() {
         menuImageButton = findViewById(R.id.menuImageButton);
         homeDrawerLayout = findViewById(R.id.homeDrawerLayout);
         navigationView = findViewById(R.id.navigationView);
@@ -365,7 +385,8 @@ public class HomeActivity extends AppCompatActivity {    private static final St
             }
         }
     }
-      /**
+
+    /**
      * Initialize the notification tracking system
      */
     private void initializeNotificationSystem() {
@@ -392,7 +413,8 @@ public class HomeActivity extends AppCompatActivity {    private static final St
             startNotificationPolling();
         }
     }
-      /**
+
+    /**
      * Start periodic notification checking with intelligent caching
      */
     private void startNotificationPolling() {
@@ -434,7 +456,8 @@ public class HomeActivity extends AppCompatActivity {    private static final St
     private void stopNotificationPolling() {
         notificationHandler.removeCallbacksAndMessages(null);
     }
-      /**
+
+    /**
      * Check for new announcements and update counter
      */
     private void checkForNewAnnouncements() {
@@ -477,6 +500,12 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                         updateNotificationCounter();
                         saveKnownNotifications();
                         Log.d(TAG, "Found " + newAnnouncementCount + " new announcements");
+                        // Show system notification for the first new announcement
+                        if (!announcements.isEmpty()) {
+                            AnnouncementResponse firstAnnouncement = announcements.get(0);
+                            String announcementContentId = "announcement_" + firstAnnouncement.getId();
+                            showSystemNotification("New Announcement", firstAnnouncement.getAnnouncementTitle(), announcementContentId);
+                        }
                     }
                 }
             }
@@ -487,7 +516,8 @@ public class HomeActivity extends AppCompatActivity {    private static final St
             }
         });
     }
-      /**
+
+    /**
      * Check for document status changes and update counter
      */
     private void checkForDocumentStatusChanges() {
@@ -529,6 +559,12 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                             saveKnownNotifications();
                             statusTracker.saveTrackedStatuses(HomeActivity.this);
                             Log.d(TAG, "Found " + newStatusChangeCount + " document status changes");
+                            // Show system notification for the first document status change
+                            if (!requests.isEmpty()) {
+                                DocumentRequest firstRequest = requests.get(0);
+                                String docContentId = "doc_" + firstRequest.getId() + "_" + firstRequest.getStatus().toUpperCase();
+                                showSystemNotification("Document Status Update", "Request ID #" + firstRequest.getId() + " status: " + firstRequest.getStatus(), docContentId);
+                            }
                         }
                     }
                 }
@@ -598,6 +634,12 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                             updateNotificationCounter();
                             saveKnownNotifications();
                             Log.d(TAG, "Found " + newStatusChangeCount + " incident status changes");
+                            // Show system notification for the first incident status change
+                            if (!reports.isEmpty()) {
+                                IncidentReport firstReport = reports.get(0);
+                                String incidentContentId = "incident_" + firstReport.getId() + "_" + firstReport.getStatus().toLowerCase();
+                                showSystemNotification("Incident Status Update", "Incident '" + firstReport.getTitle() + "' status: " + firstReport.getStatus(), incidentContentId);
+                            }
                         }
                     }
                 }
@@ -664,6 +706,11 @@ public class HomeActivity extends AppCompatActivity {    private static final St
                             updateNotificationCounter();
                             saveKnownNotifications();
                             Log.d(TAG, "Found " + newDbNotificationCount + " new database notifications");
+                            // Show system notification for the first new database notification
+                            if(!dbNotifications.isEmpty()){                                NotificationResponse firstDbNotif = dbNotifications.get(0);
+                                String dbNotifContentId = "db_notif_" + firstDbNotif.getId();
+                                showSystemNotification(firstDbNotif.getTitle(), firstDbNotif.getMessage(), dbNotifContentId);
+                            }
                         }
                     }
                 }
@@ -896,5 +943,36 @@ public class HomeActivity extends AppCompatActivity {    private static final St
         }
         saveKnownNotifications();
         saveLastCheckTimes();
+    }
+
+    private void showSystemNotification(String title, String message, String notificationContentId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Set<String> shownNotificationIds = prefs.getStringSet(PREF_KEY_SHOWN_SYSTEM_NOTIFICATION_IDS, new HashSet<>());
+
+        if (shownNotificationIds.contains(notificationContentId)) {
+            Log.d(TAG, "System notification for " + notificationContentId + " already shown in HomeActivity. Skipping.");
+            return;
+        }
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Barangay Home Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_pps_logo) // Replace with your app's notification icon
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        notificationManager.notify(HOME_NOTIFICATION_ID, builder.build());
+
+        // Add to set and save
+        shownNotificationIds.add(notificationContentId);
+        prefs.edit().putStringSet(PREF_KEY_SHOWN_SYSTEM_NOTIFICATION_IDS, shownNotificationIds).apply();
+        Log.d(TAG, "Shown system notification for " + notificationContentId + " in HomeActivity and saved to prefs.");
     }
 }
