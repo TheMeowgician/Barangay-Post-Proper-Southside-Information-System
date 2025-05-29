@@ -21,7 +21,7 @@ import java.util.TimeZone;
 public class DocumentRequestFragment extends Fragment {
 
     // PROGRAMMER CONTROL: Set this to false to disable office hours restriction
-    private static final boolean ENABLE_OFFICE_HOURS_RESTRICTION = false;
+    private static final boolean ENABLE_OFFICE_HOURS_RESTRICTION = true;
 
     public AppCompatButton document_request_barangay_clearance_material_cardview_select_button,
             document_request_cedula_material_cardview_select_button,

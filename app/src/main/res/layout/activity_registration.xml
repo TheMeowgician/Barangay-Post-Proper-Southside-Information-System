@@ -485,7 +485,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@+id/stateCityTextInputEditTextLinearLayoutLinearLayout"
+        android:layout_below="@+id/stateCityTextInputEditTextLinearLayout"
         android:layout_marginBottom="20dp">
 
         <TextView
@@ -515,9 +515,11 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins"
                 android:hint="DD/MM/YYYY"
-                android:inputType="date"
+                android:inputType="none"
                 android:onClick="openDialog"
                 android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="false"
                 android:textSize="14dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
