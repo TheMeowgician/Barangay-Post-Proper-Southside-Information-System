@@ -1,5 +1,7 @@
 package com.example.barangayinformationsystem;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,6 +47,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     private static final String PREF_KEY_LAST_ANNOUNCEMENT_CHECK = "last_announcement_check_time";
     private static final String PREF_KEY_LAST_DOCUMENT_CHECK = "last_document_check_time";
     private static final String PREF_KEY_LAST_INCIDENT_CHECK = "last_incident_check_time";
+
+    private static final String CHANNEL_ID = "barangay_notification_channel";
+    private static final int NOTIFICATION_ID = 1;
 
     private RecyclerView notificationRecyclerView;
     private MaterialTextView notification_activity_recent_textview;
@@ -446,6 +452,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                             notificationItems.add(0, newNotification); // Add new to top
                             notificationAdapter.notifyItemInserted(0); // Notify adapter
                             saveNotifications(); // Save after adding
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
                         }
                     }
                 }
@@ -500,6 +507,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                         // Only add if not already in the list
                         if (!isDuplicate) {
                             notificationItems.add(newNotification);
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
                         }
                     }
                     notificationAdapter.notifyDataSetChanged();
@@ -624,6 +632,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
 
         // Save notifications after adding new one
         saveNotifications();
+        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
         
         // Show toast for immediate feedback
         Toast.makeText(this, "Document status updated: " + status, Toast.LENGTH_SHORT).show();
@@ -693,6 +702,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                         if (!isDuplicate) {
                             notificationItems.add(0, newNotification); // Add to the top
                             addedAnnouncements = true;
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
                         }
                     }
 
@@ -1195,6 +1205,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
 
         // Save notifications after adding new one
         saveNotifications();
+        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
         
         // Update status tracker
         incidentStatusTracker.updateIncidentStatus(report.getId(), status);
@@ -1321,6 +1332,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                                 // Add to the top of the list (most recent first)
                                 notificationItems.add(0, newNotification);
                                 Log.d(TAG, "Added database notification: " + title + " - " + message);
+                                showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption());
                             }
                         }
                         
@@ -1341,5 +1353,23 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 Log.e(TAG, "Error fetching database notifications: " + t.getMessage());
             }
         });
+    }
+
+    private void showSystemNotification(String title, String message) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Barangay Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_pps_logo) // Replace with your app's notification icon
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 }
