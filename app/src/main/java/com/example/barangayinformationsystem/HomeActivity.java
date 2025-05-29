@@ -2,6 +2,7 @@ package com.example.barangayinformationsystem;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -504,7 +505,12 @@ public class HomeActivity extends AppCompatActivity {
                         if (!announcements.isEmpty()) {
                             AnnouncementResponse firstAnnouncement = announcements.get(0);
                             String announcementContentId = "announcement_" + firstAnnouncement.getId();
-                            showSystemNotification("New Announcement", firstAnnouncement.getAnnouncementTitle(), announcementContentId);
+                            
+                            Intent intent = new Intent(HomeActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(HomeActivity.this, announcementContentId.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                            showSystemNotification("New Announcement", firstAnnouncement.getAnnouncementTitle(), announcementContentId, pendingIntent);
                         }
                     }
                 }
@@ -561,9 +567,14 @@ public class HomeActivity extends AppCompatActivity {
                             Log.d(TAG, "Found " + newStatusChangeCount + " document status changes");
                             // Show system notification for the first document status change
                             if (!requests.isEmpty()) {
-                                DocumentRequest firstRequest = requests.get(0);
+                                DocumentRequest firstRequest = requests.get(0); 
                                 String docContentId = "doc_" + firstRequest.getId() + "_" + firstRequest.getStatus().toUpperCase();
-                                showSystemNotification("Document Status Update", "Request ID #" + firstRequest.getId() + " status: " + firstRequest.getStatus(), docContentId);
+                                
+                                Intent docIntent = new Intent(HomeActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+                                docIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                PendingIntent docPendingIntent = PendingIntent.getActivity(HomeActivity.this, docContentId.hashCode(), docIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                
+                                showSystemNotification("Document Status Update", "Request ID #" + firstRequest.getId() + " status: " + firstRequest.getStatus(), docContentId, docPendingIntent);
                             }
                         }
                     }
@@ -635,10 +646,15 @@ public class HomeActivity extends AppCompatActivity {
                             saveKnownNotifications();
                             Log.d(TAG, "Found " + newStatusChangeCount + " incident status changes");
                             // Show system notification for the first incident status change
-                            if (!reports.isEmpty()) {
+                            if (!reports.isEmpty()) { 
                                 IncidentReport firstReport = reports.get(0);
                                 String incidentContentId = "incident_" + firstReport.getId() + "_" + firstReport.getStatus().toLowerCase();
-                                showSystemNotification("Incident Status Update", "Incident '" + firstReport.getTitle() + "' status: " + firstReport.getStatus(), incidentContentId);
+                                
+                                Intent incidentIntent = new Intent(HomeActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+                                incidentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                PendingIntent incidentPendingIntent = PendingIntent.getActivity(HomeActivity.this, incidentContentId.hashCode(), incidentIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                
+                                showSystemNotification("Incident Status Update", "Incident '" + firstReport.getTitle() + "' status: " + firstReport.getStatus(), incidentContentId, incidentPendingIntent);
                             }
                         }
                     }
@@ -709,7 +725,12 @@ public class HomeActivity extends AppCompatActivity {
                             // Show system notification for the first new database notification
                             if(!dbNotifications.isEmpty()){                                NotificationResponse firstDbNotif = dbNotifications.get(0);
                                 String dbNotifContentId = "db_notif_" + firstDbNotif.getId();
-                                showSystemNotification(firstDbNotif.getTitle(), firstDbNotif.getMessage(), dbNotifContentId);
+
+                                Intent dbIntent = new Intent(HomeActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+                                dbIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                PendingIntent dbPendingIntent = PendingIntent.getActivity(HomeActivity.this, dbNotifContentId.hashCode(), dbIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                                showSystemNotification(firstDbNotif.getTitle(), firstDbNotif.getMessage(), dbNotifContentId, dbPendingIntent);
                             }
                         }
                     }
@@ -945,7 +966,7 @@ public class HomeActivity extends AppCompatActivity {
         saveLastCheckTimes();
     }
 
-    private void showSystemNotification(String title, String message, String notificationContentId) {
+    private void showSystemNotification(String title, String message, String notificationContentId, PendingIntent pendingIntent) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Set<String> shownNotificationIds = prefs.getStringSet(PREF_KEY_SHOWN_SYSTEM_NOTIFICATION_IDS, new HashSet<>());
 
@@ -966,6 +987,7 @@ public class HomeActivity extends AppCompatActivity {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent) // Set the PendingIntent
                 .setAutoCancel(true);
 
         notificationManager.notify(HOME_NOTIFICATION_ID, builder.build());

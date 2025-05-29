@@ -2,6 +2,7 @@ package com.example.barangayinformationsystem;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -32,13 +33,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class NotificationActivity extends AppCompatActivity {    private static final String TAG = "NotificationActivity";
+public class NotificationActivity extends AppCompatActivity {
+    private static final String TAG = "NotificationActivity";
     private static final String PREF_KEY_SAVED_NOTIFICATIONS = "saved_notifications";
     private static final String PREF_KEY_DELETED_ANNOUNCEMENTS = "deleted_announcements";
     private static final String PREF_KEY_DELETED_DOCUMENT_REQUESTS = "deleted_document_requests";
     private static final String PREF_KEY_DELETED_INCIDENT_REPORTS = "deleted_incident_reports";
     private static final String PREF_KEY_DELETED_DATABASE_NOTIFICATIONS = "deleted_database_notifications";
-    private static final String PREF_KEY_FIRST_LOGIN_TIMESTAMP = "first_login_timestamp_";    private static final int MAX_NOTIFICATIONS = 50; // Maximum notifications to keep
+    private static final String PREF_KEY_FIRST_LOGIN_TIMESTAMP = "first_login_timestamp_";
+    private static final int MAX_NOTIFICATIONS = 50; // Maximum notifications to keep
     private static final int POLLING_INTERVAL = 20000; // Reduced from 5000 to 20000 (20 seconds)
     private static final int BACKGROUND_POLLING_INTERVAL = 60000; // Poll every 60 seconds when in background
     private static final long MIN_CACHE_DURATION = 15000; // Minimum 15 seconds between API calls
@@ -67,7 +70,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     private Set<String> deletedAnnouncementIds;
     private Set<String> deletedDocumentRequestIds;
     private Set<String> deletedIncidentReportIds;
-    private Set<String> deletedDatabaseNotificationIds;    private final Handler handler = new Handler();
+    private Set<String> deletedDatabaseNotificationIds;
+    private final Handler handler = new Handler();
     
     // Caching variables to reduce API calls
     private long lastAnnouncementCheckTime = 0;
@@ -81,7 +85,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification);        initializeViews();
+        setContentView(R.layout.activity_notification);
+        initializeViews();
         setupRecyclerView();
 
         // Initialize deleted notification tracking
@@ -99,7 +104,8 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         statusTracker.loadTrackedStatuses(this);
         
         incidentStatusTracker = IncidentStatusTracker.getInstance();
-        incidentStatusTracker.loadTrackedStatuses(this);        // Get user ID from SharedPreferences
+        incidentStatusTracker.loadTrackedStatuses(this);
+        // Get user ID from SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         userId = prefs.getInt("user_id", -1);
         
@@ -136,7 +142,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         notification_activity_recent_textview = findViewById(R.id.notification_activity_recent_textview);
         notification_activity_header_back_button = findViewById(R.id.notification_activity_header_back_button);
         notificationRecyclerView = findViewById(R.id.notification_activity_recycler_view);
-    }    private void setupRecyclerView() {
+    }
+
+    private void setupRecyclerView() {
         // Initialize the list and adapter
         notificationItems = new ArrayList<>();
         notificationAdapter = new NotificationAdapter(this, notificationItems);
@@ -170,10 +178,14 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         // Remove any padding from RecyclerView
         notificationRecyclerView.setPadding(0, 0, 0, 0);
         notificationRecyclerView.setClipToPadding(false);
-    }    public void goBack(View view) {
+    }
+
+    public void goBack(View view) {
         finish();
-    }    private void handleNotificationClick(NotificationRecyclerViewItem item, int position) {
-                                                                                                                                                                                                                                              // Handle navigation based on notification type
+    }
+
+    private void handleNotificationClick(NotificationRecyclerViewItem item, int position) {
+        // Handle navigation based on notification type
         String title = item.getNameOfUser();
         String message = item.getCaption();
         
@@ -211,7 +223,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
             Log.e(TAG, "Error handling notification click", e);
             Toast.makeText(this, "Error opening notification", Toast.LENGTH_SHORT).show();
         }
-    }    private void handleNotificationDelete(NotificationRecyclerViewItem item, int position) {
+    }
+
+    private void handleNotificationDelete(NotificationRecyclerViewItem item, int position) {
         try {
             // Track the deleted notification to prevent re-adding
             // Use nameOfUser to properly identify notification source instead of message content
@@ -273,7 +287,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("notification_count", notificationItems.size());
         editor.apply();
-    }    private void startPolling() {
+    }
+
+    private void startPolling() {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -319,14 +335,17 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 Log.d(TAG, "Next poll in " + pollingInterval + "ms (foreground: " + isAppInForeground + ")");
             }
         }, POLLING_INTERVAL);
-    }@Override
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacksAndMessages(null); // Stop all scheduled tasks
         // Save tracked statuses when activity is destroyed
         statusTracker.saveTrackedStatuses(this);
         incidentStatusTracker.saveTrackedStatuses(this);
-        // Save notifications and deleted IDs        saveNotifications();
+        // Save notifications and deleted IDs
+        saveNotifications();
         saveDeletedNotificationIds();
     }
 
@@ -407,13 +426,16 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         } catch (Exception e) {
             Log.e(TAG, "Error loading notifications: " + e.getMessage());
         }
-    }    private void fetchNewAnnouncements() {
+    }
+
+    private void fetchNewAnnouncements() {
         Call<List<AnnouncementResponse>> call = apiService.getAnnouncements();
         call.enqueue(new Callback<List<AnnouncementResponse>>() {
             @Override
             public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<AnnouncementResponse> announcements = response.body();                    for (AnnouncementResponse announcement : announcements) {
+                    List<AnnouncementResponse> announcements = response.body();
+                    for (AnnouncementResponse announcement : announcements) {
                         String announcementTitle = announcement.getAnnouncementTitle();
                         String createdAt = announcement.getCreatedAt();
                         
@@ -454,8 +476,13 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                             notificationItems.add(0, newNotification); // Add new to top
                             notificationAdapter.notifyItemInserted(0); // Notify adapter
                             saveNotifications(); // Save after adding
-                            String notificationContentId = "announcement_" + announcement.getId(); // Assuming AnnouncementResponse has getId()
-                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), notificationContentId);
+                            String notificationContentId = "announcement_" + announcement.getId();
+                            
+                            Intent intent = new Intent(NotificationActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(NotificationActivity.this, notificationContentId.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                            
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), notificationContentId, pendingIntent);
                         }
                     }
                 }
@@ -466,13 +493,16 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 Log.e(TAG, "Error fetching announcements: " + t.getMessage());
             }
         });
-    }    private void fetchAnnouncements() {
+    }
+
+    private void fetchAnnouncements() {
         Call<List<AnnouncementResponse>> call = apiService.getAnnouncements();
         call.enqueue(new Callback<List<AnnouncementResponse>>() {
             @Override
             public void onResponse(Call<List<AnnouncementResponse>> call, Response<List<AnnouncementResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<AnnouncementResponse> announcements = response.body();                    for (AnnouncementResponse announcement : announcements) {
+                    List<AnnouncementResponse> announcements = response.body();
+                    for (AnnouncementResponse announcement : announcements) {
                         String announcementTitle = announcement.getAnnouncementTitle();
                         String createdAt = announcement.getCreatedAt();
                         
@@ -510,8 +540,13 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                         // Only add if not already in the list
                         if (!isDuplicate) {
                             notificationItems.add(newNotification);
-                            String notificationContentId = "announcement_" + announcement.getId(); // Assuming AnnouncementResponse has getId()
-                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), notificationContentId);
+                            String notificationContentId = "announcement_" + announcement.getId();
+
+                            Intent intent = new Intent(NotificationActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(NotificationActivity.this, notificationContentId.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), notificationContentId, pendingIntent);
                         }
                     }
                     notificationAdapter.notifyDataSetChanged();
@@ -592,7 +627,9 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 Log.e(TAG, "Error fetching document requests: " + t.getMessage());
             }
         });
-    }    // Add a notification for document status change
+    }
+
+    // Add a notification for document status change
     private void addDocumentStatusNotification(DocumentRequest request) {
         String status = request.getStatus().toUpperCase();
         String notificationMessage = "";
@@ -637,7 +674,12 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         // Save notifications after adding new one
         saveNotifications();
         String docNotificationContentId = "doc_" + request.getId() + "_" + request.getStatus().toUpperCase();
-        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), docNotificationContentId);
+        
+        Intent docIntent = new Intent(NotificationActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+        docIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent docPendingIntent = PendingIntent.getActivity(NotificationActivity.this, docNotificationContentId.hashCode(), docIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        
+        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), docNotificationContentId, docPendingIntent);
         
         // Show toast for immediate feedback
         Toast.makeText(this, "Document status updated: " + status, Toast.LENGTH_SHORT).show();
@@ -707,8 +749,13 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                         if (!isDuplicate) {
                             notificationItems.add(0, newNotification); // Add to the top
                             addedAnnouncements = true;
-                            String announcementContentId = "announcement_" + announcement.getId(); // Assuming AnnouncementResponse has getId()
-                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), announcementContentId);
+                            String announcementContentId = "announcement_" + announcement.getId();
+
+                            Intent intent = new Intent(NotificationActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(NotificationActivity.this, announcementContentId.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                            showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), announcementContentId, pendingIntent);
                         }
                     }
 
@@ -1212,7 +1259,12 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         // Save notifications after adding new one
         saveNotifications();
         String incidentContentId = "incident_" + report.getId() + "_" + report.getStatus().toLowerCase();
-        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), incidentContentId);
+        
+        Intent incidentIntent = new Intent(NotificationActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+        incidentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent incidentPendingIntent = PendingIntent.getActivity(NotificationActivity.this, incidentContentId.hashCode(), incidentIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        
+        showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), incidentContentId, incidentPendingIntent);
         
         // Update status tracker
         incidentStatusTracker.updateIncidentStatus(report.getId(), status);
@@ -1274,8 +1326,6 @@ public class NotificationActivity extends AppCompatActivity {    private static 
             return null;
         }
     }
-
-
 
     /**
      * Fetch notifications from the database (the primary source of notifications)
@@ -1340,7 +1390,12 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                                 notificationItems.add(0, newNotification);
                                 Log.d(TAG, "Added database notification: " + title + " - " + message);
                                 String dbNotificationContentId = "db_notif_" + dbNotification.getId(); // Assuming NotificationResponse has getId()
-                                showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), dbNotificationContentId);
+                                
+                                Intent dbIntent = new Intent(NotificationActivity.this, NotificationActivity.class); // Always go to NotificationActivity
+                                dbIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                PendingIntent dbPendingIntent = PendingIntent.getActivity(NotificationActivity.this, dbNotificationContentId.hashCode(), dbIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                
+                                showSystemNotification(newNotification.getNameOfUser(), newNotification.getCaption(), dbNotificationContentId, dbPendingIntent);
                             }
                         }
                         
@@ -1363,7 +1418,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
         });
     }
 
-    private void showSystemNotification(String title, String message, String notificationContentId) {
+    private void showSystemNotification(String title, String message, String notificationContentId, PendingIntent pendingIntent) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Set<String> shownNotificationIds = prefs.getStringSet(PREF_KEY_SHOWN_SYSTEM_NOTIFICATION_IDS, new HashSet<>());
 
@@ -1384,6 +1439,7 @@ public class NotificationActivity extends AppCompatActivity {    private static 
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent) // Set the PendingIntent
                 .setAutoCancel(true);
 
         notificationManager.notify(NOTIFICATION_ID, builder.build());
