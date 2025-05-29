@@ -63,7 +63,9 @@ public class FAQQuestion {
         questions.add(new FAQQuestion(7, "How do I update my information?", 
             "To update your personal information, go to your Profile section which is the icon button on the top right, " +
             "After making changes, press the 'Save Changes' button."));
-            
+
+        questions.add(new FAQQuestion(8, "Where is the Barangay Post Proper Southside Located?", 
+            "The Barangay Post Proper Southside is located at Barangay 31 Post Proper Southside Lawton Ave, Taguig City, Metro Manila."));
         return questions;
     }
 }
